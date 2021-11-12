@@ -1,8 +1,8 @@
 #ifndef WINDOWS_H
 #define WINDOWS_H
 
-#include "common.h"
-#include "Windows/zoom.h"
+#include "../common/common.h"
+#include "windows/zoom.h"
 
 //C functions
 extern	WINDOW 	*searchBox,		*searchWindow,

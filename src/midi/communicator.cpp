@@ -1,9 +1,9 @@
-#include "common.h"
+#include "../common/common.h"
 #include <string.h>
 #include <time.h>
 
 #include "keyboards.h"
-#include "databases.h"
+#include "../data/databases.h"
 
 extern void play_media_seq(char *title, char *type);
 

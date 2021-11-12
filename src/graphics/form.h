@@ -2,8 +2,8 @@
 #define FORM_H
 
 #include "fields.h"
-#include "common.h"
-#include "databases.h"
+#include "../common/common.h"
+#include "../data/databases.h"
 
 // Encuadre
 #define TITLE		0

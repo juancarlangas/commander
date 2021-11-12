@@ -1,8 +1,8 @@
 #include <ncurses.h>
 #include <ctype.h>
-#include "common.h"
+#include "../common/common.h"
 #include "colors.h"
-#include "databases.h"
+#include "../data/databases.h"
 
 extern const char *get_digit(char, short int);
 

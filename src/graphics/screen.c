@@ -1,6 +1,6 @@
-#include "math.h"
-#include "common.h"
-#include "databases.h"
+#include "../common/math.h"
+#include "../common/common.h"
+#include "../data/databases.h"
 
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;

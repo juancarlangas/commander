@@ -1,7 +1,7 @@
 #include "fields.h"
-#include "common.h"
-#include "colors.h"
-#include "string.h"
+#include "../common/common.h"
+#include "../graphics/colors.h"
+#include "../common/string.h"
 
 void Field::create(	const char* legend,
 					const int high, const int width, const int y, const int x,

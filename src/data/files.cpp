@@ -1,5 +1,5 @@
 
-#include "common.h"
+#include "../common/common.h"
 #include "string.h"
 #include "databases.h"
 

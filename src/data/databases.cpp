@@ -8,7 +8,7 @@
 
 #include "databases.h"
 #include "form.h"
-#include "string.h"
+#include "../common/string.h"
 
 Database::Database()
 {

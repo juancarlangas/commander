@@ -1,8 +1,8 @@
 #include <ncurses.h>
-#include "common.h"
+#include "../common/common.h"
 #include "colors.h"
-#include "Windows/zoom.h"
-#include "Windows/bannerBox.h"
+#include "windows/zoom.h"
+#include "windows/bannerBox.h"
 
 #include <stdlib.h>
 
