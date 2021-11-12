@@ -6,16 +6,16 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "midi/keyboards.h"
+#include "midi/keyboards.hpp"
 
-#include "data/databases.h"
-#include "graphics/form.h"
-#include "graphics/channelForm.h"
-#include "common/common.h"
-#include "commander.h"
-#include "common/string.h"
-#include "graphics/windows.h"
-#include "graphics/windows/zoom.h"
+#include "data/databases.hpp"
+#include "graphics/form.hpp"
+#include "graphics/channelForm.hpp"
+#include "common/common.hpp"
+#include "commander.hpp"
+#include "common/string.hpp"
+#include "graphics/windows.hpp"
+#include "graphics/windows/zoom.hpp"
 
 enum matroska get_command(int, short int, short int, Variation, char [], short int, int dIndex);
 

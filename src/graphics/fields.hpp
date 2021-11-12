@@ -1,7 +1,7 @@
 #ifndef FIELDS_H
 #define FIELDS_H
 
-#include "../common/common.h"
+#include "../common/common.hpp"
 
 enum Type {STRING, BANK, VALUE};
 

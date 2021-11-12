@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
-#include "channelForm.h"
-#include "colors.h"
+#include "channelForm.hpp"
+#include "colors.hpp"
 
 extern short int x, y;
 

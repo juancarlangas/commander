@@ -1,7 +1,7 @@
 
-#include "../common/common.h"
-#include "string.h"
-#include "databases.h"
+#include "../common/common.hpp"
+#include "../common/string.hpp"
+#include "databases.hpp"
 
 #include <stdlib.h>
 

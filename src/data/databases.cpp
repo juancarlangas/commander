@@ -6,9 +6,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "databases.h"
+#include "databases.hpp"
 #include "form.h"
-#include "../common/string.h"
+#include "../common/string.hpp"
 
 Database::Database()
 {

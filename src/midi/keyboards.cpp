@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "keyboards.h"
-#include "ncurses.h"
+#include "keyboards.hpp"
+#include <ncurses.h>
 
 // Initializing
 Keyboard::Keyboard() {

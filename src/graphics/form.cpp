@@ -1,9 +1,9 @@
 #include <stdlib.h>
 
-#include "form.h"
+#include "form.hpp"
 
-#include "../common/common.h"
-#include "colors.h"
+#include "../common/common.hpp"
+#include "colors.hpp"
 
 Form::Form()
 {

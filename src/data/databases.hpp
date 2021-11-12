@@ -1,7 +1,7 @@
 #ifndef DATABASES_H
 #define DATABASES_H
 
-#include "../common/common.h"
+#include "../common/common.hpp"
 
 #define ROWS 1000
 

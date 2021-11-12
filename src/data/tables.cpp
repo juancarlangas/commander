@@ -1,9 +1,9 @@
 #include <string.h>
-#include "../common/common.h"
+#include "../common/common.hpp"
 #include <stdlib.h>
 #include <string.h>
-#include "../common/string.h"
-#include "databases.h"
+#include "../common/string.hpp"
+#include "databases.hpp"
 
 short int compare(const char stringSystem[], const char stringUser[]);
 
