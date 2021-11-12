@@ -15,7 +15,7 @@ all:
 		src/midi/keyboards.cpp \
 		src/midi/audio.cpp \
 		src/midi/communicator.cpp \
-		src/commander.cpp \
+		src/main.cpp \
 	-o bin/commander \
 		-std=c++98 -lpanel -lncurses -lasound;
 

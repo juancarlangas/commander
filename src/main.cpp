@@ -12,8 +12,8 @@
 #include "graphics/form.hpp"
 #include "graphics/channelForm.hpp"
 #include "common/common.hpp"
-#include "commander.hpp"
 #include "common/string.hpp"
+#include "main.hpp"
 #include "graphics/windows.hpp"
 #include "graphics/windows/zoom.hpp"
 
