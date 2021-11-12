@@ -180,6 +180,19 @@ int main()
 						master.select_part(1);
 				break;
 
+			////////////////////////// MOVING ARRAY ////////////////////////////
+			/* Esta es una adaptación provisional de la futura (Dios Mediante) función
+			 * para tener 16 arrays por patch. Por ahora nos conformaremos con usar
+			 * las flechas para simular dos arrays por patch. */
+
+			case PREV_ARRAY:
+				master.select_part( 1 );
+				break;
+
+			case NEXT_ARRAY:
+				master.select_part( 2 );
+				break;
+
 			/////////////////////////// INTRO ///////////////////////////
 			case INTRO:
 				switch (winMode) {
@@ -696,13 +709,13 @@ enum matroska get_command(	const int digit,
 			comando = CHANGE_WINDOW;
 			break;
 
+		// Flechas
 		case KEY_UP: case KEY_DOWN:
 			comando = MOVE_INDEX;
 			break;
 
-		case KEY_LEFT: case KEY_RIGHT:
-			comando = SELECT_PART;
-			break;
+		case KEY_LEFT:	comando = PREV_ARRAY; break;
+		case KEY_RIGHT:	comando = NEXT_ARRAY; break;
 
 		case 566: case 525:
 			if (digit == 566)
