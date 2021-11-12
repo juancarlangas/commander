@@ -16,6 +16,6 @@ all:
 		audio.c \
 		communicator.cpp \
 		commander.cpp \
-	-o /usr/local/bin/commander \
+	-o bin/commander \
 		-std=c++98 -lpanel -lncurses -lasound;
 
