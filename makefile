@@ -17,5 +17,5 @@ all:
 		src/midi/communicator.cpp \
 		src/main.cpp \
 	-o bin/commander \
-		-std=c++98 -lpanel -lncurses -lasound;
+		-std=gnu++20 -lpanel -lncurses -lasound;
 

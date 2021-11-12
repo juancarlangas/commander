@@ -12,7 +12,7 @@
 
 Database::Database()
 {
-	register int i, k;
+	int32_t i, k;
 
 	for (i = 0; i <= ROWS - 1; i++)
 		clean_row(i);
@@ -56,7 +56,7 @@ void Database::load(const char *directory, const char *filename)
 
 	FILE *cFile = fopen(path, "r");
 
-	register int i;
+	int32_t i;
 	int k;
 	char c, quote, rawstring[LONG_STRING];
 
@@ -223,7 +223,7 @@ void Database::exportate(const char *filename)
 
 	cFile = fopen(path, "w");
 
-	register int i;
+	int32_t i;
 	int k;
 	char c, quote, rawstring[LONG_STRING];
 
@@ -276,8 +276,8 @@ void Database::delete_value(int line)
 ////////////////////////// ordenate /////////////////////////////7
 void Database::ordenate()
 {
-	register int a, b;
-	register short k;
+	int32_t a, b;
+	int32_t k;
 	bool success;
 	System aux;
 

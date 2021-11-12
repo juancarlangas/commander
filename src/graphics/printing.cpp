@@ -17,7 +17,7 @@ void print_displayTable(	WINDOW *window,
 							const int index,
 							short int winMode)
 {
-	register int i;
+	int32_t i;
 	short int row = 0;
 
 	wclear(window);
@@ -65,7 +65,7 @@ void print_playlist(	WINDOW *window,
 						const int indexA, const int indexB,
 						const short int mode, short int winMode		)
 {
-	register int i;
+	int32_t i;
 	short int row = 1;
 
 	wclear(window);

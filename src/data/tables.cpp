@@ -13,7 +13,7 @@ void 	llenado_displayTable(	System *displayTable[], System dataBase[],
 								int *dRows)
 {
 	short int match;
-	register short int i, iDisplay, j, k;
+	short int i, iDisplay, j, k;
 	short int seekTop, seekBottom;
 
 	switch (string[0]) {
