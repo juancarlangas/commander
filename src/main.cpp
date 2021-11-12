@@ -8,7 +8,6 @@
 
 #include "midi/keyboards.hpp"
 
-#include "data/databases.hpp"
 #include "graphics/form.hpp"
 #include "graphics/channelForm.hpp"
 #include "common/common.hpp"
@@ -36,14 +35,14 @@ int main()
    	sprintf(directory, "%s/.commander", homedir);
 
    	//********************************* Databases ************************************//
-	Database dBase[2];	// C++ Object (1 for combs, 1 for seqs)
-	int nRows[2];
+	Database dBase[1];	// C++ Object (1 for combs, 1 for seqs)
 
-		nRows[COMBINATIONS] = dBase[COMBINATIONS].get_activeRows(directory, "Combinations");
-		dBase[0].load(directory, "Combinations");
+	int nRows[1];
+    const std::string config_directory{ directory };
 
-		nRows[SEQUENCES] 	= dBase[SEQUENCES].get_activeRows(directory, "Sequences");
-		dBase[1].load(directory, "Sequences");
+	nRows[COMBINATIONS] = Files::contar_lineas( config_directory + "/combinations.csv" );
+
+    dBase[COMBINATIONS].cargar( config_directory );
 
 	//************************************* tables ***********************************//
 	System *displayTable[1000], playlistTable[1000], *buffer;
@@ -570,12 +569,9 @@ int main()
 			///////////////////////// EXPORTATE /////////////////////
 			case EXPORTATE:
 
-				if (mode == COMBINATIONS)
-					dBase[COMBINATIONS].exportate("Combinations");
-				else
-					dBase[SEQUENCES].exportate("Sequences");
+				dBase[COMBINATIONS].escribir( config_directory + "/combinations.csv" );
 
-				sprintf(keyword, "");
+				*keyword = '\0';
 
 				llenado_displayTable(displayTable, dBase[mode].base,  nRows[mode],  keyword, &dRows);
 

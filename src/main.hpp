@@ -1,3 +1,6 @@
+#include "data/databases.hpp"
+#include "../../lib/utilities/src/files.hpp"
+
 extern	short int init_ncurses(void);
 extern	void draw_windows(void);
 

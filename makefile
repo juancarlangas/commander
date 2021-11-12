@@ -1,5 +1,6 @@
 all:
 	g++ \
+		../lib/utilities/src/files.cpp \
 		src/graphics/ncurses.cpp \
 		src/graphics/fields.cpp \
 		src/graphics/form.cpp \

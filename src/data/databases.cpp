@@ -1,3 +1,4 @@
+#include <bits/stdint-intn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,13 +7,19 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <string>
+#include <string_view>
+#include <iostream>
+#include <fstream>
+#include <iomanip> // zerofill
+
 #include "databases.hpp"
 #include "form.h"
 #include "../common/string.hpp"
 
-Database::Database()
+Database::Database() : activeRows( 0 )
 {
-	int32_t i, k;
+	int32_t i;
 
 	for (i = 0; i <= ROWS - 1; i++)
 		clean_row(i);
@@ -22,249 +29,218 @@ Database::Database()
 		homedir = getpwuid(getuid())->pw_dir;
 }
 
-///////////////////////// clean_row ///////////////////////
 void Database::clean_row(int line)
 {
-	sprintf(base[line].title, "");
-	sprintf(base[line].artist, "");
-	sprintf(base[line].genre, "");
-	sprintf(base[line].section, "");
-	sprintf(base[line].keywords, "");
-	sprintf(base[line].type, "");
+	*base[line].title = '\0';
+	*base[line].artist = '\0';
+	*base[line].genre = '\0';
+	*base[line].section = '\0';
+	*base[line].keywords = '\0';
+	*base[line].type = '\0';
 	base[line].bnk = 0;
 	base[line].num = 0;
 }
 
-/////////////////////// get_activeRows ////////////////////
-int Database::get_activeRows(const char* folder, const char* name)
+void Database::cargar( const std::string &_Path ) noexcept
 {
-	char path[100];
-	sprintf(path, "%s/%s.dat", folder, name);
+	std::ifstream archivo{ _Path + "/combinations.csv" };
+	std::ofstream log{ _Path + "/log.txt" };
+	
+	if ( archivo.fail() ) {
+		std::cerr << "No se pudo abrir " + _Path + "en BaseDeDatos::cargar()" << std::endl;
+		exit( EXIT_FAILURE );
+	}
 
-	FILE *cFile = fopen(path, "r");
-		fscanf(cFile, "%d", &activeRows);
-	fclose(cFile);
+	activeRows = 0;
+	std::string linea;
 
-	return activeRows;
-}
+	int32_t n_linea = 0;
+	while ( std::getline( archivo, linea ) or linea != "" ) {
+		++activeRows;
 
-/////////////////////////// load /////////////////////////
-void Database::load(const char *directory, const char *filename)
-{
-	char path[100];
-	sprintf(path, "%s/%s.csv", directory, filename);
-
-	FILE *cFile = fopen(path, "r");
-
-	int32_t i;
-	int k;
-	char c, quote, rawstring[LONG_STRING];
-
-	for (i = 0; i <= activeRows - 1; i++) {
-
-		//*************title***************
-		fscanf(cFile, "%c", &c);
-		if (c == '\"') {
-			quote = '\"';
-			k = 0;
+		// Titulo
+		if ( linea.starts_with( '\"' ) ) { // Incluye comas
+			linea = linea.substr( 1 ); // Quitamos "
+			catalogo[n_linea].titulo = linea.substr( 0, linea.find_first_of( '\"' ) );
+			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			quote = ',';
-			rawstring[0] = c;
-			k = 1;
+			catalogo[n_linea].titulo = linea.substr( 0, linea.find_first_of( ',' ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
-		while (k == 0 || (k > 0 && rawstring[k - 1] != quote)) {
-			fscanf(cFile, "%c", &c);
-			rawstring[k++] = c;
-		}
-		rawstring[k - 1] = '\0';
-		no_accent(base[i].title, rawstring);
-		if (quote == '\"')
-			fscanf(cFile, ",");
 
-		//**************artist***********************
-		fscanf(cFile, "%c", &c);
-		if (c == '\"') {
-			quote = '\"';
-			k = 0;
+		// Artista
+		if ( linea.starts_with( '\"' ) ) { // Incluye comas
+			linea = linea.substr( 1 ); // Quitamos "
+			catalogo[n_linea].artista = linea.substr( 0, linea.find_first_of( '\"' ) );
+			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			quote = ',';
-			rawstring[0] = c;
-			k = 1;
+			catalogo[n_linea].artista = linea.substr( 0, linea.find_first_of( ',' ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
-		while (k == 0 || (k > 0 && rawstring[k - 1] != quote)) {
-			fscanf(cFile, "%c", &c);
-			rawstring[k++] = c;
-		}
-		rawstring[k - 1] = '\0';
-		no_accent(base[i].artist, rawstring);
-		if (quote == '\"')
-			fscanf(cFile, ",");
 
-		//**************genre***********************
-		fscanf(cFile, "%c", &c);
-		if (c == '\"') {
-			quote = '\"';
-			k = 0;
+		// Genero
+		if ( linea.starts_with( '\"' ) ) { // Incluye comas
+			linea = linea.substr( 1 ); // Quitamos "
+			catalogo[n_linea].genero = linea.substr( 0, linea.find_first_of( '\"' ) );
+			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			quote = ',';
-			rawstring[0] = c;
-			k = 1;
+			catalogo[n_linea].genero = linea.substr( 0, linea.find_first_of( ',' ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
-		while (k == 0 || (k > 0 && rawstring[k - 1] != quote)) {
-			fscanf(cFile, "%c", &c);
-			rawstring[k++] = c;
-		}
-		rawstring[k - 1] = '\0';
-		no_accent(base[i].genre, rawstring);
-		if (quote == '\"')
-			fscanf(cFile, ",");
 
-		//**************section***********************
-		fscanf(cFile, "%c", &c);
-		if (c == '\"') {
-			quote = '\"';
-			k = 0;
+		// Mood
+		if ( linea.starts_with( '\"' ) ) { // Incluye comas
+			linea = linea.substr( 1 ); // Quitamos "
+			catalogo[n_linea].mood = linea.substr( 0, linea.find_first_of( '\"' ) );
+			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			quote = ',';
-			rawstring[0] = c;
-			k = 1;
+			catalogo[n_linea].mood = linea.substr( 0, linea.find_first_of( ',' ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
-		while (k == 0 || (k > 0 && rawstring[k - 1] != quote)) {
-			fscanf(cFile, "%c", &c);
-			rawstring[k++] = c;
-		}
-		rawstring[k - 1] = '\0';
-		no_accent(base[i].section, rawstring);
-		if (quote == '\"')
-			fscanf(cFile, ",");
 
-		//**************keywords***********************
-		fscanf(cFile, "%c", &c);
-		if (c == '\"') {
-			quote = '\"';
-			k = 0;
+		// Keywords
+		if ( linea.starts_with( '\"' ) ) { // Incluye comas
+			linea = linea.substr( 1 ); // Quitamos "
+			catalogo[n_linea].key_words = linea.substr( 0, linea.find_first_of( '\"' ) );
+			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			quote = ',';
-			rawstring[0] = c;
-			k = 1;
-		}
-		while (k == 0 || (k > 0 && rawstring[k - 1] != quote)) {
-			fscanf(cFile, "%c", &c);
-			rawstring[k++] = c;
-		}
-		rawstring[k - 1] = '\0';
-		no_accent(base[i].keywords, rawstring);
-		if (quote == '\"')
-			fscanf(cFile, ",");
-
-		//************** type ***********************
-		fscanf(cFile, "%c", &c);
-		if (c == '\"') {
-			quote = '\"';
-			k = 0;
-		}
-		else {
-			quote = ',';
-			rawstring[0] = c;
-			k = 1;
-		}
-		while (k == 0 || (k > 0 && rawstring[k - 1] != quote)) {
-			fscanf(cFile, "%c", &c);
-			rawstring[k++] = c;
-		}
-		rawstring[k - 1] = '\0';
-		no_accent(base[i].type, rawstring);
-		if (quote == '\"')
-			fscanf(cFile, ",");
-		
-		//****************bnk*******************
-		fscanf(cFile, "%c", &c);
-		if (c != ',') {
-			base[i].bnk = c;
-			fscanf(cFile, ",");
+			catalogo[n_linea].key_words = linea.substr( 0, linea.find_first_of( ',' ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
 
-		//************** num ***********************
-		fscanf(cFile, "%c", &c);
-		if (c != ',') {
-			rawstring[0] = c;
-			for (k = 1; k <= 2; k++) {
-				fscanf(cFile, "%c", &c);
-				rawstring[k] = c;
+		// Tipo
+		catalogo[n_linea].tipo = linea.substr( 0, linea.find_first_of( ',' ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+
+		// BNK
+		base[n_linea].bnk = linea.data()[0];
+		linea = linea.substr( 2 ); // garantiza que queda después de la 'coma'
+
+		// NUM
+		base[n_linea].num = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+
+		// n_arreglos
+		catalogo[n_linea].n_arreglos = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+		linea = linea.substr( 2 );
+
+		for ( int32_t i = 0; i < catalogo[n_linea].n_arreglos; ++i ) {
+			// Label
+			catalogo[n_linea].orquestacion[i].etiqueta =
+				linea.substr( 0, linea.find_first_of( ',' ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+			// data
+			for ( int32_t j = 0; j < 16; ++j ) {
+				catalogo[n_linea].orquestacion[i].canal[j] = linea.data()[0];
+				linea = linea.substr( 2 );
 			}
-			fscanf(cFile, ",");
+
 		}
-		rawstring[k] = '\0';
-		base[i].num = atoi(rawstring);
-
-		//******************************************
-		fscanf(cFile, "\n");
-	}
-
-	fclose(cFile);
-}
-
-///////////////////////////// exportate ////////////////////////
-void Database::exportate(const char *filename)
-{
-	char path[100];
-	sprintf(path, "%s/.commander/%s.dat", homedir, filename);
-
-	FILE *cFile = fopen(path, "w");
-		fprintf(cFile, "%d", activeRows);
-	fclose(cFile);
-
-	sprintf(path, "%s/.commander/%s.csv", homedir, filename);
-
-	cFile = fopen(path, "w");
-
-	int32_t i;
-	int k;
-	char c, quote, rawstring[LONG_STRING];
-
-	for (i = 0; i <= activeRows - 1; i++) {
-
-		//*************title************
-		if (strstr(base[i].title, ","))
-			fprintf(cFile, "\"%s\",", base[i].title);
-		else
-			fprintf(cFile, "%s,", base[i].title);
-
-		if (strstr(base[i].artist, ","))
-			fprintf(cFile, "\"%s\",", base[i].artist);
-		else
-			fprintf(cFile, "%s,", base[i].artist);
-
-		fprintf(cFile, "%s,", base[i].genre);
-		fprintf(cFile, "%s,", base[i].section);
-		fprintf(cFile, "%s,", base[i].keywords);
-		fprintf(cFile, "%s,", base[i].type);
-		fprintf(cFile, "%c,", base[i].bnk);
-		fprintf(cFile, "%03d\n", base[i].num);
-	}
-	fclose(cFile);
 		
+		// arreglo inicial
+		catalogo[n_linea].arreglo_inicial = std::stoi( linea );
+
+		++n_linea;
+	}
+
+	log.close();
+	archivo.close();
+
+	// Cloning
+	for ( int32_t i = 0; i < activeRows; ++i ) {
+		strcpy( base[i].title,		catalogo[i].titulo.c_str() );
+		strcpy( base[i].artist,		catalogo[i].artista.c_str() );
+		strcpy( base[i].genre,		catalogo[i].genero.c_str() );
+		strcpy( base[i].section,	catalogo[i].mood.c_str() );
+		strcpy( base[i].keywords,	catalogo[i].key_words.c_str() );
+		strcpy( base[i].type,		catalogo[i].tipo.c_str() );
+		base[i].bnk = base[i].bnk;
+		base[i].num = base[i].num;
+	}
 }
 
+void Database::escribir( const std::string &_Path ) noexcept
+{
+	std::ofstream archivo{ _Path };
 
-///////////////////////// add_value ////////////////////////
+	if ( archivo.fail() ) {
+		std::cerr << "No s pudo abrir " + _Path + "en BaseDeDatos::cargar()" << std::endl;
+		exit( EXIT_FAILURE );
+	}
+
+	for ( int32_t i = 0; i < activeRows; ++i ) {
+		// Compatibles
+		catalogo[i].titulo		= base[i].title;
+		catalogo[i].artista		= base[i].artist;
+		catalogo[i].genero		= base[i].genre;
+		catalogo[i].mood		= base[i].section;
+		catalogo[i].key_words 	= base[i].keywords;
+		catalogo[i].tipo 		= base[i].type;
+		catalogo[i].bnk 		= base[i].bnk;
+		catalogo[i].num 		= base[i].num;
+
+		// Extra
+		catalogo[i].n_arreglos = 2;
+
+		catalogo[i].orquestacion[0].etiqueta = "Piano";
+		for ( int32_t k = 0; k < 16; ++k )
+				catalogo[i].orquestacion[0].canal[k] = k < 12 ? Switch::ON : Switch::OFF;
+
+		catalogo[i].orquestacion[1].etiqueta = "Trompitas";
+		for ( int32_t k = 0; k < 16; ++k )
+				catalogo[i].orquestacion[1].canal[k] = k < 8 or 11 < k ? Switch::ON : Switch:: OFF;
+
+		catalogo[i].arreglo_inicial = 0;
+
+	}
+	std::string delimitador;
+
+	for ( int32_t i = 0; i < activeRows; ++i ) {
+		delimitador = catalogo[i].titulo.find( ',' ) < catalogo[i].titulo.npos ? "\"" : "";
+		archivo << delimitador << catalogo[i].titulo << delimitador << ',';
+
+		delimitador = catalogo[i].artista.find( ',' ) < catalogo[i].artista.npos ? "\"" : "";
+		archivo << delimitador << catalogo[i].artista << delimitador << ',';
+
+		delimitador = catalogo[i].genero.find( ',' ) < catalogo[i].genero.npos ? "\"" : "";
+		archivo << delimitador << catalogo[i].genero << delimitador << ',';
+
+		archivo << catalogo[i].mood << ",";
+
+		delimitador = catalogo[i].key_words.find( ',' ) < catalogo[i].key_words.npos ? "\"" : "";
+		archivo << delimitador << base[i].keywords << delimitador << ",";
+
+		archivo	<< catalogo[i].tipo	<< ","
+				<< base[i].bnk	<< ","
+				<< std::setw( 3 ) << std::setfill( '0' ) << base[i].num	<< ","
+
+				<< catalogo[i].n_arreglos << ",";
+		for ( int32_t j = 0; j < catalogo[i].n_arreglos; ++j ) {
+				archivo << catalogo[i].orquestacion[j].etiqueta << ",";
+				for ( int32_t k = 0; k < 16; ++k )
+						archivo << catalogo[i].orquestacion[j].canal[k] << ",";
+		}
+		archivo << catalogo[i].arreglo_inicial << '\n';
+	}
+
+	archivo.close();
+}
+
 void Database::add_value(System row)
 {
 	base[activeRows++] = row;
 }
 
-/////////////////////// edit_value //////////////////////////////7
 void Database::edit_value(int line, System row)
 {
 	base[line] = row;
 }
 
-//////////////////////// delete_value ////////////////////////
 void Database::delete_value(int line)
 {
 	for (int i = line; i < activeRows - 1; i++)
@@ -273,7 +249,6 @@ void Database::delete_value(int line)
 	clean_row(activeRows--);
 }
 
-////////////////////////// ordenate /////////////////////////////7
 void Database::ordenate()
 {
 	int32_t a, b;
