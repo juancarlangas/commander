@@ -24,7 +24,6 @@ short displayShowResults, playlistShowResults;
 
 //Display display(y * 44 / 200, x * 141 / 200, y * 26 / 200, x * 0 / 200);
 
-/******************************************************* init_ncurses *************************************************/
 short int init_ncurses(void)
 
 {
@@ -60,25 +59,23 @@ short int init_ncurses(void)
 	
 	refresh();
 
-	
-	searchBox 		= newwin(6, 				x * 140 / 200,     	y * 84 / 100,     	x * 0 / 200	 	);
-	searchWindow 	= newwin(4, 				x * 140 / 200 - 2, 	y * 84 / 100 + 1, 	x * 0 / 200 + 1	);
+	searchBox 		= newwin(5, 				x * 140 / 200,     	y * 84 / 100,     	x * 0 / 200	 	);
+	searchWindow 	= newwin(3, 				x * 140 / 200 - 2, 	y * 84 / 100 + 1, 	x * 0 / 200 + 1	);
 
 	computerBox		= newwin(1,					x * 60 / 200,     	y * 8 / 100,     	x * 150 / 200	);
 	computerWindow 	= newwin(1,					x * 60 / 200 - 2, 	y * 8 / 100, 		x * 150 / 200 + 1);
 
-	//lcdBox 			= newwin(6,	    			x * 98 / 200,     	0,					x * 50 / 200	);
-	lcdWindow 		= newwin(4, 				x * 98 / 200 - 2, 	0,  				x * 50 / 200 + 1);
+	// lcdBox		= newwin(y * 38 / 200,	 	x * 98 / 200,     	y * 36 / 200,		x * 102 / 200	);
+	lcdWindow 		= newwin(y * 38 / 200 - 2, 	x * 98 / 200 - 2, 	y * 38 / 200 + 1,	x * 102 / 200 + 1);
 	
+	playlistBox		= newwin(y * 70 / 100, 		x * 60 / 200, 		y * 34 / 100,	   	x * 141 / 200  	);
+	playlistWindow 	= newwin(y * 70 / 100 - 3, 	x * 60 / 200 - 2, 	y * 34 / 100 + 2, 	x * 141 / 200 + 1);
 	
-	playlistBox		= newwin(y * 70 / 100, 		x * 60 / 200, 		y * 32 / 100,	   	x * 70 / 100  	);
-	playlistWindow 	= newwin(y * 70 / 100 - 3, 	x * 60 / 200 - 2, 	y * 32 / 100 + 2, 	x * 70 / 100 + 1);
-	
-	displayBox 		= newwin(y * 54 / 100,		x * 141 / 200,     	y * 32 / 100,     	x * 0 / 100	 	);
-	displayWindow 	= newwin(y * 54 / 100 - 3,	x * 141 / 200 - 2, 	y * 32 / 100 + 2, 	x * 0 / 100 + 1	);
+	displayBox 		= newwin(y * 54 / 100,		x * 143 / 200,     	y * 34 / 100,     	x * 0 / 100	 	);
+	displayWindow 	= newwin(y * 54 / 100 - 3,	x * 143 / 200 - 2, 	y * 34 / 100 + 2, 	x * 0 / 100 + 1	);
 
-	zoomBox 		= newwin(y * 36 / 200, 		x * 120 / 200, 		y * 36 / 200, 		x * 80 / 200		);		
-	zoomWindow 		= newwin(y * 36 / 200 - 2, 	x * 120 / 200 - 2, 	y * 36 / 200 + 1, 	x * 80 / 200 + 1	);		
+	zoomBox 		= newwin(y * 40 / 200, 		x * 98 / 200, 		y * 36 / 200, 		x * 0 / 200		);		
+	zoomWindow 		= newwin(y * 40 / 200 - 2, 	x * 98 / 200 - 2, 	y * 36 / 200 + 1, 	x * 0 / 200 + 1	);		
 	
 	ventana[DIALOG_WINDOW]	= newwin(3,			x * 40 / 100,		y * 40 / 100,		x * 30 / 100	);
 	ventana[INPUT_BOX]		= newwin(1,			x * 40 / 100 - 2,	y * 40 / 100 + 1,	x * 30 / 100 + 1);
@@ -88,6 +85,7 @@ short int init_ncurses(void)
 	
 	hide_panel(panel[DIALOG_WINDOW]);
 	hide_panel(panel[INPUT_BOX]);
+
 	
 	update_panels();
 	doupdate();
@@ -95,7 +93,6 @@ short int init_ncurses(void)
 	return y;
 }
 
-/********************************* draw_windows ************************/
 void draw_windows(void)
 {
 	/* lcdBox */
@@ -109,12 +106,6 @@ void draw_windows(void)
 		wattron(computerBox, A_BOLD);
 		wborder(computerBox, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
 		wrefresh(computerBox);
-
-	/* zoomBox*/
-		wattron(zoomBox, COLOR_PAIR(GRAY_DEFAULT));
-		wattron(zoomBox, A_BOLD);
-		wborder(zoomBox, 0, 0, 0, 0, ACS_ULCORNER, ACS_URCORNER, ACS_BTEE, ACS_RTEE);
-		wrefresh(zoomBox);
 
 	/* playlistBox */
 		wattron(playlistBox, COLOR_PAIR(GRAY_DEFAULT));
@@ -136,7 +127,7 @@ void draw_windows(void)
 	/* zoomBox*/
 		wattron(zoomBox, COLOR_PAIR(GRAY_DEFAULT));
 		wattron(zoomBox, A_BOLD);
-		wborder(zoomBox, 0, 0, 0, 0, ACS_ULCORNER, ACS_URCORNER, ACS_BTEE, ACS_RTEE);
+		wborder(zoomBox, 0, 0, 0, 0, ACS_ULCORNER, ACS_URCORNER, ACS_LTEE, ACS_BTEE);
 		wrefresh(zoomBox);
 
 	//bannerBox.draw(PLAYLISTBOX);
@@ -154,8 +145,6 @@ void draw_windows(void)
 		wattron(ventana[DIALOG_WINDOW], A_BOLD);
 		wborder(ventana[DIALOG_WINDOW], 0, 0, 0, 0, ACS_ULCORNER, ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER);
 		mvwprintw(ventana[DIALOG_WINDOW], 0, 5, " Load / Save ");
-
-	
 
 	/* DIALOG_WINDOW */
 		wattron(ventana[INPUT_BOX], COLOR_PAIR(GRAY_DEFAULT));
