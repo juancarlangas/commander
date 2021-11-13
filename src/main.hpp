@@ -23,3 +23,6 @@
 
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
+
+enum matroska get_command(int, short int, short int, Variation, char [], short int, int dIndex);
+

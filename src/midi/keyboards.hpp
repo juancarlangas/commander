@@ -1,19 +1,18 @@
 #ifndef KEYBOARDS_H
 #define KEYBOARDS_H
 
-#define COMBI 1
-#define MULTI 2
-
 #define PLAY 	0
 #define TIMBRE 	1
 
-
 #include <alsa/asoundlib.h>
+
+enum Page { COMBI, GLOBAL, MULTI };
 
 class Keyboard {
 public:
 	Keyboard();
 	void select_part(const short);
+	void select_page( const enum Page );
 	short part;
 	short midiChannel;
 	void set_name(const char *);

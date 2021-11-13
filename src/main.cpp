@@ -1,7 +1,5 @@
 #include "main.hpp"
 
-enum matroska get_command(int, short int, short int, Variation, char [], short int, int dIndex);
-
 int main()
 {
 	//ncurses
