@@ -1,11 +1,9 @@
+#include "communicator.hpp"
 #include "../common/common.hpp"
+#include "audio.hpp"
+
 #include <string.h>
 #include <time.h>
-
-#include "keyboards.hpp"
-#include "../data/databases.hpp"
-
-extern void play_media_seq(char *title, char *type);
 
 void communicator(Keyboard& device, System *row, Variation var, short channel)
 {

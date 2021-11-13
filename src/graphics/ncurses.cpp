@@ -25,7 +25,6 @@ short displayShowResults, playlistShowResults;
 //Display display(y * 44 / 200, x * 141 / 200, y * 26 / 200, x * 0 / 200);
 
 short int init_ncurses(void)
-
 {
 	initscr();
 	raw();
@@ -155,7 +154,6 @@ void draw_windows(void)
 	return;
 }
 
-/*********************** tint_lcd ****************************************/
 void tint_lcd(const short int mode)
 {
 	switch(mode) {

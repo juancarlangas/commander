@@ -33,6 +33,4 @@ void print_mode(WINDOW *window, const short int mode );
 
 void print_zoom(WINDOW *window, System *linea);
 
-
 #endif
-

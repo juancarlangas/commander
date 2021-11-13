@@ -4,8 +4,8 @@
 #include "keyboards.hpp"
 #include <ncurses.h>
 
-// Initializing
-Keyboard::Keyboard() {
+Keyboard::Keyboard()
+{
 	sprintf(name, "");
 	activeMode = false;
 	passiveMode = false;
@@ -85,13 +85,11 @@ void Keyboard::select_part(const short value)
 	device = NULL;
 }
 
-/////////////////// Setting name based on sprintf() //////////////////////////////
 void Keyboard::set_name(const char *id)
 {
 	sprintf(name, id);
 }
 
-////////////////////// set_modality //////////////////////////////////////////////
 void Keyboard::set_modality(short toMode)
 {
 	snd_rawmidi_t *device = NULL;
@@ -109,7 +107,6 @@ void Keyboard::set_modality(short toMode)
 	device = NULL;
 }
 
-///////////////////// Setting program (COMBI) ///////////////////////////////
 void Keyboard::set_program(const char bnk, const short num)
 {
 	snd_rawmidi_t *device = NULL;
@@ -130,7 +127,6 @@ void Keyboard::set_program(const char bnk, const short num)
 	part = 1;
 }
 
-//////////////////// set_song /////////////////////////////////////////////////
 void Keyboard::set_song(const char song)
 {
 	snd_rawmidi_t *device = NULL;

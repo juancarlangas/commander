@@ -1,21 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <pwd.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#include "midi/keyboards.hpp"
-
-#include "graphics/printing.hpp"
-#include "graphics/form.hpp"
-#include "graphics/channelForm.hpp"
-#include "common/common.hpp"
-#include "common/string.hpp"
 #include "main.hpp"
-#include "graphics/windows.hpp"
-#include "graphics/windows/zoom.hpp"
 
 enum matroska get_command(int, short int, short int, Variation, char [], short int, int dIndex);
 

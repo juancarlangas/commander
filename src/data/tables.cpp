@@ -1,16 +1,13 @@
+#include "tables.hpp"
 #include <string.h>
 #include "../common/common.hpp"
 #include <stdlib.h>
 #include <string.h>
 #include "../common/string.hpp"
-#include "databases.hpp"
 
-short int compare(const char stringSystem[], const char stringUser[]);
-
-/*/////////////////////////////////////// llenado_displayTable ////////////////////////////////////////*/
-void 	llenado_displayTable(	System *displayTable[], System dataBase[], 
-								const int dbRows, const char string[],
-								int *dRows)
+void llenado_displayTable(	System *displayTable[], System dataBase[], 
+							const int dbRows, const char string[],
+							int *dRows)
 {
 	short int match;
 	short int i, iDisplay, j, k;
@@ -50,7 +47,6 @@ void 	llenado_displayTable(	System *displayTable[], System dataBase[],
 	return;
 }
 
-/************************************** llenado_favourite ***************************************/
 void llenado_favourite(int fav[], System base[], const int baseRows)
 {
 	int i, count = 1;
@@ -62,7 +58,6 @@ void llenado_favourite(int fav[], System base[], const int baseRows)
 	return;
 }
 
-/****************************************** compare **************************************************/
 short int compare(const char stringSystem[], const char stringUser[])
 {
 	char wordSystem[LONG_STRING], wordUser[LONG_STRING];

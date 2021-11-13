@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <ncurses.h>
 
-/*********************************** snd_audio_seq ***********************************/
 void play_media_seq(char *song, char *type)
 {
 	char command[150] = "";

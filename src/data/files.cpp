@@ -1,7 +1,6 @@
-
+#include "files.hpp"
 #include "../common/common.hpp"
 #include "../common/string.hpp"
-#include "databases.hpp"
 
 #include <stdlib.h>
 
@@ -10,11 +9,6 @@
 #include <unistd.h>
 #include <string.h>
 
-void destroy_database(System database[], const int);
-void load_database(System dataBase[], const int rows, FILE* cfPointer);
-
-
-/***************************** Load Playlist *************************************/
 int load_playlist(System plArray[], const char* file_name)
 {
 	FILE *cfPointer;
@@ -42,7 +36,6 @@ int load_playlist(System plArray[], const char* file_name)
 	return rows;
 }
 
-/***************************** Save Playlist *************************************/
 void save_playlist(System plArray[], const int plRows, const char* file_name)
 {
 	FILE *cfPointer;

@@ -5,7 +5,6 @@
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
 
-/************************************** decrease_index *********************************************/
 void decrease_index(	int *top, const int resultRows, int *index, 
 						const short int winMode	)
 {
@@ -17,7 +16,6 @@ void decrease_index(	int *top, const int resultRows, int *index,
 	}
 }
 
-/************************************* switch_display_index *********************************************/
 void increase_index(	int *top, const int resultRows, int *index, 
 						const short int winMode	)
 {
@@ -38,7 +36,6 @@ void increase_index(	int *top, const int resultRows, int *index,
 	return;
 }
 
-/*/////////////////////////////// korg_drag /////////////////////////////////////*/
 void korg_drag(	System table[],
 				const int rows, const int indexUP, const int indexDOWN,
 				const int caracter									)
