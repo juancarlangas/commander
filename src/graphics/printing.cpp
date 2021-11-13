@@ -1,3 +1,4 @@
+#include "printing.hpp"
 #include <ncurses.h>
 #include <ctype.h>
 #include "../common/common.hpp"
@@ -10,7 +11,6 @@ extern WINDOW *debugWindow;
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
 
-/*********************************** print_displayTable **********************************************/
 void print_displayTable(	WINDOW *window,
 							System *displayTable[],
 							const unsigned int top, const short resultRows, 
@@ -58,7 +58,6 @@ void print_displayTable(	WINDOW *window,
 	return;
 }
 
-/*************************************** print_playlist **********************************************/
 void print_playlist(	WINDOW *window,
 						System playlistTable[],
 						const unsigned int top, const short resultRows, 
@@ -94,7 +93,6 @@ void print_playlist(	WINDOW *window,
 	return;
 }
 
-/*********************************** lcd *************************************************/
 void lcd(	WINDOW *window, 
 			const short int yPos, const short int xPos, const short int limit,
 			const short int color, const bool cursor,
@@ -120,7 +118,6 @@ void lcd(	WINDOW *window,
 	return;
 }
 
-/************************************************** print_search ************************************/
 void print_search(WINDOW *window, char cadena[])
 {
 	wclear(window);
@@ -132,7 +129,6 @@ void print_search(WINDOW *window, char cadena[])
 	return;	
 }
 
-/************************************** print_lcd *********************************************/
 void print_lcd(WINDOW *window, System *linea, const Variation var)
 {
 	short int k = 0, yPos;
@@ -171,7 +167,6 @@ void print_lcd(WINDOW *window, System *linea, const Variation var)
 	return;
 }
 
-/************************************* print_computer *****************************************/
 void print_computer(WINDOW *window, const short int oxygen, const short int mode, const Variation var)
 {
 	wattron(window, A_BOLD);
@@ -223,7 +218,6 @@ void print_computer(WINDOW *window, const short int oxygen, const short int mode
 	return;
 }
 
-/********************************** print_mode *********************************************/
 void print_mode(WINDOW *window, const short int mode)
 {
 	wattron(window, A_BOLD);
@@ -235,7 +229,6 @@ void print_mode(WINDOW *window, const short int mode)
 	return;
 }
 
-/******************************* print_zoom **************************************/
 void print_zoom(WINDOW *window, System *linea)
 {
 	//static char message[50];
@@ -268,11 +261,10 @@ void print_zoom(WINDOW *window, System *linea)
 		
 		//sprintf(message, "%c-%03hd %s", linea->bnk2, linea->num2, linea->title);
 
-		lcd(window, 0, 10, 17, 5, FALSE, linea->title);
+		lcd(window, 1, 2, 13, 5, FALSE, linea->title);
 
-		mvwprintw(window, 2, 3, "%c-%03hd", linea->bnk, linea->num);
+		mvwprintw(window, 0, 2, "%c-%03hd", linea->bnk, linea->num);
 		wrefresh(window);
-
 	
 	return;
 }

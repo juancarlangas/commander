@@ -8,6 +8,7 @@
 
 #include "midi/keyboards.hpp"
 
+#include "graphics/printing.hpp"
 #include "graphics/form.hpp"
 #include "graphics/channelForm.hpp"
 #include "common/common.hpp"
@@ -641,7 +642,6 @@ int main()
 
 }
 
-//***********************************+ get_command *************************************
 enum matroska get_command(	const int digit,
 							const short mode, short windowMode, Variation variation, 
 							char cadena[], short int ci,

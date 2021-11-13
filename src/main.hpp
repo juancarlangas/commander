@@ -14,21 +14,6 @@ extern void llenado_displayTable(	System *displayTable[], System dataBase[],
 
 extern void llenado_favourite( int favourite[], System dataBase[], const int dbRows);
 
-extern void print_displayTable(	WINDOW *, System *[],
-								const unsigned int dTop, const short dRows, const int dIndex,
-								short int winMode);
-extern void print_playlist(		WINDOW *, System [],
-								const unsigned int plTop, const short plRows,
-								const int indexA, const int indexB,
-								const short int mode, short int winMode);
-extern void print_zoom(			WINDOW *window, System *linea);
-extern void print_lcd	(		WINDOW *window, System *linea, const Variation var);
-extern void print_digits(		WINDOW *, System *, int plRows, const short int mode,
-								const Variation);
-extern void print_mode(			WINDOW *window, const short int mode);
-extern void print_computer(		WINDOW *, const short int, const short int, const Variation var);
-extern void print_search(		WINDOW *searchWindow, char keyword[]);
-
 extern short int capture(	char keyword[],
 							const int 	dRows,  int *dTop,  int *dIndex,
 							int 		*plRows, int *plTop, int *plIndexA, int *plIndexB,
