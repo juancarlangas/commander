@@ -27,7 +27,7 @@ struct Pista {
 	char bnk;
 	int16_t num;
 	int16_t n_arreglos;
-	std::array<Arreglo, 16> orquestacion;
+	std::array<Arreglo, 8> orquestacion;
 	int16_t arreglo_inicial;
 };
 

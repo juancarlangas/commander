@@ -135,7 +135,7 @@ void Database::cargar( const std::string &_Path ) noexcept
 				linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 			// data
-			for ( int32_t j = 0; j < 16; ++j ) {
+			for ( int32_t j = 0; j < 8; ++j ) {
 				catalogo[n_linea].orquestacion[i].canal[j] = linea.data()[0];
 				linea = linea.substr( 2 );
 			}
@@ -222,7 +222,7 @@ void Database::escribir( const std::string &_Path ) noexcept
 				<< catalogo[i].n_arreglos << ",";
 		for ( int32_t j = 0; j < catalogo[i].n_arreglos; ++j ) {
 				archivo << catalogo[i].orquestacion[j].etiqueta << ",";
-				for ( int32_t k = 0; k < 16; ++k )
+				for ( int32_t k = 0; k < 8; ++k )
 						archivo << catalogo[i].orquestacion[j].canal[k] << ",";
 		}
 		archivo << catalogo[i].arreglo_inicial << '\n';
