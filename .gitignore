@@ -2,3 +2,4 @@ bin/
 build/
 Debug/
 compile_commands.json
+.vscode/

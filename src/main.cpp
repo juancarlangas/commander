@@ -1,4 +1,6 @@
 #include "main.hpp"
+#include "common/common.hpp"
+#include "data/databases.hpp"
 
 int main()
 {
@@ -582,6 +584,9 @@ int main()
 
 				break;
 
+			default:
+				break;
+
 		}
 		///////////////////////////////////////	printing ///////////////////////////////////////
 
@@ -604,7 +609,7 @@ int main()
 			print_mode(computerWindow, mode);
 		}
 
-		if (updateWindow[ZOOM] == true)
+		if (updateWindow[ZOOM] == true) {
 			if (winMode == MODE_PLAYLIST)
 				print_zoom(zoomWindow, &playlistTable[plIndexB]);
 			else if (keyword[0] != '/' && dIndex >= 0)
@@ -613,6 +618,7 @@ int main()
 				wclear(zoomWindow);
 				wrefresh(zoomWindow);
 			}
+		}
 
 		command = get_command(caracter = getch(), mode, winMode, var, keyword, charIndex, dIndex);
 
