@@ -194,12 +194,6 @@ int main()
 						updateWindow[ZOOM] = true;
 						break;
 				}
-				//if (master.part == 2);
-				//	master.select_part(1);
-
-				//ESTE CODIGO LO QUEREMOS TRABAJAR ////////////////////
-				//master.select_part(1);
-				//nuevo = false;
 
 				updateWindow[LCD] = true;
 
@@ -367,7 +361,7 @@ int main()
 						updateWindow[PLAYLIST] = true;
 					}
 
-					if (keyword[0] != '/' || charIndex == 1)
+					if (keyword[0] != ':' || charIndex == 1)
 						updateWindow[ZOOM] = true;
 
 					updateWindow[LCD] 	  = true;
@@ -639,40 +633,41 @@ enum matroska get_command(	const int digit,
 	switch (digit) {
 
 		case '\n': //ESCAPE SEQUENCE*
-			if (strstr("/add", cadena) != NULL && strstr(cadena, "/add") != NULL)
+			if (strstr(":add", cadena) != NULL && strstr(cadena, ":add") != NULL)
 				//if (cadena[0] == '\0'); // Se garantiza que no hay búsquedas
 					comando = ADD_VALUE;
 
-			else if (strstr("/seq", cadena) != NULL && strstr(cadena, "/seq") != NULL) {
+			else if (strstr(":seq", cadena) != NULL && strstr(cadena, ":seq") != NULL) {
 				if (mode == COMBINATOR)
 					comando = SET_MODE;
 				else
 					comando = ESCAPE;
 			}
-			else if (strstr("/cmb", cadena) != NULL && strstr(cadena, "/cmb") != NULL) { 
+			else if (strstr(":cmb", cadena) != NULL && strstr(cadena, ":cmb") != NULL) { 
 				if (mode == SEQUENCER)
 					comando = SET_MODE;
 				else
 					comando = ESCAPE;
 			}
 
-			else if (strstr("/save", cadena) != NULL && strstr(cadena, "/save") != NULL)
+			else if (strstr(":w", cadena) != NULL && strstr(cadena, ":save") != NULL)
 				comando = SAVE_PLAYLIST;
 
-			else if (strstr("/load", cadena) != NULL && strstr(cadena, "/load") != NULL)
+			else if (strstr(":load", cadena) != NULL && strstr(cadena, ":load") != NULL)
 				comando = LOAD_PLAYLIST;
 
-			else if (strstr("/clear", cadena) != NULL && strstr(cadena, "/clear") != NULL)
+			else if (strstr(":clear", cadena) != NULL && strstr(cadena, ":clear") != NULL)
 				comando = CLEAR_PLAYLIST;
 
-			else if (strstr("/export", cadena) != NULL && strstr(cadena, "/export") != NULL)
+			else if (strstr(":export", cadena) != NULL && strstr(cadena, ":export") != NULL)
 				comando = EXPORTATE;
+
+			else if ( strcmp( ":q", cadena ) == 0 )
+				comando = EXIT;
 
 			else
 				comando = INTRO;
 
-            //else if (strstr("/channel", cadena) != NULL && strstr(cadena, "/channel") != NULL)
-				//comando = SET_MIDI_CHANNEL;
 			break;
 
 		case '+':
