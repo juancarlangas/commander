@@ -194,6 +194,7 @@ void Database::escribir( const std::string &_Path ) noexcept
 		exit( EXIT_FAILURE );
 	}
 
+	////////////////////////////////// clonar de la antigua ///////////////////////////////////
 	n_canciones = activeRows;
 
 	for ( int32_t i = 0; i < n_canciones; ++i ) {
@@ -206,30 +207,9 @@ void Database::escribir( const std::string &_Path ) noexcept
 		cancion[i].tipo 	= base[i].type;
 		cancion[i].bnk 		= base[i].bnk;
 		cancion[i].num 		= base[i].num;
-
-		// Extra
-		cancion[i].n_variaciones = 2;
-
-		cancion[i].variacion[0].etiqueta = "Piano";
-		for ( int32_t k = 0; k < 8; ++k ) {
-			cancion[i].variacion[0].track[k].status = k < 5 ? Switch::ON : Switch::OFF;
-			cancion[i].variacion[0].track[k].lower_key = 0;
-			cancion[i].variacion[0].track[k].upper_key = 127;
-			cancion[i].variacion[0].track[k].transposition = 0;
-		}
-
-		cancion[i].variacion[1].etiqueta = "Trompitas";
-		for ( int32_t k = 0; k < 8; ++k ) {
-			cancion[i].variacion[1].track[k].status = k < 2 or 5 <= k ? Switch::ON : Switch::OFF;
-			cancion[i].variacion[1].track[k].lower_key = 0;
-			cancion[i].variacion[1].track[k].upper_key = 127;
-			cancion[i].variacion[1].track[k].transposition = 0;
-		}
-
-		cancion[i].variacion_inicial = 0;
-
 	}
 
+	///////////////////////////////////// escritura ///////////////////////////////////////////
 	std::string delimitador;
 
 	for ( int32_t i = 0; i < activeRows; ++i ) {
@@ -250,10 +230,11 @@ void Database::escribir( const std::string &_Path ) noexcept
 		archivo	<< cancion[i].tipo	<< ","
 				<< base[i].bnk	<< ","
 				<< std::setw( 3 ) << std::setfill( '0' ) << base[i].num	<< ","
-
 				<< cancion[i].n_variaciones << ",";
+
 		for ( int32_t j = 0; j < cancion[i].n_variaciones; ++j ) {
 			archivo << cancion[i].variacion[j].etiqueta << ",";
+
 			for ( int32_t k = 0; k < 8; ++k ) {
 					archivo << cancion[i].variacion[j].track[k].status << ",";
 					archivo << cancion[i].variacion[j].track[k].lower_key << ",";
