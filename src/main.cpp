@@ -30,6 +30,7 @@ int main()
 
 	//************************************* tables ***********************************//
 	System *displayTable[1000], playlistTable[1000], *buffer;
+	Cancion buffer_2;
 	int favourite[10];
 
 	int 	dRows, 		dTop  = 0, 	dIndex   = 0,
@@ -76,12 +77,14 @@ int main()
 			/////////////////////////// BEGIN /////////////////////////////////
 			case BEGIN:
 
-				llenado_displayTable(displayTable, dBase[COMBINATIONS].base, nRows[COMBINATOR], 
-										keyword, &dRows);
+				llenado_displayTable(
+					displayTable, dBase[COMBINATIONS].base, nRows[COMBINATOR], keyword, &dRows );
 				plRows = load_playlist(playlistTable, "default");
 
-				if (nRows[COMBINATOR] > 0)
+				if (nRows[COMBINATOR] > 0) {
 					buffer = dBase[COMBINATIONS].base;
+					buffer_2 = dBase[COMBINATIONS].get_cancion( 0 );
+				}
 
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;
@@ -158,10 +161,11 @@ int main()
 
 			/////////////////////////// SELECT_PART ///////////////////////////
 			case SELECT:	
-					if (master.part == 1)
-						master.select_part(2);
-					else
-						master.select_part(1);
+				if (master.part == 1)
+					master.select_part(2);
+				else
+					master.select_part(1);
+
 				break;
 
 			////////////////////////// MOVING ARRAY ////////////////////////////
@@ -181,10 +185,12 @@ int main()
 			case INTRO:
 				switch (winMode) {
 					case MODE_DISPLAY:
-						communicator(master, buffer = displayTable[dIndex], var, master.midiChannel);
+						communicator( master, buffer = displayTable[dIndex],
+								var, master.midiChannel);
 						break;
 					case MODE_PLAYLIST:
-						communicator(master, buffer = &playlistTable[plIndexA], var, master.midiChannel);
+						communicator( master, buffer = &playlistTable[plIndexA], 
+								var, master.midiChannel);
 						//avance carro
 						if (plIndexB < plRows - 1) {
 							plIndexB++;

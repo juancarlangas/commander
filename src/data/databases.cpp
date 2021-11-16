@@ -13,9 +13,9 @@
 #include <fstream>
 #include <iomanip> // zerofill
 
-#include "databases.hpp"
-#include "form.h"
-#include "../common/string.hpp"
+#include "data/databases.hpp"
+#include "graphics/form.hpp"
+#include "common/string.hpp"
 
 Database::Database() : n_canciones( 0 )
 {
@@ -377,4 +377,9 @@ void Database::ordenate()
 				}
 			}
 		}
+}
+
+struct Cancion Database::get_cancion( const int _Index ) noexcept
+{
+	return cancion[ _Index ];
 }

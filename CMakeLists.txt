@@ -20,6 +20,10 @@ ADD_EXECUTABLE( Commander
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/common/string.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/data/tables.cpp"
 			"/home/juancarlangas/Programming/lib/utilities/src/files.cpp" )
+	
+target_include_directories( Commander
+	PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src"
+	PRIVATE	"/home/juancarlangas/Programming/lib/" )
 
 target_link_libraries( Commander ncurses panel asound )
 
@@ -30,3 +34,4 @@ set_target_properties( Commander
 			RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin" 
 			OUTPUT_NAME "commander" )
 
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON )

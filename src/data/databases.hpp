@@ -63,6 +63,7 @@ class Database {
 		void exportate(const char *);
 		void clonar_from_old( Database & ) noexcept;
 		void escribir( const std::string & ) noexcept;
+		struct Cancion get_cancion( const int ) noexcept;
 
 		System base[ROWS];
 	private:
