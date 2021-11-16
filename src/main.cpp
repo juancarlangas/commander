@@ -1,6 +1,7 @@
 #include "main.hpp"
 #include "common/common.hpp"
 #include "data/databases.hpp"
+#include <cstdlib>
 
 int main()
 {
@@ -26,11 +27,11 @@ int main()
 
 	nRows[COMBINATIONS] = Files::contar_lineas( config_directory + "/combinations.csv" );
 
-    dBase[COMBINATIONS].cargar( config_directory );
+    dBase[COMBINATIONS].cargar( config_directory + "/combinations.csv" );
 
 	//************************************* tables ***********************************//
-	System *displayTable[1000], playlistTable[1000], *buffer;
-	Cancion buffer_2;
+	System **displayTable = new System *[ nRows[COMBINATIONS] ]();
+	System playlistTable[1000], *buffer;
 	int favourite[10];
 
 	int 	dRows, 		dTop  = 0, 	dIndex   = 0,
@@ -81,10 +82,8 @@ int main()
 					displayTable, dBase[COMBINATIONS].base, nRows[COMBINATOR], keyword, &dRows );
 				plRows = load_playlist(playlistTable, "default");
 
-				if (nRows[COMBINATOR] > 0) {
+				if (nRows[COMBINATOR] > 0)
 					buffer = dBase[COMBINATIONS].base;
-					buffer_2 = dBase[COMBINATIONS].get_cancion( 0 );
-				}
 
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;
@@ -625,7 +624,11 @@ int main()
 	} while (command != EXIT);
 
 	endwin();
-	return 0;
+
+	delete [] displayTable;
+	buffer = NULL;
+
+	return EXIT_SUCCESS;
 
 }
 

@@ -16,18 +16,20 @@
 #include "data/databases.hpp"
 #include "graphics/form.hpp"
 #include "common/string.hpp"
+#include "utilities/src/files.hpp"
 
-Database::Database() : n_canciones( 0 )
+Database::Database() : activeRows( 0 )
 {
-	activeRows = n_canciones;
-	int32_t i;
-
-	for (i = 0; i <= ROWS - 1; i++)
-		clean_row(i);
+	n_canciones = activeRows;
 
 	// homedir
 	if ((homedir = getenv("HOME")) == NULL)
 		homedir = getpwuid(getuid())->pw_dir;
+}
+
+Database::~Database()
+{
+	delete [] base;
 }
 
 void Database::clean_row(int line)
@@ -44,78 +46,79 @@ void Database::clean_row(int line)
 
 void Database::cargar( const std::string &_Path ) noexcept
 {
-	std::ifstream archivo{ _Path + "/combinations.csv" };
-	std::ofstream log{ _Path + "/log.txt" };
-	
+	activeRows = n_canciones = Files::contar_lineas( _Path );
+	base = new struct System[ n_canciones ]();
+
+	std::ifstream archivo{ _Path };
 	if ( archivo.fail() ) {
 		std::cerr << "No se pudo abrir " + _Path + "en BaseDeDatos::cargar()" << std::endl;
 		exit( EXIT_FAILURE );
 	}
 
-	n_canciones = 0;
+	for ( int32_t i = 0; i < n_canciones; i++ )
+		clean_row(i);
+
 	std::string linea;
 
-	int32_t n_linea = 0;
-	while ( std::getline( archivo, linea ) or linea != "" ) {
-		++n_canciones;
-
+	for ( int32_t n_linea = 0; n_linea < n_canciones; ++n_linea ) {
 		// Titulo
+		std::getline( archivo, linea );
 		if ( linea.starts_with( '\"' ) ) { // Incluye comas
 			linea = linea.substr( 1 ); // Quitamos "
-			cancion[n_linea].titulo = linea.substr( 0, linea.find_first_of( '\"' ) );
+			base[n_linea].titulo = linea.substr( 0, linea.find_first_of( '\"' ) );
 			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			cancion[n_linea].titulo = linea.substr( 0, linea.find_first_of( ',' ) );
+			base[n_linea].titulo = linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
 
 		// Artista
 		if ( linea.starts_with( '\"' ) ) { // Incluye comas
 			linea = linea.substr( 1 ); // Quitamos "
-			cancion[n_linea].artista = linea.substr( 0, linea.find_first_of( '\"' ) );
+			base[n_linea].artista = linea.substr( 0, linea.find_first_of( '\"' ) );
 			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			cancion[n_linea].artista = linea.substr( 0, linea.find_first_of( ',' ) );
+			base[n_linea].artista = linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
 
 		// Genero
 		if ( linea.starts_with( '\"' ) ) { // Incluye comas
 			linea = linea.substr( 1 ); // Quitamos "
-			cancion[n_linea].genero = linea.substr( 0, linea.find_first_of( '\"' ) );
+			base[n_linea].genero = linea.substr( 0, linea.find_first_of( '\"' ) );
 			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			cancion[n_linea].genero = linea.substr( 0, linea.find_first_of( ',' ) );
+			base[n_linea].genero = linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
 
 		// Mood
 		if ( linea.starts_with( '\"' ) ) { // Incluye comas
 			linea = linea.substr( 1 ); // Quitamos "
-			cancion[n_linea].mood = linea.substr( 0, linea.find_first_of( '\"' ) );
+			base[n_linea].mood = linea.substr( 0, linea.find_first_of( '\"' ) );
 			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			cancion[n_linea].mood = linea.substr( 0, linea.find_first_of( ',' ) );
+			base[n_linea].mood = linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
 
 		// Keywords
 		if ( linea.starts_with( '\"' ) ) { // Incluye comas
 			linea = linea.substr( 1 ); // Quitamos "
-			cancion[n_linea].keywords = linea.substr( 0, linea.find_first_of( '\"' ) );
+			base[n_linea].key_words = linea.substr( 0, linea.find_first_of( '\"' ) );
 			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			cancion[n_linea].keywords = linea.substr( 0, linea.find_first_of( ',' ) );
+			base[n_linea].key_words = linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
 
 		// Tipo
-		cancion[n_linea].tipo = linea.substr( 0, linea.find_first_of( ',' ) );
+		base[n_linea].tipo = linea.substr( 0, linea.find_first_of( ',' ) );
 		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 
 		// BNK
@@ -127,61 +130,56 @@ void Database::cargar( const std::string &_Path ) noexcept
 		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 
 		// n_variaciones
-		cancion[n_linea].n_variaciones = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+		base[n_linea].n_variaciones = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 		linea = linea.substr( 2 );
 
 		///////////////////////////// VARIACIONES ///////////////////////////////////////
-		for ( int32_t i = 0; i < cancion[n_linea].n_variaciones; ++i ) {
+		for ( int32_t i = 0; i < base[n_linea].n_variaciones; ++i ) {
 
 			// Label
-			cancion[n_linea].variacion[i].etiqueta =
+			base[n_linea].variacion[i].etiqueta =
 				linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 			for ( int32_t j = 0; j < 8; ++j ) {
 				// status
-				cancion[n_linea].variacion[i].track[j].status =
+				base[n_linea].variacion[i].track[j].status =
 					static_cast<enum Switch>(
 							std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 				// lower_key
-				cancion[n_linea].variacion[i].track[j].lower_key =
+				base[n_linea].variacion[i].track[j].lower_key =
 					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 				// upper_key
-				cancion[n_linea].variacion[i].track[j].upper_key =
+				base[n_linea].variacion[i].track[j].upper_key =
 					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 				// transposition
-				cancion[n_linea].variacion[i].track[j].transposition =
+				base[n_linea].variacion[i].track[j].transposition =
 					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 			}
 		}
 		
 		// arreglo inicial
-		cancion[n_linea].variacion_inicial = std::stoi( linea.substr( 0, linea.find( ',' ) ) );
-
-		++n_linea;
+		base[n_linea].variacion_inicial = std::stoi( linea.substr( 0, linea.find( ',' ) ) );
 	}
 
-	log.close();
 	archivo.close();
 
 	// Cloning
 	activeRows = n_canciones;
 	for ( int32_t i = 0; i < activeRows; ++i ) {
-		strcpy( base[i].title,		cancion[i].titulo.c_str() );
-		strcpy( base[i].artist,		cancion[i].artista.c_str() );
-		strcpy( base[i].genre,		cancion[i].genero.c_str() );
-		strcpy( base[i].section,	cancion[i].mood.c_str() );
-		strcpy( base[i].keywords,	cancion[i].keywords.c_str() );
-		strcpy( base[i].type,		cancion[i].tipo.c_str() );
-		base[i].bnk = base[i].bnk;
-		base[i].num = base[i].num;
+		strcpy( base[i].title,		base[i].titulo.c_str() );
+		strcpy( base[i].artist,		base[i].artista.c_str() );
+		strcpy( base[i].genre,		base[i].genero.c_str() );
+		strcpy( base[i].section,	base[i].mood.c_str() );
+		strcpy( base[i].keywords,	base[i].key_words.c_str() );
+		strcpy( base[i].type,		base[i].tipo.c_str() );
 	}
 }
 
@@ -198,51 +196,48 @@ void Database::escribir( const std::string &_Path ) noexcept
 	n_canciones = activeRows;
 
 	for ( int32_t i = 0; i < n_canciones; ++i ) {
-		// Compatibles
-		cancion[i].titulo	= base[i].title;
-		cancion[i].artista	= base[i].artist;
-		cancion[i].genero	= base[i].genre;
-		cancion[i].mood		= base[i].section;
-		cancion[i].keywords = base[i].keywords;
-		cancion[i].tipo 	= base[i].type;
-		cancion[i].bnk 		= base[i].bnk;
-		cancion[i].num 		= base[i].num;
+		base[i].titulo	= base[i].title;
+		base[i].artista	= base[i].artist;
+		base[i].genero	= base[i].genre;
+		base[i].mood		= base[i].section;
+		base[i].key_words = base[i].keywords;
+		base[i].tipo 	= base[i].type;
 	}
 
 	///////////////////////////////////// escritura ///////////////////////////////////////////
 	std::string delimitador;
 
 	for ( int32_t i = 0; i < activeRows; ++i ) {
-		delimitador = cancion[i].titulo.find( ',' ) < cancion[i].titulo.npos ? "\"" : "";
-		archivo << delimitador << cancion[i].titulo << delimitador << ',';
+		delimitador = base[i].titulo.find( ',' ) < base[i].titulo.npos ? "\"" : "";
+		archivo << delimitador << base[i].titulo << delimitador << ',';
 
-		delimitador = cancion[i].artista.find( ',' ) < cancion[i].artista.npos ? "\"" : "";
-		archivo << delimitador << cancion[i].artista << delimitador << ',';
+		delimitador = base[i].artista.find( ',' ) < base[i].artista.npos ? "\"" : "";
+		archivo << delimitador << base[i].artista << delimitador << ',';
 
-		delimitador = cancion[i].genero.find( ',' ) < cancion[i].genero.npos ? "\"" : "";
-		archivo << delimitador << cancion[i].genero << delimitador << ',';
+		delimitador = base[i].genero.find( ',' ) < base[i].genero.npos ? "\"" : "";
+		archivo << delimitador << base[i].genero << delimitador << ',';
 
-		archivo << cancion[i].mood << ",";
+		archivo << base[i].mood << ",";
 
-		delimitador = cancion[i].keywords.find( ',' ) < cancion[i].keywords.npos ? "\"" : "";
-		archivo << delimitador << base[i].keywords << delimitador << ",";
+		delimitador = base[i].key_words.find( ',' ) < base[i].key_words.npos ? "\"" : "";
+		archivo << delimitador << base[i].key_words << delimitador << ",";
 
-		archivo	<< cancion[i].tipo	<< ","
+		archivo	<< base[i].tipo	<< ","
 				<< base[i].bnk	<< ","
 				<< std::setw( 3 ) << std::setfill( '0' ) << base[i].num	<< ","
-				<< cancion[i].n_variaciones << ",";
+				<< base[i].n_variaciones << ",";
 
-		for ( int32_t j = 0; j < cancion[i].n_variaciones; ++j ) {
-			archivo << cancion[i].variacion[j].etiqueta << ",";
+		for ( int32_t j = 0; j < base[i].n_variaciones; ++j ) {
+			archivo << base[i].variacion[j].etiqueta << ",";
 
 			for ( int32_t k = 0; k < 8; ++k ) {
-					archivo << cancion[i].variacion[j].track[k].status << ",";
-					archivo << cancion[i].variacion[j].track[k].lower_key << ",";
-					archivo << cancion[i].variacion[j].track[k].upper_key << ",";
-					archivo << cancion[i].variacion[j].track[k].transposition << ",";
+					archivo << base[i].variacion[j].track[k].status << ",";
+					archivo << base[i].variacion[j].track[k].lower_key << ",";
+					archivo << base[i].variacion[j].track[k].upper_key << ",";
+					archivo << base[i].variacion[j].track[k].transposition << ",";
 			}
 		}
-		archivo << cancion[i].variacion_inicial << '\n';
+		archivo << base[i].variacion_inicial << '\n';
 	}
 
 	archivo.close();
@@ -379,7 +374,7 @@ void Database::ordenate()
 		}
 }
 
-struct Cancion Database::get_cancion( const int _Index ) noexcept
+struct System Database::get_cancion( const int _Index ) noexcept
 {
-	return cancion[ _Index ];
+	return base[ _Index ];
 }

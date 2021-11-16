@@ -21,37 +21,42 @@ struct Track {
 
 struct Variacion {
 	std::string etiqueta;
-	std::array<struct Track, 8> track;
-};
-
-struct Cancion {
-	std::string titulo;
-	std::string artista;
-	std::string genero;
-	std::string mood;
-	std::string keywords;
-	std::string tipo;
-	char bnk;
-	int16_t num;
-	int16_t n_variaciones;
-	std::array<Variacion, 16> variacion;
-	int16_t variacion_inicial;
+	struct Track track[8];
+	// std::array<struct Track, 8> track;
 };
 
 struct System {
+	// C
 	char title[LONG_STRING];
 	char artist[LONG_STRING];
 	char genre[LONG_STRING];
 	char section[LONG_STRING];
 	char keywords[LONG_STRING];
 	char type[10];
+	
+	// C++
+	std::string titulo;
+	std::string artista;
+	std::string genero;
+	std::string mood;
+	std::string key_words;
+	std::string tipo;
+
+	// Global
 	char bnk;
 	short num;
+
+	// New
+	int16_t n_variaciones;
+	struct Variacion variacion[ 16 ];
+	//std::array<Variacion, 16> variacion;
+	int16_t variacion_inicial;
 };
 
 class Database {
 	public:
 		Database();
+		~Database();
 		void load(const char*, const char *);
 		int get_activeRows(const char *,const char *);
 		void cargar( const std::string & ) noexcept;
@@ -63,13 +68,11 @@ class Database {
 		void exportate(const char *);
 		void clonar_from_old( Database & ) noexcept;
 		void escribir( const std::string & ) noexcept;
-		struct Cancion get_cancion( const int ) noexcept;
-
-		System base[ROWS];
+		struct System get_cancion( const int ) noexcept;
+		System *base;
 	private:
 		int32_t activeRows;
 		int32_t n_canciones;
-		std::array<struct Cancion, MAXIMO_DE_CANCIONES> cancion;
 		void clean_row(int);
 		const char *homedir;
 	};
