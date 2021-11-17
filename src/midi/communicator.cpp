@@ -23,10 +23,10 @@ void communicator(Keyboard& device, System *row, Variation var, short channel)
 		if (row->bnk != '\0')
 			switch (var) {
 				case VAR1:
-					device.set_program(row->bnk, row->num);
+					device.set_program( *row );
 					break;
 				case VAR2:
-					device.set_program(row->bnk, row->num);
+					device.set_program( *row );
 					break;
 			}
 	//}

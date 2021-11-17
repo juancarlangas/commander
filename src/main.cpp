@@ -173,8 +173,7 @@ int main()
 						break;
 				}
 
-				keyboard.set_buffer( *buffer );
-				communicator( keyboard, buffer, var, keyboard.midiChannel);
+				keyboard.set_program( *buffer );
 
 				updateWindow[LCD] = true;
 
