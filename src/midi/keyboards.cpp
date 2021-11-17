@@ -102,10 +102,11 @@ void Keyboard::set_variation( const int16_t _Variacion ) noexcept
 		// zone
 		x50_lower_key[i][11] = buffer.variacion[variacion].track[i].lower_key;
 		x50_upper_key[i][11] = buffer.variacion[variacion].track[i].upper_key;
-		// transposition
+		// transposition =	columna 11 hacemos + porque es número negativo, de este modo
+		// 					obtenemos una RESTA
 		if ( buffer.variacion[variacion].track[i].transposition < 0 ) {
 			x50_transposition[i][10] = 0x7F;
-			x50_transposition[i][11] = 0x80 - buffer.variacion[variacion].track[i].transposition;
+			x50_transposition[i][11] = 0x80 + buffer.variacion[variacion].track[i].transposition;
 		}
 		else
 			x50_transposition[i][11] = buffer.variacion[variacion].track[i].transposition;

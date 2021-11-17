@@ -34,7 +34,6 @@ Form::Form()
 									VALUE, 3);
 }
 
-////////////////////////////////// capture_value() ////////////////////////////////
 bool Form::capture_value()
 {
 	// Initialize
@@ -63,7 +62,6 @@ bool Form::capture_value()
 	return success;
 }
 
-////////////////////////////////// capture_value(System) ////////////////////////////////
 bool Form::capture_value(System get)
 {
 	row = get;
@@ -83,7 +81,7 @@ bool Form::capture_value(System get)
 
 	return success;
 }
-////////////////////////////////////// capture /////////////////////////
+
 bool Form::capture()
 {
 	char word[LONG_STRING];

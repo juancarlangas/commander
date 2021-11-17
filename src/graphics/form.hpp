@@ -1,9 +1,9 @@
 #ifndef FORM_H
 #define FORM_H
 
-#include "fields.hpp"
-#include "../common/common.hpp"
-#include "../data/databases.hpp"
+#include "graphics/fields.hpp"
+#include "common/common.hpp"
+#include "data/databases.hpp"
 
 // Encuadre
 #define TITLE		0
