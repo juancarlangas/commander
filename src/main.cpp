@@ -53,13 +53,12 @@ int main()
 	bool nuevo = TRUE;
 
 	//************************************** keyboards **********************************//
-	Keyboard master, oxygen61;
+	Keyboard keyboard;
+	keyboard.set_name("X50");
 
-	oxygen61.set_name("VI61");
-		bool bridge;
-		sprintf(directory, "%s/bridge_state.dat", homedir);
+	// bool bridge;
+	// sprintf(directory, "%s/bridge_state.dat", homedir);
 
-	master.set_name("X50");
 
 	short channel;
 		FILE *channelFile = fopen("/home/juancarlangas/.commander/midiChannel.dat", "r");
@@ -145,51 +144,24 @@ int main()
 				break;
 
 			/////////////////////////// CHANGE_VARIATION ///////////////////////////
-			case CHANGE_VARIATION:
-
-				if (var == VAR2)
-					var = VAR1;
-				else
-					var = VAR2;
-
+			case PREV_VARIATION:
+				keyboard.prev_variation();
 				nuevo = TRUE;
-
-				updateWindow[COMPUTER] = true;
-
 				break;
 
-			/////////////////////////// SELECT_PART ///////////////////////////
-			case SELECT:	
-				if (master.part == 1)
-					master.select_part(2);
-				else
-					master.select_part(1);
-
+			case NEXT_VARIATION :
+				keyboard.next_variation();
+				nuevo = TRUE;
 				break;
-
-			////////////////////////// MOVING ARRAY ////////////////////////////
-			/* Esta es una adaptación provisional de la futura (Dios Mediante) función
-			 * para tener 16 arrays por patch. Por ahora nos conformaremos con usar
-			 * las flechas para simular dos arrays por patch. */
-
-			case PREV_ARRAY:
-				master.select_part( 1 );
-				break;
-
-			case NEXT_ARRAY:
-				master.select_part( 2 );
-				break;
-
+				
 			/////////////////////////// INTRO ///////////////////////////
 			case INTRO:
 				switch (winMode) {
 					case MODE_DISPLAY:
-						communicator( master, buffer = displayTable[dIndex],
-								var, master.midiChannel);
+						buffer = displayTable[ dIndex ];
 						break;
 					case MODE_PLAYLIST:
-						communicator( master, buffer = &playlistTable[plIndexA], 
-								var, master.midiChannel);
+						buffer = &playlistTable[ plIndexA ];
 						//avance carro
 						if (plIndexB < plRows - 1) {
 							plIndexB++;
@@ -197,8 +169,12 @@ int main()
 						}
 						updateWindow[PLAYLIST] = true;
 						updateWindow[ZOOM] = true;
+
 						break;
 				}
+
+				keyboard.set_buffer( *buffer );
+				communicator( keyboard, buffer, var, keyboard.midiChannel);
 
 				updateWindow[LCD] = true;
 
@@ -705,8 +681,8 @@ enum matroska get_command(	const int digit,
 			comando = MOVE_INDEX;
 			break;
 
-		case KEY_LEFT:	comando = PREV_ARRAY; break;
-		case KEY_RIGHT:	comando = NEXT_ARRAY; break;
+		case KEY_LEFT:	comando = PREV_VARIATION; break;
+		case KEY_RIGHT:	comando = NEXT_VARIATION; break;
 
 		case 566: case 525:
 			if (digit == 566)
