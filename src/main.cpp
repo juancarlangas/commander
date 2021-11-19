@@ -25,9 +25,9 @@ int main()
 	int nRows[1];
     const std::string config_directory{ directory };
 
-	nRows[COMBINATIONS] = Files::contar_lineas( config_directory + "/combinations.csv" );
+	nRows[COMBINATIONS] = Files::contar_lineas( config_directory + "/combinations-2.csv" );
 
-    dBase[COMBINATIONS].cargar( config_directory + "/combinations.csv" );
+    dBase[COMBINATIONS].cargar( config_directory + "/combinations-2.csv" );
 
 	//************************************* tables ***********************************//
 	System **displayTable = new System *[ nRows[COMBINATIONS] ]();
@@ -540,7 +540,7 @@ int main()
 			///////////////////////// EXPORTATE /////////////////////
 			case EXPORTATE:
 
-				dBase[COMBINATIONS].escribir( config_directory + "/combinations.csv" );
+				dBase[COMBINATIONS].escribir( config_directory + "/combinations-3.csv" );
 
 				*keyword = '\0';
 
@@ -610,7 +610,7 @@ int main()
 enum matroska get_command(	const int digit,
 							const short mode, short windowMode, Variation variation, 
 							char cadena[], short int ci,
-							int dIndex												)
+							int dIndex )
 {
 	enum matroska comando = NEXT;
 

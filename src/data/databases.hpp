@@ -21,8 +21,7 @@ struct Track {
 
 struct Variacion {
 	std::string etiqueta;
-	struct Track track[8];
-	// std::array<struct Track, 8> track;
+	struct Track track[ 8 ];
 };
 
 struct System {
@@ -48,9 +47,9 @@ struct System {
 
 	// New
 	int16_t n_variaciones;
-	struct Variacion variacion[ 16 ];
-	//std::array<Variacion, 16> variacion;
 	int16_t variacion_inicial;
+	std::string instrumento[ 8 ];
+	struct Variacion variacion[ 16 ];
 };
 
 class Database {

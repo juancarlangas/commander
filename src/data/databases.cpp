@@ -129,44 +129,57 @@ void Database::cargar( const std::string &_Path ) noexcept
 		base[n_linea].num = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 
+		///////////////////////////// VARIACIONES ///////////////////////////////////////
 		// n_variaciones
 		base[n_linea].n_variaciones = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
-		linea = linea.substr( 2 );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
-		///////////////////////////// VARIACIONES ///////////////////////////////////////
+		// Label
 		for ( int32_t i = 0; i < base[n_linea].n_variaciones; ++i ) {
-
-			// Label
 			base[n_linea].variacion[i].etiqueta =
 				linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+		}
 
-			for ( int32_t j = 0; j < 8; ++j ) {
+		// Variación inicial
+		base[n_linea].variacion_inicial = std::stoi( linea.substr( 0, linea.find( ',' ) ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+
+		for ( int32_t i = 0; i < 8; ++i ) {
+			// instrumento
+			if ( linea.starts_with( '\"' ) ) { // Incluye comas
+				linea = linea.substr( 1 ); // Quitamos "
+				base[n_linea].instrumento[ i ] = linea.substr( 0, linea.find_first_of( '\"' ) );
+				linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
+			}
+			else {
+				base[n_linea].instrumento[ i ] = linea.substr( 0, linea.find_first_of( ',' ) );
+				linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+			}
+
+			for ( int32_t j = 0; j < base[n_linea].n_variaciones; ++j ) {
 				// status
-				base[n_linea].variacion[i].track[j].status =
-					static_cast<enum Switch>(
+				base[n_linea].variacion[j].track[i].status = static_cast<enum Switch>(
 							std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 				// lower_key
-				base[n_linea].variacion[i].track[j].lower_key =
+				base[n_linea].variacion[j].track[i].lower_key =
 					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 				// upper_key
-				base[n_linea].variacion[i].track[j].upper_key =
+				base[n_linea].variacion[j].track[i].upper_key =
 					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 				// transposition
-				base[n_linea].variacion[i].track[j].transposition =
+				base[n_linea].variacion[j].track[i].transposition =
 					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 			}
 		}
 		
-		// arreglo inicial
-		base[n_linea].variacion_inicial = std::stoi( linea.substr( 0, linea.find( ',' ) ) );
 	}
 
 	archivo.close();
@@ -208,6 +221,7 @@ void Database::escribir( const std::string &_Path ) noexcept
 	std::string delimitador;
 
 	for ( int32_t i = 0; i < activeRows; ++i ) {
+		// BASE
 		delimitador = base[i].titulo.find( ',' ) < base[i].titulo.npos ? "\"" : "";
 		archivo << delimitador << base[i].titulo << delimitador << ',';
 
@@ -217,27 +231,39 @@ void Database::escribir( const std::string &_Path ) noexcept
 		delimitador = base[i].genero.find( ',' ) < base[i].genero.npos ? "\"" : "";
 		archivo << delimitador << base[i].genero << delimitador << ',';
 
-		archivo << base[i].mood << ",";
+		archivo << base[i].mood << ',';
 
 		delimitador = base[i].key_words.find( ',' ) < base[i].key_words.npos ? "\"" : "";
 		archivo << delimitador << base[i].key_words << delimitador << ",";
 
-		archivo	<< base[i].tipo	<< ","
-				<< base[i].bnk	<< ","
+		archivo	<< base[i].tipo	<< ','
+				<< base[i].bnk	<< ','
 				<< std::setw( 3 ) << std::setfill( '0' ) << base[i].num	<< ","
-				<< base[i].n_variaciones << ",";
+				<< base[i].n_variaciones << ',';
 
+		// VARIACIONES Etiquetas
 		for ( int32_t j = 0; j < base[i].n_variaciones; ++j ) {
-			archivo << base[i].variacion[j].etiqueta << ",";
+			delimitador = 	base[i].variacion[j].etiqueta.find( ',' ) <
+							base[i].variacion[j].etiqueta.npos	? "\"" : "";
+			archivo << delimitador << base[i].variacion[j].etiqueta << delimitador << ',';
+		}
+		
+		// Variación INICIAL
+		archivo << base[i].variacion_inicial << ',';
 
-			for ( int32_t k = 0; k < 8; ++k ) {
-					archivo << base[i].variacion[j].track[k].status << ",";
-					archivo << base[i].variacion[j].track[k].lower_key << ",";
-					archivo << base[i].variacion[j].track[k].upper_key << ",";
-					archivo << base[i].variacion[j].track[k].transposition << ",";
+		// INSTRUMENTOS
+		for ( int32_t k = 0; k < 8; ++k ) {
+			delimitador = base[i].instrumento[ k ].find( ',' ) < base[i].instrumento[ k ].npos ?
+				"\"" : "";
+			archivo << delimitador << base[i].instrumento[ k ] << delimitador << ',';
+			for ( int32_t j = 0; j < base[i].n_variaciones; ++j ) {
+				archivo << base[i].variacion[j].track[k].status << ','
+						<< base[i].variacion[j].track[k].lower_key << ','
+						<< base[i].variacion[j].track[k].upper_key << ','
+						<< base[i].variacion[j].track[k].transposition
+						<< ( k < 7 or j < base[i].n_variaciones - 1 ? ',' : '\n' );
 			}
 		}
-		archivo << base[i].variacion_inicial << '\n';
 	}
 
 	archivo.close();
