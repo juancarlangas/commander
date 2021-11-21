@@ -16,6 +16,7 @@
 #include "graphics/screen.hpp"
 #include "common/common.hpp"
 #include "common/string.hpp"
+#include "common/matroska.hpp"
 #include "data/tables.hpp"
 #include "data/databases.hpp"
 #include "data/files.hpp"
@@ -23,6 +24,3 @@
 
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
-
-enum matroska get_command(int, short int, short int, Variation, char [], short int, int dIndex);
-

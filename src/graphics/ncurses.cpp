@@ -1,9 +1,11 @@
-#include <ncurses.h>
-#include "../common/common.hpp"
-#include "colors.hpp"
-#include "windows/zoom.hpp"
-#include "windows/bannerBox.hpp"
+#include "common/common.hpp"
+#include "graphics/windows/zoom.hpp"
+#include "graphics/colors.hpp"
+#include "graphics/windows/bannerBox.hpp"
+#include "graphics/windows.hpp"
+#include "graphics/window.hpp"
 
+#include <ncurses.h>
 #include <stdlib.h>
 
 WINDOW 	*searchBox,		*searchWindow,
@@ -85,7 +87,7 @@ short int init_ncurses(void)
 	hide_panel(panel[DIALOG_WINDOW]);
 	hide_panel(panel[INPUT_BOX]);
 
-	
+
 	update_panels();
 	doupdate();
 	

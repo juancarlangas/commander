@@ -196,6 +196,138 @@ void Database::cargar( const std::string &_Path ) noexcept
 	}
 }
 
+void Database::cargar_especifico( const std::string &_Path, int32_t _Indice ) noexcept
+{
+	std::ifstream archivo{ _Path };
+	if ( archivo.fail() ) {
+		std::cerr << "No se pudo abrir " + _Path + "en BaseDeDatos::cargar()" << std::endl;
+		exit( EXIT_FAILURE );
+	}
+
+	std::string linea;
+	for ( int32_t i = 0; i < _Indice; ++i )
+		std::getline( archivo, linea );
+
+	std::getline( archivo, linea ); // cargamos la definitiva
+
+	if ( linea.starts_with( '\"' ) ) { // Incluye comas
+		linea = linea.substr( 1 ); // Quitamos "
+		base[ _Indice ].titulo = linea.substr( 0, linea.find_first_of( '\"' ) );
+		linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
+	}
+	else {
+		base[ _Indice ].titulo = linea.substr( 0, linea.find_first_of( ',' ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+	}
+
+	// Artista
+	if ( linea.starts_with( '\"' ) ) { // Incluye comas
+		linea = linea.substr( 1 ); // Quitamos "
+		base[ _Indice ].artista = linea.substr( 0, linea.find_first_of( '\"' ) );
+		linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
+	}
+	else {
+		base[ _Indice ].artista = linea.substr( 0, linea.find_first_of( ',' ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+	}
+
+	// Genero
+	if ( linea.starts_with( '\"' ) ) { // Incluye comas
+		linea = linea.substr( 1 ); // Quitamos "
+		base[ _Indice ].genero = linea.substr( 0, linea.find_first_of( '\"' ) );
+		linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
+	}
+	else {
+		base[ _Indice ].genero = linea.substr( 0, linea.find_first_of( ',' ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+	}
+
+	// Mood
+	if ( linea.starts_with( '\"' ) ) { // Incluye comas
+		linea = linea.substr( 1 ); // Quitamos "
+		base[ _Indice ].mood = linea.substr( 0, linea.find_first_of( '\"' ) );
+		linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
+	}
+	else {
+		base[ _Indice ].mood = linea.substr( 0, linea.find_first_of( ',' ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+	}
+
+	// Keywords
+	if ( linea.starts_with( '\"' ) ) { // Incluye comas
+		linea = linea.substr( 1 ); // Quitamos "
+		base[ _Indice ].key_words = linea.substr( 0, linea.find_first_of( '\"' ) );
+		linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
+	}
+	else {
+		base[ _Indice ].key_words = linea.substr( 0, linea.find_first_of( ',' ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+	}
+
+	// Tipo
+	base[ _Indice ].tipo = linea.substr( 0, linea.find_first_of( ',' ) );
+	linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+
+	// BNK
+	base[ _Indice ].bnk = linea.data()[0];
+	linea = linea.substr( 2 ); // garantiza que queda después de la 'coma'
+
+	// NUM
+	base[ _Indice ].num = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+	linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+
+	///////////////////////////// VARIACIONES ///////////////////////////////////////
+	// n_variaciones
+	base[ _Indice ].n_variaciones = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+	linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+
+	// Label
+	for ( int32_t i = 0; i < base[ _Indice ].n_variaciones; ++i ) {
+		base[ _Indice ].variacion[i].etiqueta =
+			linea.substr( 0, linea.find_first_of( ',' ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+	}
+
+	// Variación inicial
+	base[ _Indice ].variacion_inicial = std::stoi( linea.substr( 0, linea.find( ',' ) ) );
+	linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+
+	for ( int32_t i = 0; i < 8; ++i ) {
+		// instrumento
+		if ( linea.starts_with( '\"' ) ) { // Incluye comas
+			linea = linea.substr( 1 ); // Quitamos "
+			base[ _Indice ].instrumento[ i ] = linea.substr( 0, linea.find_first_of( '\"' ) );
+			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
+		}
+		else {
+			base[ _Indice ].instrumento[ i ] = linea.substr( 0, linea.find_first_of( ',' ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+		}
+
+		for ( int32_t j = 0; j < base[ _Indice ].n_variaciones; ++j ) {
+			// status
+			base[ _Indice ].variacion[j].track[i].status = static_cast<enum Switch>(
+						std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+
+			// lower_key
+			base[ _Indice ].variacion[j].track[i].lower_key =
+				std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+
+			// upper_key
+			base[ _Indice ].variacion[j].track[i].upper_key =
+				std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+
+			// transposition
+			base[ _Indice ].variacion[j].track[i].transposition =
+				std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+			}
+	}
+}
+
 void Database::escribir( const std::string &_Path ) noexcept
 {
 	std::ofstream archivo{ _Path };

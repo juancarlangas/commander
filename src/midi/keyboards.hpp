@@ -13,9 +13,11 @@ class Keyboard {
 public:
 	Keyboard();
 	void set_buffer( const struct System & ) noexcept;
-	void set_variation( const int16_t ) noexcept;
 	void prev_variation() noexcept;
 	void next_variation() noexcept;
+	void set_variation( const int16_t ) noexcept;
+	void reset_variation() noexcept;
+	void dump_variation() noexcept;
 	void select_part(const short);
 	void select_page( const enum Page ) noexcept;
 	short part;

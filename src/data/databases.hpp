@@ -59,6 +59,7 @@ class Database {
 		void load(const char*, const char *);
 		int get_activeRows(const char *,const char *);
 		void cargar( const std::string & ) noexcept;
+		void cargar_especifico( const std::string &, int32_t ) noexcept;
 		void clonar_to_old( Database & ) noexcept;
 		void add_value(System);
 		void edit_value(int, System);

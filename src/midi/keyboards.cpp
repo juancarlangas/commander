@@ -17,6 +17,10 @@ Keyboard::Keyboard() :
 void Keyboard::set_buffer( const struct System &_Buffer ) noexcept
 {
 	buffer = _Buffer;
+}
+
+void Keyboard::reset_variation() noexcept
+{
 	variacion = buffer.variacion_inicial;
 }
 
@@ -35,7 +39,11 @@ void Keyboard::next_variation() noexcept
 void Keyboard::set_variation( const int16_t _Variacion ) noexcept
 {
 	variacion = _Variacion;
+	dump_variation();
+}
 
+void Keyboard::dump_variation() noexcept
+{
 	// sleep
 		static struct timespec keyboardTimer;
 		keyboardTimer.tv_sec 	= 0;
