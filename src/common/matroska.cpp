@@ -1,4 +1,5 @@
 #include "common/matroska.hpp"
+#include "common.hpp"
 #include <string.h>
 
 enum matroska get_command(	const int digit,
@@ -59,7 +60,10 @@ enum matroska get_command(	const int digit,
 			break;
 
 		case 27:
-			comando = ESCAPE;
+			if ( windowMode == MODE_ORCHESTRA )
+				comando = CLOSE_ORCHESTRA;
+			else
+				comando = ESCAPE;
 			break;
 
 		case KEY_F(1):
@@ -102,6 +106,11 @@ enum matroska get_command(	const int digit,
 		case KEY_F(2):
 			if (windowMode == MODE_DISPLAY)
 				comando = EDIT_VALUE;
+			break;
+
+		case KEY_F( 3 ) :
+			if ( windowMode == MODE_DISPLAY )
+				comando = EDIT_ORCHESTRATION;
 			break;
 
 		case 519: //CTL+SUPR

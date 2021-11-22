@@ -11,5 +11,6 @@
 	#define RED_DEFAULT		8
 	#define WHITE_BLACK		9
 	#define BLACK_GRAY		10
+	#define WHITE_GRAY		11
 
 #endif

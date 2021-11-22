@@ -1,5 +1,6 @@
 #include "main.hpp"
 #include "common/common.hpp"
+#include "common/matroska.hpp"
 #include "data/databases.hpp"
 #include <cstdlib>
 
@@ -547,6 +548,29 @@ int main()
 				break;
 			}
 
+			//////////////////////////////// EDIT_ORCHESTRATION ///////////////////////////////////
+			case EDIT_ORCHESTRATION :
+				winMode = MODE_ORCHESTRA;
+				popup_orquestacion.show();
+
+				break;
+
+			//////////////////////////////// EDIT_ORCHESTRATION ///////////////////////////////////
+			case CLOSE_ORCHESTRA :
+				popup_orquestacion.hide();
+				winMode = MODE_DISPLAY;
+
+				draw_windows();
+				updateWindow[LCD]		= true;
+				updateWindow[SEARCH] 	= true;
+				updateWindow[DISPLAY]	= true;
+				updateWindow[PLAYLIST] 	= true;
+				updateWindow[COMPUTER] 	= true;
+				updateWindow[DIGITS]	= true;
+				updateWindow[ZOOM]		= true;	
+
+				break;
+
 			///////////////////////// EXPORTATE /////////////////////
 			case EXPORTATE:
 
@@ -616,4 +640,3 @@ int main()
 	return EXIT_SUCCESS;
 
 }
-

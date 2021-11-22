@@ -11,7 +11,6 @@
 #include "graphics/form.hpp"
 #include "graphics/channelForm.hpp"
 #include "graphics/windows.hpp"
-#include "graphics/windows/zoom.hpp"
 #include "graphics/ncurses.hpp"
 #include "graphics/screen.hpp"
 #include "common/common.hpp"
@@ -24,3 +23,4 @@
 
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
+extern Popup popup_orquestacion;

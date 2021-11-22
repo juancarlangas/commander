@@ -39,6 +39,7 @@
 /* WINMODE */
 #define MODE_DISPLAY	1
 #define MODE_PLAYLIST	2
+#define MODE_ORCHESTRA	3
 
 // MIDI Connections
 #define DISCONNECTED 	0

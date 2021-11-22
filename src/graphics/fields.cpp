@@ -24,7 +24,6 @@ void Field::create(	const char* legend,
 	wattron(wEspacio, COLOR_PAIR(WHITE_DEFAULT));
 }
 
-////////////////////////////////// show ////////////////////
 void Field::show()
 {
 	show_panel(pCaja);

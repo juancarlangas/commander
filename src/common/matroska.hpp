@@ -27,10 +27,13 @@ enum matroska {	NEXT = 0,
 				RELOAD_CONNECTIONS,
 				ADD_VALUE,
 				EDIT_VALUE,
+				EDIT_ORCHESTRATION,
+				CLOSE_ORCHESTRA,
 				DELETE_VALUE,
 				EXPORTATE,
 				SELECT_PART,
 				EXIT				};
+
 enum matroska get_command(	const int digit,
 							const short mode, short windowMode, Variation variation, 
 							char cadena[], short int ci,

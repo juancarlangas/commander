@@ -1,15 +1,63 @@
 #include "graphics/window.hpp"
+#include <cstdlib>
+#include <iostream>
 
-Ventana::Ventana() {}
-Ventana::~Ventana() {}
-
-void Ventana::init( const int32_t _Ysize, const int32_t _Xsize,
+void Popup::init( const int32_t _Ysize, const int32_t _Xsize,
 					const int32_t _Xpos, const int32_t _Ypos ) noexcept
 {
-	box = newwin( _Ysize, _Xsize, _Ypos, _Xpos );
+	ventana = newwin( y_size, x_size, y_pos, x_pos );
+	panel = new_panel( ventana );
 }
 
-void Ventana::set_box_color( const int32_t &_Color ) noexcept
+void Popup::set_color( const int32_t &_Color ) noexcept
 {
-	wattron( box, COLOR_PAIR( _Color ) );
+	wattron( ventana, COLOR_PAIR( _Color ) );
+}
+
+void Popup::set_font_width( const std::string_view _Style )
+{
+	if ( _Style != "Bold" and _Style != "Regular" ) {
+		std::cerr << _Style << " no se reconoce como un estilo en Popup::set_font_width()"
+			<< std::endl;
+		exit( EXIT_FAILURE );
+	}
+
+	if ( _Style == "Regular" )
+		wattroff( ventana, A_BOLD );
+	else
+		wattron( ventana, A_BOLD );
+}
+
+void Popup::set_borders( 	const int32_t &_Top, const int32_t &_Right,
+							const int32_t &_Bottom, const int32_t &_Left,
+							const int32_t &_TopLeft, const int32_t &_TopRight,
+							const int32_t &_BottomRight, const int32_t &_BottomLeft ) noexcept
+{
+	wborder( ventana, _Top, _Right, _Bottom, _Left, _TopLeft, _TopRight, _BottomRight, _BottomLeft);
+}
+
+void Popup::draw() noexcept
+{
+	wrefresh( ventana );
+}
+
+void Popup::update() noexcept
+{
+	wrefresh( ventana );
+}
+
+void Popup::show() noexcept
+{
+	show_panel( panel );
+
+	update_panels();
+	doupdate();
+}
+
+void Popup::hide() noexcept
+{
+	hide_panel( panel );
+
+	update_panels();
+	doupdate();
 }

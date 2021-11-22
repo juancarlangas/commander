@@ -2,7 +2,6 @@
 #define WINDOWS_H
 
 #include "../common/common.hpp"
-#include "windows/zoom.hpp"
 
 //C functions
 extern	WINDOW 	*searchBox,		*searchWindow,
@@ -15,8 +14,6 @@ extern	WINDOW 	*searchBox,		*searchWindow,
 
 extern WINDOW 	*ventana[2];
 extern PANEL 	*panel[2];
-
-extern Zoom zoom();
 
 extern	short int x, y;
 extern	short displayShowResults, playlistShowResults;

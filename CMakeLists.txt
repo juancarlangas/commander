@@ -15,6 +15,7 @@ ADD_EXECUTABLE( Commander
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/ncurses.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/printing.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/screen.cpp"
+			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/window.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/data/databases.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/data/files.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/data/tables.cpp"
