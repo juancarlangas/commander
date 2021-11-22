@@ -10,12 +10,10 @@ short int x, y;
 short displayShowResults, playlistShowResults;	
 
 WINDOW 	*searchBox,		*searchWindow,
-		*lcdBox,		*lcdWindow,
+		*lcdWindow,
 		*zoomBox,		*zoomWindow,
-		*computerBox,	*computerWindow,
 		*displayBox,	*displayWindow,
-		*playlistBox,	*playlistWindow,
-		*digitsBox, 	*digitsWindow;
+		*playlistBox,	*playlistWindow;
 
 WINDOW 	*ventana[2];
 PANEL 	*panel[2];
@@ -92,12 +90,6 @@ short int init_ncurses(void)
 	
 void draw_windows(void)
 {
-	/* lcdBox */
-		wattron(lcdBox, COLOR_PAIR(GREEN_DEFAULT));
-		wattron(lcdBox, A_BOLD);
-		wborder(lcdBox, ' ', ' ', 0, 0, ACS_ULCORNER, ACS_URCORNER, ACS_LLCORNER, ACS_LRCORNER);
-		wrefresh(lcdBox);
-
 	/* playlistBox */
 		wattron(playlistBox, COLOR_PAIR(GRAY_DEFAULT));
 		wattron(playlistBox, A_BOLD);

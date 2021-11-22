@@ -6,7 +6,6 @@ ADD_EXECUTABLE( Commander
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/midi/audio.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/midi/keyboards.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/midi/communicator.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/channelForm.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/form.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/common/matroska.cpp"
@@ -30,6 +29,8 @@ target_include_directories( Commander
 target_link_libraries( Commander ncurses panel asound )
 
 target_compile_features( Commander PUBLIC cxx_std_20 )
+
+target_compile_options( Commander PRIVATE -Wall -Wextra -Wpedantic -Werror )
 
 set_target_properties( Commander
 			PROPERTIES

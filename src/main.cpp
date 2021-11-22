@@ -33,7 +33,6 @@ int main()
 	//************************************* tables ***********************************//
 	System **displayTable = new System *[ nRows[COMBINATIONS] ]();
 	System playlistTable[1000], *buffer;
-	int favourite[10];
 
 	int 	dRows, 		dTop  = 0, 	dIndex   = 0,
 			plRows = 0, plTop = 0, 	plIndexA = 0, plIndexB = 0;
@@ -47,11 +46,8 @@ int main()
 	//************************************** system ************************************//
 	short int 	mode = COMBINATOR,
 			winMode = MODE_DISPLAY;
-	bool	 	oxygenBridge = CONNECTED;
 	enum matroska command = BEGIN;
 	Variation var = VAR2;
-	short int part;
-	bool nuevo = TRUE;
 
 	//************************************** keyboards **********************************//
 	Keyboard keyboard;
@@ -121,7 +117,6 @@ int main()
 				dTop   = 0;
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
-				nuevo = TRUE;
 
 				updateWindow[SEARCH] 	= true;
 				updateWindow[DISPLAY]	= true;
@@ -141,7 +136,6 @@ int main()
 				charIndex = 0;
 				dTop = 0;
 				dIndex = 0;
-				nuevo = TRUE;
 
 				if (winMode == MODE_PLAYLIST) {
 					winMode = MODE_DISPLAY;
@@ -157,12 +151,10 @@ int main()
 			/////////////////////////// CHANGE_VARIATION ///////////////////////////
 			case PREV_VARIATION:
 				keyboard.prev_variation();
-				nuevo = TRUE;
 				break;
 
 			case NEXT_VARIATION :
 				keyboard.next_variation();
-				nuevo = TRUE;
 				break;
 				
 			/////////////////////////// INTRO ///////////////////////////
@@ -203,9 +195,6 @@ int main()
 				else if (winMode == MODE_PLAYLIST)
 					winMode = MODE_DISPLAY;
 
-				nuevo = TRUE;
-
-
 				updateWindow[DISPLAY] 	= true;
 				updateWindow[PLAYLIST] 	= true;
 				updateWindow[ZOOM]		= true;
@@ -240,7 +229,6 @@ int main()
 							updateWindow[PLAYLIST] = true;
 							break;
 					}
-				nuevo = TRUE;
 
 				updateWindow[DIGITS] = true;
 				updateWindow[ZOOM]	= true;
@@ -253,9 +241,8 @@ int main()
 				if (plRows > plTop + playlistShowResults)
 					(plTop)++;
 
-				save_playlist(playlistTable, (const int)plRows, "default");
+				save_playlist(playlistTable, plRows, "default");
 
-				nuevo = TRUE;
 
 				updateWindow[PLAYLIST] = true;
 
@@ -271,9 +258,7 @@ int main()
 				}
 				(plRows)--;
 
-				save_playlist(playlistTable, (const int)plRows, "default");
-
-				nuevo = TRUE;
+				save_playlist(playlistTable, plRows, "default");
 
 				if (plRows == 0) { //cambio
 					winMode = MODE_DISPLAY;
@@ -295,7 +280,6 @@ int main()
 				
 				dTop = 0;
 				dIndex = 0;
-				nuevo = TRUE;
 
 				updateWindow[0] = 1;
 				updateWindow[1] = 1;
@@ -314,7 +298,7 @@ int main()
 					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
 					decrease_index(&plTop, plRows, &plIndexB, winMode);
 					plIndexA = plIndexB;
-					save_playlist(playlistTable, (const int)plRows, "default");
+					save_playlist(playlistTable, plRows, "default");
 					updateWindow[PLAYLIST] = true;
 				}
 
@@ -322,7 +306,7 @@ int main()
 					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
 					increase_index(&plTop, plRows, &plIndexB, winMode);
 					plIndexA = plIndexB;
-					save_playlist(playlistTable, (const int)plRows, "default");
+					save_playlist(playlistTable, plRows, "default");
 					updateWindow[PLAYLIST] = true;
 				}
 				
@@ -344,8 +328,6 @@ int main()
 						dTop = dIndex = -1;
 					else
 						dTop = dIndex = 0;
-
-					nuevo = TRUE;
 
 					if (winMode == MODE_PLAYLIST) {
 						winMode = MODE_DISPLAY;
@@ -378,7 +360,7 @@ int main()
 
 					char file_name[40];
 					wscanw(ventana[INPUT_BOX], "%s", file_name);
-					save_playlist(playlistTable, (const int)plRows, file_name);
+					save_playlist(playlistTable, plRows, file_name);
 
 				noecho();
 				wclear(ventana[INPUT_BOX]);
@@ -435,7 +417,7 @@ int main()
 				update_panels();
 				doupdate();
 
-				save_playlist(playlistTable, (const int)plRows, "default");
+				save_playlist(playlistTable, plRows, "default");
 
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
@@ -458,7 +440,7 @@ int main()
 			case CLEAR_PLAYLIST:
 
 				plRows = 0;
-				save_playlist(playlistTable, (const int)plRows, "default");
+				save_playlist(playlistTable, plRows, "default");
 
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
@@ -612,15 +594,10 @@ int main()
 		if (updateWindow[LCD] == true)
 			print_lcd(lcdWindow, buffer, var);
 
-		if (updateWindow[COMPUTER] == true) {
-			print_computer(computerWindow, oxygenBridge, mode, var);
-			print_mode(computerWindow, mode);
-		}
-
 		if (updateWindow[ZOOM] == true) {
 			if (winMode == MODE_PLAYLIST)
 				print_zoom(zoomWindow, &playlistTable[plIndexB]);
-			else if (keyword[0] != '/' && dIndex >= 0)
+			else if ( keyword[0] != '/' and dIndex >= 0 )
 				print_zoom(zoomWindow, displayTable[dIndex]);
 			else {
 				wclear(zoomWindow);
@@ -628,7 +605,7 @@ int main()
 			}
 		}
 
-		command = get_command(caracter = getch(), mode, winMode, var, keyword, charIndex, dIndex);
+		command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
 
 	} while (command != EXIT);
 

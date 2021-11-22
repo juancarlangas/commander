@@ -8,7 +8,7 @@ Keyboard::Keyboard() :
 	device( NULL ),
 	port( "hw:1,0,0" )
 {
-	sprintf(name, "");
+	*name = '\0';
 	activeMode = false;
 	passiveMode = false;
 	part = 1;
@@ -45,16 +45,18 @@ void Keyboard::set_variation( const int16_t _Variacion ) noexcept
 void Keyboard::dump_variation() noexcept
 {
 	// sleep
-		static struct timespec keyboardTimer;
+	/*
+	 * static struct timespec keyboardTimer;
 		keyboardTimer.tv_sec 	= 0;
 		keyboardTimer.tv_nsec	= 200000000;
+	*/
 
 	// apagar sonidos
-		unsigned char allSoundsOff[3] = {0xB0, 0x7B, 0x7F};
+	//	unsigned char allSoundsOff[3] = {0xB0, 0x7B, 0x7F};
 
 	// cambio de página
-		unsigned char pageSysEx[2][7] =    {{0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x00, 0xF7},
-											{0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7}};
+	//	unsigned char pageSysEx[2][7] =    {{0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x00, 0xF7},
+	//										{0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7}};
 				
 	///////////////////- Track: col 7 - control: col 9 - Value: col 11 /////////////////////////
 

@@ -2,10 +2,8 @@
 #include "common.hpp"
 #include <string.h>
 
-enum matroska get_command(	const int digit,
-							const short mode, short windowMode, Variation variation, 
-							char cadena[], short int ci,
-							int dIndex )
+enum matroska get_command(	const int digit, const short mode, short windowMode, 
+							char cadena[], short int ci, int dIndex ) noexcept
 {
 	enum matroska comando = NEXT;
 
@@ -123,7 +121,7 @@ enum matroska get_command(	const int digit,
 			break;
 
 		default:
-			if (48 <= digit && digit <= 122 || digit == '/')
+			if ( ( 48 <= digit and digit <= 122 ) || digit == '/' )
 				comando = READ_CHAR;
 			else if (48 <= digit && digit <= 57)
 				comando = FAVOURITE;

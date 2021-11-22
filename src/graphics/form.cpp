@@ -37,12 +37,12 @@ Form::Form()
 bool Form::capture_value()
 {
 	// Initialize
-		sprintf(row.title, "");
-		sprintf(row.artist, "");
-		sprintf(row.genre, "");
-		sprintf(row.section, "");
-		sprintf(row.keywords, "");
-		sprintf(row.type, "");
+		*row.title = '\0';
+		*row.artist = '\0';
+		*row.genre = '\0';
+		*row.section = '\0';
+		*row.keywords = '\0';
+		*row.type = '\0';
 		row.bnk = 'A';
 		row.num = 0;
 

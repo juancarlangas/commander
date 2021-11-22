@@ -35,8 +35,8 @@ enum matroska {	NEXT = 0,
 				EXIT				};
 
 enum matroska get_command(	const int digit,
-							const short mode, short windowMode, Variation variation, 
+							const short mode, short windowMode,
 							char cadena[], short int ci,
-							int dIndex );
+							int dIndex ) noexcept;
 
 #endif
