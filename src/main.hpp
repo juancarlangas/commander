@@ -12,6 +12,8 @@
 #include "graphics/windows.hpp"
 #include "graphics/ncurses.hpp"
 #include "graphics/screen.hpp"
+#include "graphics/popup.hpp"
+#include "graphics/popups/orchestra.hpp"
 #include "common/common.hpp"
 #include "common/string.hpp"
 #include "common/matroska.hpp"
@@ -22,4 +24,5 @@
 
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
-extern Popup orquestacion;
+
+extern Orchestra orquestacion;

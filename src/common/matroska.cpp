@@ -58,10 +58,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 			break;
 
 		case 27:
-			if ( windowMode == MODE_ORCHESTRA )
-				comando = CLOSE_ORCHESTRA;
-			else
-				comando = ESCAPE;
+			comando = ESCAPE;
 			break;
 
 		case KEY_F(1):

@@ -2,6 +2,7 @@
 #include "common/common.hpp"
 #include "common/matroska.hpp"
 #include "data/databases.hpp"
+#include "graphics/ncurses.hpp"
 #include <cstdlib>
 
 int main()
@@ -530,16 +531,13 @@ int main()
 
 			//////////////////////////////// EDIT_ORCHESTRATION ///////////////////////////////////
 			case EDIT_ORCHESTRATION :
-				winMode = MODE_ORCHESTRA;
+				// ida
 				orquestacion.show();
+				update_popups(); // se decide poner aquí para no refrescar varias veces
+				orquestacion.capture_key();
 
-				break;
-
-			//////////////////////////////// EDIT_ORCHESTRATION ///////////////////////////////////
-			case CLOSE_ORCHESTRA :
-				orquestacion.hide();
-				winMode = MODE_DISPLAY;
-
+				// retorno
+				update_popups();
 				draw_windows();
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;
@@ -548,7 +546,6 @@ int main()
 				updateWindow[COMPUTER] 	= true;
 				updateWindow[DIGITS]	= true;
 				updateWindow[ZOOM]		= true;	
-
 				break;
 
 			///////////////////////// EXPORTATE /////////////////////

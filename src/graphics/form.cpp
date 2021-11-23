@@ -34,6 +34,7 @@ Form::Form()
 									VALUE, 3);
 	
 	hide_panel( panel );
+
 	for ( int32_t i = 0; i < 8; ++i )
 		field[i].hide();
 }

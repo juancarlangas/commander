@@ -3,7 +3,7 @@
 #include <iostream>
 
 void Popup::init( const int32_t _Ysize, const int32_t _Xsize,
-					const int32_t _Xpos, const int32_t _Ypos ) noexcept
+					const int32_t _Ypos, const int32_t _Xpos ) noexcept
 {
 	y_size = _Ysize;
 	x_size = _Xsize;
@@ -54,15 +54,9 @@ void Popup::update() noexcept
 void Popup::show() noexcept
 {
 	show_panel( panel );
-
-	update_panels();
-	doupdate();
 }
 
 void Popup::hide() noexcept
 {
 	hide_panel( panel );
-
-	update_panels();
-	doupdate();
 }

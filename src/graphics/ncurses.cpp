@@ -80,8 +80,7 @@ short int init_ncurses(void)
 	hide_panel(panel[DIALOG_WINDOW]);
 	hide_panel(panel[INPUT_BOX]);
 
-	orquestacion.init( y * 90 / 200, x * 90 / 200, y * 20 / 200, x * 20 / 200 );
-	orquestacion.hide();
+	orquestacion.init( y * 180 / 200, x * 180 / 200, y * 10 / 200, x * 10 / 200 );
 
 	update_panels();
 	doupdate();
@@ -152,4 +151,10 @@ void tint_lcd(const short int mode)
 	}
 
 	return;
+}
+
+void update_popups() noexcept
+{
+	update_panels();
+	doupdate();
 }
