@@ -32,8 +32,8 @@ int main()
 
 	//************************************* tables ***********************************//
 	System **displayTable = new System *[ nRows[COMBINATIONS] ]();
-	System playlistTable[1000], *buffer;
-
+	System playlistTable[ 50 ], *buffer;
+			  
 	int 	dRows, 		dTop  = 0, 	dIndex   = 0,
 			plRows = 0, plTop = 0, 	plIndexA = 0, plIndexB = 0;
 	char 	keyword[LONG_STRING] = "\0";
@@ -47,15 +47,10 @@ int main()
 	short int 	mode = COMBINATOR,
 			winMode = MODE_DISPLAY;
 	enum matroska command = BEGIN;
-	Variation var = VAR2;
 
 	//************************************** keyboards **********************************//
 	Keyboard keyboard;
 	keyboard.set_name("X50");
-
-	// bool bridge;
-	// sprintf(directory, "%s/bridge_state.dat", homedir);
-
 
 	short channel;
 		FILE *channelFile = fopen("/home/juancarlangas/.commander/midiChannel.dat", "r");
@@ -207,11 +202,11 @@ int main()
 				if (caracter == KEY_UP || caracter == KEY_LEFT)
 					switch (winMode) {
 						case MODE_DISPLAY:
-							decrease_index(&dTop, dRows, &dIndex, winMode);
+							decrease_index( &dTop, &dIndex );
 							updateWindow[DISPLAY] = true;
 							break;
 						case MODE_PLAYLIST:
-							decrease_index(&plTop, plRows, &plIndexB, winMode);
+							decrease_index(&plTop, &plIndexB );
 							plIndexA = plIndexB;
 							updateWindow[PLAYLIST] = true;
 							break;
@@ -253,7 +248,7 @@ int main()
 				for (i = plIndexA; i <= plRows - 1; i++)  //succión
 					playlistTable[i] = playlistTable[i + 1];
 				if (plIndexA == plRows - 1) { //fin de lista
-					decrease_index(&plTop, plRows, &plIndexA, winMode);
+					decrease_index(&plTop, &plIndexA );
 					(plIndexB = plIndexA);
 				}
 				(plRows)--;
@@ -296,7 +291,7 @@ int main()
 
 				if (winMode == MODE_PLAYLIST && caracter == 566 && plIndexB > 0) {
 					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
-					decrease_index(&plTop, plRows, &plIndexB, winMode);
+					decrease_index(&plTop, &plIndexB );
 					plIndexA = plIndexB;
 					save_playlist(playlistTable, plRows, "default");
 					updateWindow[PLAYLIST] = true;
@@ -319,15 +314,20 @@ int main()
 				keyword[charIndex++] = caracter;
 				keyword[charIndex] = '\0';
 
-				if (keyword[charIndex - 1] != -61) { //skip alter-character
+				if (keyword[charIndex - 1] != -61) { // saltamos acentos y tildes
 					charIndex = no_accent(keyword, keyword); //clean
 
-					llenado_displayTable(displayTable, dBase[mode].base, nRows[mode], keyword, &dRows);
+					llenado_displayTable(	displayTable, dBase[mode].base,
+											nRows[mode], keyword, &dRows	);
 
+					/*
+					 * Esta parte se supone que era un hack para que no imprimiera nada
+					 * pero resultó contraproducente pues el -1 sí habilitaba la impresión.
 					if (dRows == 0)
 						dTop = dIndex = -1;
 					else
 						dTop = dIndex = 0;
+					*/
 
 					if (winMode == MODE_PLAYLIST) {
 						winMode = MODE_DISPLAY;
@@ -586,13 +586,13 @@ int main()
 
 		if (updateWindow[PLAYLIST] == true)
 			print_playlist(	playlistWindow, playlistTable,
-							plTop, 	plRows, plIndexA, plIndexB, mode, winMode);
+							plTop, 	plRows, plIndexA, plIndexB, winMode);
 
 		if (updateWindow[SEARCH] == true)
 			print_search(searchWindow, keyword);
 
 		if (updateWindow[LCD] == true)
-			print_lcd(lcdWindow, buffer, var);
+			print_lcd( lcdWindow, buffer );
 
 		if (updateWindow[ZOOM] == true) {
 			if (winMode == MODE_PLAYLIST)

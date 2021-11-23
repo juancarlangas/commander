@@ -13,7 +13,7 @@ extern short int displayShowResults, playlistShowResults;
 
 void print_displayTable(	WINDOW *window,
 							System *displayTable[],
-							const unsigned int top, const short resultRows, 
+							const int32_t top, const short resultRows, 
 							const int index,
 							short int winMode)
 {
@@ -22,7 +22,7 @@ void print_displayTable(	WINDOW *window,
 
 	wclear(window);
 	
-	for (i = top; (i <= top + displayShowResults - 1) && (i <= resultRows - 1); i++) {
+	for (i = top; ( i <= top + displayShowResults - 1) && (i <= resultRows - 1); i++) {
 		switch ((displayTable[i]->section)[0]) {
 			case 'L':
 				wattron(window, COLOR_PAIR(MAGENTA_DEFAULT));
@@ -59,10 +59,8 @@ void print_displayTable(	WINDOW *window,
 }
 
 void print_playlist(	WINDOW *window,
-						System playlistTable[],
-						const unsigned int top, const short resultRows, 
-						const int indexA, const int indexB,
-						const short int mode, short int winMode		)
+						System playlistTable[], const int32_t top, const short resultRows, 
+						const int indexA, const int indexB, short int winMode )
 {
 	int32_t i;
 	short int row = 1;
@@ -95,8 +93,7 @@ void print_playlist(	WINDOW *window,
 
 void lcd(	WINDOW *window, 
 			const short int yPos, const short int xPos, const short int limit,
-			const short int color, const bool cursor,
-			const char cadena[])
+			const bool cursor, const char cadena[])
 {
 	short int i = 0, j;
 	
@@ -121,18 +118,15 @@ void lcd(	WINDOW *window,
 void print_search(WINDOW *window, char cadena[])
 {
 	wclear(window);
-	lcd(window, 0, 2, 11, 
-		5, TRUE, 
-		cadena);
+	lcd(window, 0, 2, 11, TRUE, cadena);
 	wrefresh(window);
 
 	return;	
 }
 
-void print_lcd(WINDOW *window, System *linea, const Variation var)
+void print_lcd(WINDOW *window, System *linea )
 {
 	short int k = 0, yPos;
-	char num[4];
 	
 	wclear(window);
 	wattron(window, COLOR_PAIR(GREEN_DEFAULT));
@@ -218,17 +212,6 @@ void print_computer(WINDOW *window, const short int oxygen, const short int mode
 	return;
 }
 
-void print_mode(WINDOW *window, const short int mode)
-{
-	wattron(window, A_BOLD);
-
-	
-	
-	wrefresh(window);
-
-	return;
-}
-
 void print_zoom(WINDOW *window, System *linea)
 {
 	//static char message[50];
@@ -261,7 +244,7 @@ void print_zoom(WINDOW *window, System *linea)
 		
 		//sprintf(message, "%c-%03hd %s", linea->bnk2, linea->num2, linea->title);
 
-		lcd(window, 1, 2, 13, 5, FALSE, linea->title);
+		lcd(window, 1, 2, 13, FALSE, linea->title);
 
 		mvwprintw(window, 0, 2, "%c-%03hd", linea->bnk, linea->num);
 		wrefresh(window);

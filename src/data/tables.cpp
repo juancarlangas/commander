@@ -10,8 +10,7 @@ void llenado_displayTable(	System *displayTable[], System dataBase[],
 							int *dRows)
 {
 	short int match;
-	short int i, iDisplay, j, k;
-	short int seekTop, seekBottom;
+	short int i;
 
 	switch (string[0]) {
 		case '\0': /*CLEAN*/

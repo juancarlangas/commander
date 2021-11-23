@@ -5,8 +5,7 @@
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
 
-void decrease_index(	int *top, const int resultRows, int *index, 
-						const short int winMode	)
+void decrease_index( int *top, int *index )
 {
 	
 	if (*index > 0) {
@@ -45,7 +44,7 @@ void korg_drag(	System table[],
 	System store;
 
 	if (caracter == 566) {
-		if (rows >= vabs(indexUP - indexDOWN) + 1) {
+		if (rows >= static_cast<int32_t>( vabs(indexUP - indexDOWN) + 1) ) {
 			store = table[indexUP - 1];
 			for (i = indexUP; i <= indexDOWN; i++)
 				table[i - 1] = table[i];
@@ -54,7 +53,7 @@ void korg_drag(	System table[],
 	}
 	
 	else {
-		if (rows >= vabs(indexUP - indexDOWN) + 1) {
+		if (rows >= static_cast<int32_t>( vabs(indexUP - indexDOWN) + 1) ) {
 			store = table[indexDOWN + 1];
 			for (i = indexDOWN; i >= indexUP; i--)
 				table[i + 1] = table[i];

@@ -5,6 +5,11 @@
 void Popup::init( const int32_t _Ysize, const int32_t _Xsize,
 					const int32_t _Xpos, const int32_t _Ypos ) noexcept
 {
+	y_size = _Ysize;
+	x_size = _Xsize;
+	y_pos = _Ypos;
+	x_pos = _Xpos;
+
 	ventana = newwin( y_size, x_size, y_pos, x_pos );
 	panel = new_panel( ventana );
 }
