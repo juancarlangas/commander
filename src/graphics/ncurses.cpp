@@ -1,7 +1,8 @@
 #include "common/common.hpp"
 #include "graphics/colors.hpp"
 #include "graphics/windows.hpp"
-#include "graphics/window.hpp"
+#include "graphics/ncurses.hpp"
+#include "popups/orchestra.hpp"
 
 #include <ncurses.h>
 #include <stdlib.h>
@@ -18,7 +19,7 @@ WINDOW 	*searchBox,		*searchWindow,
 WINDOW 	*ventana[2];
 PANEL 	*panel[2];
 
-Popup popup_orquestacion;
+Orchestra orquestacion;
 
 short int init_ncurses(void)
 {
@@ -79,8 +80,8 @@ short int init_ncurses(void)
 	hide_panel(panel[DIALOG_WINDOW]);
 	hide_panel(panel[INPUT_BOX]);
 
-	popup_orquestacion.init( y * 90 / 200, x * 90 / 200, y * 20 / 200, x * 20 / 200 );
-	popup_orquestacion.hide();
+	orquestacion.init( y * 90 / 200, x * 90 / 200, y * 20 / 200, x * 20 / 200 );
+	orquestacion.hide();
 
 	update_panels();
 	doupdate();
@@ -132,9 +133,9 @@ void draw_windows(void)
 		wattron(ventana[INPUT_BOX], A_BOLD);
 	
 	// POPUP ORQUESTACIÓN
-		popup_orquestacion.set_color( WHITE_BLACK );
-		popup_orquestacion.set_font_width( "Bold" );
-		popup_orquestacion.set_borders( 0, 0, 0, 0, 0, 0, 0, 0 );
+		orquestacion.set_color( WHITE_BLACK );
+		orquestacion.set_font_width( "Bold" );
+		orquestacion.set_borders( 0, 0, 0, 0, 0, 0, 0, 0 );
 
 	return;
 }

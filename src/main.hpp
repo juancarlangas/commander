@@ -9,7 +9,6 @@
 #include "midi/communicator.hpp"
 #include "graphics/printing.hpp"
 #include "graphics/form.hpp"
-#include "graphics/channelForm.hpp"
 #include "graphics/windows.hpp"
 #include "graphics/ncurses.hpp"
 #include "graphics/screen.hpp"
@@ -23,4 +22,4 @@
 
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
-extern Popup popup_orquestacion;
+extern Popup orquestacion;

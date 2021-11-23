@@ -32,6 +32,10 @@ Form::Form()
 									BANK, 1);
 	field[NUM].create(		"Num1", 3, x * 12 / 200, y * 144 / 200, x * 142 / 200,
 									VALUE, 3);
+	
+	hide_panel( panel );
+	for ( int32_t i = 0; i < 8; ++i )
+		field[i].hide();
 }
 
 bool Form::capture_value()
@@ -163,7 +167,7 @@ System Form::get_value()
 
 void Form::show()
 {
-	show_panel(panel);
+	show_panel( panel );
 	curs_set(true);
 
 	for (short w = TITLE; w <= 9; w++)

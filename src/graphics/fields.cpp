@@ -30,21 +30,18 @@ void Field::show()
 	show_panel(pEspacio);
 }
 
-/////////////////////////////// hide ////////////////////////
 void Field::hide()
 {
 	hide_panel(pCaja);
 	hide_panel(pEspacio);
 }
 
-/////////////////////////////// set_cursor //////////////////
 void Field::get_cursor()
 {
 	wprintw(wEspacio, "");
 	wrefresh(wEspacio);
 }
 
-//////////////////////////////////// set_string(const char *) ////////////////////////////7
 void Field::set_string(const char *word)
 {
 	sprintf(cadena, "%s", word);

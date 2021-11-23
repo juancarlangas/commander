@@ -57,8 +57,6 @@ int main()
 			fscanf(channelFile, "%hd", &channel);
 		fclose(channelFile);
 
-	ChannelForm channelForm;
-
 	//*************************************** engine ***********************************//
 	do {
 		for (i = LCD; i <= ZOOM; i++)
@@ -533,13 +531,13 @@ int main()
 			//////////////////////////////// EDIT_ORCHESTRATION ///////////////////////////////////
 			case EDIT_ORCHESTRATION :
 				winMode = MODE_ORCHESTRA;
-				popup_orquestacion.show();
+				orquestacion.show();
 
 				break;
 
 			//////////////////////////////// EDIT_ORCHESTRATION ///////////////////////////////////
 			case CLOSE_ORCHESTRA :
-				popup_orquestacion.hide();
+				orquestacion.hide();
 				winMode = MODE_DISPLAY;
 
 				draw_windows();

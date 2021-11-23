@@ -18,7 +18,7 @@ class Popup {
 		void update() noexcept;
 		void show() noexcept;
 		void hide() noexcept;
-	private:
+	protected:
 		WINDOW *ventana; // sencillito porque es una perrazera, cada ventana requiere su panel !!!!
 		PANEL *panel;
 		int32_t y_size, x_size, y_pos, x_pos;
