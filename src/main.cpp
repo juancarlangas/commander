@@ -32,8 +32,8 @@ int main()
 
 	//************************************* tables ***********************************//
 	System **displayTable = new System *[ nRows[COMBINATIONS] ]();
-	System playlistTable[ 50 ], *buffer;
-			  
+	System *playlistTable = new System [ nRows[COMBINATIONS] ](), *buffer;
+
 	int 	dRows, 		dTop  = 0, 	dIndex   = 0,
 			plRows = 0, plTop = 0, 	plIndexA = 0, plIndexB = 0;
 	char 	keyword[LONG_STRING] = "\0";
