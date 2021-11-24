@@ -532,7 +532,8 @@ int main()
 			//////////////////////////////// EDIT_ORCHESTRATION ///////////////////////////////////
 			case EDIT_ORCHESTRATION :
 				// ida
-				orquestacion.show();
+				buffer = displayTable[ dIndex ];
+				orquestacion.show( buffer );
 				update_popups(); // se decide poner aquí para no refrescar varias veces
 				orquestacion.capture_key();
 

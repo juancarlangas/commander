@@ -2,6 +2,7 @@
 #define FIELDS_H
 
 #include "../common/common.hpp"
+#include <string>
 
 enum Type {STRING, BANK, VALUE};
 
@@ -20,6 +21,7 @@ public:
 	void set_string(const char *);
 	void set_string(const char);
 	void set_string(const short);
+	void set_content( const std::string & ) noexcept;
 private:
 	Type type;
 	short limit;

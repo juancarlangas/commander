@@ -131,11 +131,6 @@ void draw_windows(void)
 		wattron(ventana[INPUT_BOX], COLOR_PAIR(GRAY_DEFAULT));
 		wattron(ventana[INPUT_BOX], A_BOLD);
 	
-	// POPUP ORQUESTACIÓN
-		orquestacion.set_color( WHITE_BLACK );
-		orquestacion.set_font_width( "Bold" );
-		orquestacion.set_borders( 0, 0, 0, 0, 0, 0, 0, 0 );
-
 	return;
 }
 

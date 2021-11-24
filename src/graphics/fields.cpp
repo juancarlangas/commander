@@ -2,6 +2,8 @@
 #include "../common/common.hpp"
 #include "../graphics/colors.hpp"
 #include "../common/string.hpp"
+#include <string_view>
+#include <string.h>
 
 void Field::create(	const char* legend,
 					const int high, const int width, const int y, const int x,
@@ -57,7 +59,6 @@ void Field::set_string(const char *word)
 	wrefresh(wEspacio);
 }
 
-//////////////////////////////////// set_string(const char) ////////////////////////////7
 void Field::set_string(const char digit)
 {
 	cadena[0] = digit;
@@ -68,7 +69,6 @@ void Field::set_string(const char digit)
 	wrefresh(wEspacio);
 }
 
-//////////////////////////////////// set_string(const short) ////////////////////////////7
 void Field::set_string(const short number)
 {
 	sprintf(cadena, "%03d", number); 
@@ -78,7 +78,15 @@ void Field::set_string(const short number)
 	wrefresh(wEspacio);
 }
 
-///////////////////////////// process_key ///////////////////////
+void Field::set_content( const std::string &_Cadena ) noexcept
+{
+	strcpy( cadena, _Cadena.c_str() );
+
+	wclear( wEspacio );
+	wprintw( wEspacio, "%s", cadena );
+	wrefresh( wEspacio );
+}
+
 bool Field::process_key(int tecla)
 {
 	bool success = false;
@@ -133,7 +141,6 @@ bool Field::process_key(int tecla)
 	return true;
 }
 
-///////////////////////////////// get_string() //////////////////////////////////
 void Field::get_string(char word[])
 {
 	sprintf(word, "%s", cadena);
