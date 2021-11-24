@@ -4,6 +4,7 @@
 #include "graphics/popup.hpp"
 #include "graphics/fields.hpp"
 #include "data/databases.hpp"
+#include "graphics/popups/text_popup.hpp"
 
 class Orchestra : public Popup {
 	public:
@@ -13,8 +14,9 @@ class Orchestra : public Popup {
 		void hide() noexcept;
 		void capture_key() noexcept;
 	private:
-		Popup base;
+		Popup box, area;
 		Field etiqueta_field;
+		TextPopup variacion_text_box;
 		int16_t variacion;
 		struct System *info;
 };

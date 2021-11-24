@@ -2,6 +2,7 @@
 #include "../common/common.hpp"
 #include "../graphics/colors.hpp"
 #include "../common/string.hpp"
+#include <iostream>
 #include <string_view>
 #include <string.h>
 
@@ -144,4 +145,23 @@ bool Field::process_key(int tecla)
 void Field::get_string(char word[])
 {
 	sprintf(word, "%s", cadena);
+}
+
+void Field::set_font_color( const int32_t &_Color ) noexcept
+{
+	wattron( wEspacio, COLOR_PAIR( _Color ) );
+}
+
+void Field::set_font_width( const std::string_view _Style ) noexcept
+{
+	if ( _Style != "Bold" and _Style != "Regular" ) {
+		std::cerr << _Style << " no se reconoce como un estilo en Field::set_font_width()"
+			<< std::endl;
+		exit( EXIT_FAILURE );
+	}
+
+	if ( _Style == "Regular" )
+		wattroff( wEspacio, A_BOLD );
+	else
+		wattron( wEspacio, A_BOLD );
 }

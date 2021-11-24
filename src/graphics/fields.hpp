@@ -22,6 +22,8 @@ public:
 	void set_string(const char);
 	void set_string(const short);
 	void set_content( const std::string & ) noexcept;
+	void set_font_color( const int32_t &color ) noexcept;
+	void set_font_width( const std::string_view ) noexcept;
 private:
 	Type type;
 	short limit;

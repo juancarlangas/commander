@@ -55,11 +55,11 @@ short int init_ncurses(void)
 	
 	refresh();
 
-	searchBox 		= newwin(5, 				x * 140 / 200,     	y * 84 / 100,     	x * 0 / 200	 	);
-	searchWindow 	= newwin(3, 				x * 140 / 200 - 2, 	y * 84 / 100 + 1, 	x * 0 / 200 + 1	);
+	searchBox 		= newwin(5, 				x * 140 / 200,     	y * 86 / 100,     	x * 0 / 200	 	);
+	searchWindow 	= newwin(3, 				x * 140 / 200 - 2, 	y * 86 / 100 + 1, 	x * 0 / 200 + 1	);
 
 	// lcdBox		= newwin(y * 38 / 200,	 	x * 98 / 200,     	y * 36 / 200,		x * 102 / 200	);
-	lcdWindow 		= newwin(y * 38 / 200 - 2, 	x * 98 / 200 - 2, 	y * 38 / 200 + 1,	x * 102 / 200 + 1);
+	lcdWindow 		= newwin(y * 38 / 200 - 2, 	x * 98 / 200 - 2, 	y * 36 / 200 + 1,	x * 102 / 200 + 1);
 	
 	playlistBox		= newwin(y * 70 / 100, 		x * 60 / 200, 		y * 34 / 100,	   	x * 141 / 200  	);
 	playlistWindow 	= newwin(y * 70 / 100 - 3, 	x * 60 / 200 - 2, 	y * 34 / 100 + 2, 	x * 141 / 200 + 1);
