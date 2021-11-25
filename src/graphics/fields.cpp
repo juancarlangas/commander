@@ -2,18 +2,19 @@
 #include "../common/common.hpp"
 #include "../graphics/colors.hpp"
 #include "../common/string.hpp"
+#include <curses.h>
 #include <iostream>
 #include <string_view>
 #include <string.h>
 
 void Field::create(	const char* legend,
-					const int high, const int width, const int y, const int x,
+					const int high, const int width, const int _Y, const int _X,
 					const Type tipo, const short limite)
 {
-	wCaja = newwin(high, width, y, x);
+	wCaja = newwin(high, width, _Y, _X);
 	pCaja = new_panel(wCaja);
 
-	wEspacio = newwin(high - 2, width - 2, y + 1, x + 1);
+	wEspacio = newwin(high - 2, width - 2, _Y + 1, _X + 1);
 	pEspacio = new_panel(wEspacio);
 
 	type = tipo;
@@ -56,7 +57,7 @@ void Field::set_string(const char *word)
 	}
 
 	wclear(wEspacio);
-	wprintw(wEspacio, "%s", cadena);
+	waddstr(wEspacio, cadena);
 	wrefresh(wEspacio);
 }
 
@@ -66,7 +67,7 @@ void Field::set_string(const char digit)
 	cadena[1] = '\0';
 
 	wclear(wEspacio);
-	wprintw(wEspacio, "%s", cadena);
+	waddstr(wEspacio, cadena);
 	wrefresh(wEspacio);
 }
 

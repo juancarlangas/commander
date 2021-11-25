@@ -4,6 +4,7 @@
 #include "data/databases.hpp"
 #include "graphics/ncurses.hpp"
 #include <cstdlib>
+#include <panel.h>
 
 int main()
 {
@@ -341,12 +342,10 @@ int main()
 					updateWindow[DISPLAY] = true;
 
 				}
-
 				break;
 
 			/////////////////////////// SAVE_PLAYLIST ///////////////////////////
 			case SAVE_PLAYLIST:
-			{
 				show_panel(panel[DIALOG_WINDOW]);
 				show_panel(panel[INPUT_BOX]);
 				update_panels();
@@ -387,11 +386,10 @@ int main()
 				updateWindow[PLAYLIST]	= true;
 
 				break;
-			}
 
 			/////////////////////////// LOAD_PLAYLIST ///////////////////////////
 			case LOAD_PLAYLIST:
-			{
+
 				show_panel(panel[DIALOG_WINDOW]);
 				show_panel(panel[INPUT_BOX]);
 				update_panels();
@@ -401,11 +399,11 @@ int main()
 				wmove(ventana[INPUT_BOX], 0, 0);
 				curs_set(true);
 				noraw();
-
+				{
 					char file_name[40];
 					wscanw(ventana[INPUT_BOX], "%s", file_name);
 					plRows = load_playlist(playlistTable, file_name);
-
+				}
 				noecho();
 				wclear(ventana[INPUT_BOX]);
 				curs_set(false);
@@ -434,7 +432,6 @@ int main()
 				updateWindow[PLAYLIST]	= true;
 
 				break;
-			}
 			/////////////////////////// CLEAR PLAYLIST ///////////////////////////
 			case CLEAR_PLAYLIST:
 
@@ -482,10 +479,9 @@ int main()
 
 				break;
 			}
-
 			////////////////////// DELETE_VALUE ///////////////////////
-			case DELETE_VALUE:
 			{
+			case DELETE_VALUE:
 				int difference = displayTable[dIndex] - &(dBase[mode].base[0]);
 
 				dBase[mode].delete_value(difference);
@@ -502,7 +498,6 @@ int main()
 
 				break;
 			}
-
 			//////////////////////// EDIT_VALUE /////////////////////////77
 			case EDIT_VALUE:
 			{
@@ -528,7 +523,6 @@ int main()
 
 				break;
 			}
-
 			//////////////////////////////// EDIT_ORCHESTRATION ///////////////////////////////////
 			case EDIT_ORCHESTRATION :
 				// ida

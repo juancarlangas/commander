@@ -2,7 +2,7 @@
 #include "graphics/colors.hpp"
 #include "graphics/windows.hpp"
 #include "graphics/ncurses.hpp"
-#include "popups/orchestra.hpp"
+#include "graphics/orchestra.hpp"
 
 #include <ncurses.h>
 #include <stdlib.h>
@@ -82,9 +82,8 @@ short int init_ncurses(void)
 
 	orquestacion.init( y * 180 / 200, x * 180 / 200, y * 10 / 200, x * 10 / 200 );
 
-	update_panels();
-	doupdate();
-	
+	refresh();
+
 	return y;
 }
 	
@@ -145,6 +144,7 @@ void tint_lcd(const short int mode)
 			break;
 	}
 
+	wrefresh( lcdWindow );
 	return;
 }
 

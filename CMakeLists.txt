@@ -13,10 +13,9 @@ ADD_EXECUTABLE( Commander
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/ncurses.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/printing.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/screen.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/ventana.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/popup.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/popups/orchestra.cpp"
-			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/popups/text_popup.cpp"
+			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/window.cpp"
+			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/orchestra.cpp"
+			"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/text_popup.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/data/databases.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/data/files.cpp"
 			"${CMAKE_CURRENT_SOURCE_DIR}/src/data/tables.cpp"
@@ -25,6 +24,7 @@ ADD_EXECUTABLE( Commander
 			"/home/juancarlangas/Programming/lib/utilities/src/files.cpp" )
 	
 target_include_directories( Commander
+	PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
 	PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src"
 	PRIVATE	"/home/juancarlangas/Programming/lib/" )
 

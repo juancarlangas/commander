@@ -7,7 +7,7 @@
 
 Form::Form()
 {
-	getmaxyx(stdscr, y, x);
+	getmaxyx(stdscr, y, x); // se crea en tiempo real justo para que de tiempo de obtener x y y
 
 	window	= newwin(y * 160 / 200, x * 120 / 200, y * 30 / 200, x * 40 / 200);	
 	panel 	= new_panel(window);
@@ -33,6 +33,7 @@ Form::Form()
 	field[NUM].create(		"Num1", 3, x * 12 / 200, y * 144 / 200, x * 142 / 200,
 									VALUE, 3);
 	
+	wrefresh( window );
 	hide_panel( panel );
 
 	for ( int32_t i = 0; i < 8; ++i )

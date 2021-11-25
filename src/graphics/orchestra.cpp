@@ -1,56 +1,62 @@
-#include "graphics/popups/orchestra.hpp"
+#include "graphics/orchestra.hpp"
+#include "elements/text_popup.hpp"
 #include "graphics/colors.hpp"
 #include "graphics/ncurses.hpp"
 #include <ncurses.h>
 #include <panel.h>
 #include <string>
 
-void Orchestra::init(	const int32_t _Ysize, const int32_t _Xsize,
+void KeyboardScheme::init(	const int32_t _Ysize, const int32_t _Xsize,
+							const int32_t _Ypos, const int32_t _Xpos ) noexcept
+{
+	TextPopup::init( 6, 64, _Ypos + ( _Ysize * 50 / 200 ), _Xpos + ( _Xsize / 2 ) - 31 );
+	TextPopup::set_font_color( WHITE_DEFAULT );
+	TextPopup::set_font_width( "Bold" );
+	TextPopup::update();
+}
+
+void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 						const int32_t _Ypos, const int32_t _Xpos ) noexcept
 {
 	variacion = 0;
 
-	// Caja
-	box.init( _Ysize, _Xsize, _Ypos, _Xpos );
-	box.set_font_color( WHITE_DEFAULT );
-	box.set_font_width( "Bold" );
-	box.set_border_symbols( 0, 0, 0, 0, 0, 0, 0, 0 );
-	box.draw();
-	box.hide();
+	// Base
+	base.init( _Ysize, _Xsize, _Ypos, _Xpos );
+	base.set_box_color( WHITE_DEFAULT );
+	base.set_font_width( "Bold" );
+	base.define_box( 0, 0, 0, 0, 0, 0, 0, 0 );
+	base.update();
 
-	// Box
-	area.init( _Ysize - 2, _Xsize - 2, _Ypos + 1, _Xpos + 1 );
-	area.draw();
-	area.hide();
-	
-	// text-box
-	variacion_text_box.init( 1, 18, _Ypos + 2, _Xpos + 3 );
+	// Indicador de variación
+	variacion_text_box.init( 3, 20, _Ypos + 1, _Xpos + 2 );
 	variacion_text_box.set_font_color( GRAY_DEFAULT );
 	variacion_text_box.set_font_width( "Bold" );
-	variacion_text_box.draw();
-	variacion_text_box.hide();
+	variacion_text_box.update();
+
+	// keyboard_text_box
+	keyboard_scheme.init( 6, 64, _Ysize * 50 / 200, _Xpos + ( _Xsize / 2 ) - 31 );
+
 
 	// Campos
 	etiqueta_field.create( "Etiqueta", 3, _Xsize * 80 / 200, _Ypos + 1, _Xpos + ( _Xsize / 4 ),
 							STRING, 16 );
 	etiqueta_field.set_font_width( "Bold" );
 	etiqueta_field.set_font_color( WHITE_DEFAULT );
-	etiqueta_field.hide();
 
-	update_panels();
-	doupdate();
+	hide();
 }
 
 void Orchestra::show( struct System *&_Row ) noexcept
 {
 	info = _Row;
 
-	box.show();
-	area.show();
+	base.show();
 
 	variacion_text_box.show();
 	variacion_text_box.set_text( "Variacion " + std::to_string( variacion + 1 ) +
 								" de " + std::to_string( info->n_variaciones ) );
+
+	keyboard_scheme.show();
 
 	etiqueta_field.show();
 	etiqueta_field.set_content( info->variacion[ variacion ].etiqueta );
@@ -59,10 +65,9 @@ void Orchestra::show( struct System *&_Row ) noexcept
 void Orchestra::hide() noexcept
 {
 	etiqueta_field.hide();
-
 	variacion_text_box.hide();
-	area.hide();
-	box.hide();
+	keyboard_scheme.hide();
+	base.hide();
 }
 
 void Orchestra::capture_key() noexcept

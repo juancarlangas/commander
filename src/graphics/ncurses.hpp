@@ -1,7 +1,7 @@
 #ifndef NCURSES_HPP
 #define NCURSES_HPP
 
-#include "graphics/popup.hpp"
+#include "graphics/window.hpp"
 
 short int init_ncurses(void);
 void draw_windows(void);
