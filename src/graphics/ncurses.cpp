@@ -32,7 +32,7 @@ short int init_ncurses(void)
 	
 	getmaxyx(stdscr, y, x);
 
-	displayShowResults  = y * 54 / 100 - 4;
+	displayShowResults  = y * 56 / 100 - 4;
 	playlistShowResults = y * 70 / 100 - 4;
 
 
@@ -61,11 +61,11 @@ short int init_ncurses(void)
 	// lcdBox		= newwin(y * 38 / 200,	 	x * 98 / 200,     	y * 36 / 200,		x * 102 / 200	);
 	lcdWindow 		= newwin(y * 38 / 200 - 2, 	x * 98 / 200 - 2, 	y * 36 / 200 + 1,	x * 102 / 200 + 1);
 	
-	playlistBox		= newwin(y * 70 / 100, 		x * 60 / 200, 		y * 34 / 100,	   	x * 141 / 200  	);
-	playlistWindow 	= newwin(y * 70 / 100 - 3, 	x * 60 / 200 - 2, 	y * 34 / 100 + 2, 	x * 141 / 200 + 1);
+	playlistBox		= newwin(y * 70 / 100, 		x * 60 / 200, 		y * 32 / 100,	   	x * 141 / 200  	);
+	playlistWindow 	= newwin(y * 70 / 100 - 3, 	x * 60 / 200 - 2, 	y * 32 / 100 + 2, 	x * 141 / 200 + 1);
 	
-	displayBox 		= newwin(y * 54 / 100,		x * 143 / 200,     	y * 34 / 100,     	x * 0 / 100	 	);
-	displayWindow 	= newwin(y * 54 / 100 - 3,	x * 143 / 200 - 2, 	y * 34 / 100 + 2, 	x * 0 / 100 + 1	);
+	displayBox 		= newwin(y * 56 / 100,		x * 143 / 200,     	y * 32 / 100,     	x * 0 / 100	 	);
+	displayWindow 	= newwin(y * 56 / 100 - 3,	x * 143 / 200 - 2, 	y * 32 / 100 + 2, 	x * 0 / 100 + 1	);
 
 	zoomBox 		= newwin(y * 40 / 200, 		x * 98 / 200, 		y * 36 / 200, 		x * 0 / 200		);		
 	zoomWindow 		= newwin(y * 40 / 200 - 2, 	x * 98 / 200 - 2, 	y * 36 / 200 + 1, 	x * 0 / 200 + 1	);		

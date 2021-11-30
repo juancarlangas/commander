@@ -43,7 +43,13 @@ void Field::hide()
 void Field::get_cursor()
 {
 	wprintw(wEspacio, "");
+	curs_set( true );
 	wrefresh(wEspacio);
+}
+
+void Field::set_cursor() noexcept
+{
+	get_cursor();
 }
 
 void Field::set_string(const char *word)

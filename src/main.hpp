@@ -13,7 +13,7 @@
 #include "graphics/windows.hpp"
 #include "graphics/ncurses.hpp"
 #include "graphics/screen.hpp"
-#include "graphics/window.hpp"
+#include "graphics/elements/window.hpp"
 #include "common/common.hpp"
 #include "common/string.hpp"
 #include "common/matroska.hpp"

@@ -1,4 +1,5 @@
 #ifndef WINDOWS_H
+
 #define WINDOWS_H
 
 #include "../common/common.hpp"

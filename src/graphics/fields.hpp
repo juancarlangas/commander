@@ -16,6 +16,7 @@ public:
 	void show();
 	void hide();
 	void get_cursor();
+	void set_cursor() noexcept;
 	bool process_key(int);
 	void get_string(char []);
 	void set_string(const char *);

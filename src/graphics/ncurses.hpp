@@ -1,7 +1,10 @@
 #ifndef NCURSES_HPP
 #define NCURSES_HPP
 
-#include "graphics/window.hpp"
+#include "graphics/elements/window.hpp"
+
+#define Y_PIXELS 32
+#define X_PIXELS 127
 
 short int init_ncurses(void);
 void draw_windows(void);
