@@ -19,6 +19,10 @@ class DoubleXslider : public Popup {
 		void set_cursor_at_left() noexcept;
 		void set_cursor_at_right() noexcept;
 		void swap_cursor() noexcept;
+		bool decrease_left_slider() noexcept;
+		bool decrease_right_slider() noexcept;
+		bool increase_left_slider() noexcept;
+		bool increase_right_slider() noexcept;
 		void clean() noexcept;
 	private:
 		bool is_active;

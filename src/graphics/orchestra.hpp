@@ -11,7 +11,7 @@
 
 enum Notas { C, C_SUS, D, D_SUS, E, F, F_SUS, G, G_SUS, A, A_SUS, B };
 enum Coordinates { X, Y };
-
+enum Moved : bool { NO, YES };
 
 class KeyboardScheme : public TextPopup {
 	public:

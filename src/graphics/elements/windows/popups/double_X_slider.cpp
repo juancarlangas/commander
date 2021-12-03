@@ -53,6 +53,7 @@ void DoubleXslider::on() noexcept
 	wattron( area, COLOR_PAIR( inherit_font.color ) );
 	set_font_reverse( true );
 	mvwaddch( area, 0, lPos, ' ' );
+	inherit_font.style == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
 	set_font_reverse( false );
 	for ( int16_t i = lPos + 1; i < rPos; ++i )
 		mvwaddch( area, 0, i, '-' );
@@ -124,6 +125,84 @@ void DoubleXslider::swap_cursor() noexcept
 	}
 
 	wrefresh( area );
+}
+
+bool DoubleXslider::decrease_left_slider() noexcept
+{
+	if ( lValue > MIN_KEY ) {
+		wattron( area, COLOR_PAIR( inherit_font.color ) );
+		inherit_font.style == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
+		wattroff( area, A_REVERSE );
+		mvwaddch( area, 0, lPos, '-' );
+		--lValue;
+		--lPos;
+		wattron( area, COLOR_PAIR( cursor_font.color ) );
+		wattron( area, A_REVERSE );
+		mvwaddch( area, 0, lPos, ' ' );
+
+		wrefresh( area );
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool DoubleXslider::decrease_right_slider() noexcept
+{
+	if ( rValue > lValue ) {
+		wattroff( area, A_REVERSE );
+		mvwaddch( area, 0, rPos, ' ' );
+		--rValue;
+		--rPos;
+		wattron( area, COLOR_PAIR( cursor_font.color ) );
+		wattron( area, A_REVERSE );
+		mvwaddch( area, 0, rPos, ' ' );
+
+		wrefresh( area );
+
+		return true;
+	}
+	else
+		return false;
+}
+
+bool DoubleXslider::increase_left_slider() noexcept
+{
+	if ( lValue < rValue ) {
+		wattroff( area, A_REVERSE );
+		mvwaddch( area, 0, lPos, ' ' );
+		++lValue;
+		++lPos;
+		wattron( area, COLOR_PAIR( cursor_font.color ) );
+		wattron( area, A_REVERSE );
+		mvwaddch( area, 0, lPos, ' ' );
+
+		wrefresh( area );
+		return true;
+	}
+	else
+		return false;
+}
+
+bool DoubleXslider::increase_right_slider() noexcept
+{
+	if ( rValue < MAX_KEY ) {
+		wattron( area, COLOR_PAIR( inherit_font.color ) );
+		inherit_font.style == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
+		wattroff( area, A_REVERSE );
+		mvwaddch( area, 0, rPos, '-' );
+		++rValue;
+		++rPos;
+		wattron( area, COLOR_PAIR( cursor_font.color ) );
+		wattron( area, A_REVERSE );
+		mvwaddch( area, 0, rPos, ' ' );
+
+		wrefresh( area );
+		return true;
+	}
+	else
+		return false;
 }
 
 void DoubleXslider::clean() noexcept

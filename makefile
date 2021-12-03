@@ -19,4 +19,3 @@ all:
 		src/main.cpp \
 	-o bin/commander \
 		-std=gnu++20 -lpanel -lncurses -lasound;
-
