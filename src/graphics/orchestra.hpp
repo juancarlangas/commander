@@ -29,6 +29,7 @@ class Orchestra {
 	private:
 		BoxedPopup base;
 			TextPopup variacion_text_box;
+			FieldPopup MIDI_text_box;
 			KeyboardScheme keyboard_scheme;
 			Field etiqueta_field;
 				std::array<CheckPopup, 8> status_field;
@@ -37,10 +38,10 @@ class Orchestra {
 				std::array<DoubleXslider, 8> double_X_slider;
 				std::array<int16_t, 2> cursor;
 		std::array<struct Font, 8> native_font;
-		struct Font cursor_font, dimmed_font;
+		struct Font cursor_font, MIDI_font, dimmed_font;
 		int16_t variacion;
+		bool MIDI;
 		struct System *info;
-		std::array<std::array<bool, 1>, 2> cursor_map;
 };
 
 #endif

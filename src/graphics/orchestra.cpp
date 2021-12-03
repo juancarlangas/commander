@@ -21,8 +21,9 @@ Orchestra::Orchestra() :
 					{ CYAN_DEFAULT, "Bold" },
 					{ RED_DEFAULT, "Bold " } } },
 	cursor_font { WHITE_DEFAULT, "Bold" },
+	MIDI_font { GREEN_DEFAULT, "Bold" },
 	dimmed_font { GRAY_DEFAULT, "Bold" },
-	cursor_map { { { false } } }
+	MIDI { Switch::OFF }//,
 {}
 
 void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
@@ -42,6 +43,10 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 	variacion_text_box.set_font_color( GRAY_DEFAULT );
 	variacion_text_box.set_font_width( "Bold" );
 	variacion_text_box.update();
+
+	// MIDI Connection indicator
+	// MIDI_text_box.init( 3, 4, _Ypos + 1, _Xpos + _Xsize - 9, MIDI_font, cursor_font, dimmed_font );
+	// MIDI_text_box.update();
 
 	// keyboard_text_box
 	keyboard_scheme.init( 5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 80 / 200 ) );
@@ -79,8 +84,6 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 	}
 
 	hide();
-
-	cursor_map[ 0 ][ 0 ] = true;
 }
 
 void Orchestra::show( struct System *&_Row ) noexcept
@@ -91,6 +94,7 @@ void Orchestra::show( struct System *&_Row ) noexcept
 
 	base.show();
 	variacion_text_box.show();
+	// MIDI_text_box.show();
 	keyboard_scheme.show();
 	etiqueta_field.show();
 
@@ -110,6 +114,8 @@ void Orchestra::update() noexcept
 								" de " + std::to_string( info->n_variaciones ) );
 	etiqueta_field.set_content( info->variacion[ variacion ].etiqueta );
 
+	// MIDI == Switch::ON ? MIDI_text_box.on() :  MIDI_text_box.off();
+	// MIDI_text_box.set_text( "MIDI" );
 
 	for ( int32_t i = 0; i < 8; ++i ) {
 
