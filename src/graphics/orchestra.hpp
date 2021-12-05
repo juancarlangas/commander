@@ -8,6 +8,7 @@
 #include "elements/windows/popups/check_popup.hpp"
 #include "elements/windows/popups/text_popups/field_popup.hpp"
 #include "elements/windows/popups/double_X_slider.hpp"
+#include "midi/keyboards.hpp"
 
 enum Notas { C, C_SUS, D, D_SUS, E, F, F_SUS, G, G_SUS, A, A_SUS, B };
 enum Coordinates { X, Y };
@@ -26,6 +27,7 @@ class Orchestra {
 		void update() noexcept;
 		void hide() noexcept;
 		void capture_key() noexcept;
+		void link_MIDI_device( Keyboard * ) noexcept;
 	private:
 		BoxedPopup base;
 			TextPopup variacion_text_box;
@@ -42,6 +44,7 @@ class Orchestra {
 		int16_t variacion;
 		bool MIDI;
 		struct System *info;
+		Keyboard *keyboard;
 };
 
 #endif

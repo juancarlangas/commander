@@ -59,6 +59,7 @@ int main()
 			fscanf(channelFile, "%hd", &channel);
 		fclose(channelFile);
 
+	orquestacion.link_MIDI_device( &keyboard );
 	//*************************************** engine ***********************************//
 	do {
 		for (i = LCD; i <= ZOOM; i++)
@@ -527,10 +528,11 @@ int main()
 			case EDIT_ORCHESTRATION :
 				// ida
 				buffer = displayTable[ dIndex ];
+				keyboard.set_program( *buffer );
 				orquestacion.show( buffer );
 				update_popups(); // se decide poner aquí para no refrescar varias veces
 				orquestacion.capture_key();
-
+f
 				// retorno
 				update_popups();
 				draw_windows();

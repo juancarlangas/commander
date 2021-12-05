@@ -1,6 +1,7 @@
 #ifndef KEYBOARDS_H
 #define KEYBOARDS_H
 
+#include <bits/stdint-intn.h>
 #define PLAY 	0
 #define TIMBRE 	1
 
@@ -18,6 +19,7 @@ public:
 	void set_variation( const int16_t ) noexcept;
 	void reset_variation() noexcept;
 	void dump_variation() noexcept;
+	void dump_variation( const struct System &, const int16_t & ) noexcept;
 	void select_part(const short);
 	void select_page( const enum Page ) noexcept;
 	short part;

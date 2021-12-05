@@ -45,8 +45,8 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 	variacion_text_box.update();
 
 	// MIDI Connection indicator
-	// MIDI_text_box.init( 3, 4, _Ypos + 1, _Xpos + _Xsize - 9, MIDI_font, cursor_font, dimmed_font );
-	// MIDI_text_box.update();
+	MIDI_text_box.init( 3, 4, _Ypos + 1, _Xpos + _Xsize - 10, MIDI_font, cursor_font, dimmed_font );
+	MIDI_text_box.update();
 
 	// keyboard_text_box
 	keyboard_scheme.init( 5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 80 / 200 ) );
@@ -94,7 +94,7 @@ void Orchestra::show( struct System *&_Row ) noexcept
 
 	base.show();
 	variacion_text_box.show();
-	// MIDI_text_box.show();
+	MIDI_text_box.show();
 	keyboard_scheme.show();
 	etiqueta_field.show();
 
@@ -114,8 +114,8 @@ void Orchestra::update() noexcept
 								" de " + std::to_string( info->n_variaciones ) );
 	etiqueta_field.set_content( info->variacion[ variacion ].etiqueta );
 
-	// MIDI == Switch::ON ? MIDI_text_box.on() :  MIDI_text_box.off();
-	// MIDI_text_box.set_text( "MIDI" );
+	MIDI == Switch::ON ? MIDI_text_box.on() :  MIDI_text_box.off();
+	MIDI_text_box.set_text( "MIDI" );
 
 	for ( int32_t i = 0; i < 8; ++i ) {
 
@@ -219,6 +219,8 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
 				break;
 
@@ -258,6 +260,8 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ]].set_cursor_at_right();
 								break;
 						}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
 				break;
 
@@ -312,6 +316,8 @@ void Orchestra::capture_key() noexcept
 							break;
 					}
 					break;
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
 				break;
 
@@ -375,6 +381,8 @@ void Orchestra::capture_key() noexcept
 							break;
 					}
 					break;
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
 				break;
 
@@ -406,6 +414,8 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
 								break;
 						}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
 				break;
 
@@ -437,6 +447,8 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
 								break;
 						}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
 				break;
 
@@ -468,6 +480,8 @@ void Orchestra::capture_key() noexcept
 					temp_word.append( " " );
 					instrument_field[ cursor[Y] ].set_text( temp_word );
 				}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 
 				break;
 
@@ -484,6 +498,9 @@ void Orchestra::capture_key() noexcept
 					temp_word = temp_word.substr( 0, temp_word.length() - 1 );
 					transposition_field[ cursor[Y] ].set_text( temp_word );
 				}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
+
 				break;
 
 			case 546 : // CTRL-KEY_LEFT
@@ -496,7 +513,10 @@ void Orchestra::capture_key() noexcept
 						if ( double_X_slider[ cursor[Y] ].decrease_right_slider() == Moved::YES )
 							--( info->variacion[ variacion ].track[ cursor[Y] ].upper_key );
 					}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
+
 				break;
 
 			case 561 : // CTRL-KEY_RIGHT
@@ -509,6 +529,8 @@ void Orchestra::capture_key() noexcept
 						if ( double_X_slider[ cursor[Y] ].increase_right_slider() == Moved::YES )
 							++( info->variacion[ variacion ].track[ cursor[Y] ].upper_key );
 					}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
 				break;
 
@@ -526,6 +548,41 @@ void Orchestra::capture_key() noexcept
 					default:
 						break;
 				 }
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
+				break;
+
+			case 11 : // Toggle Connection
+				if ( MIDI == Switch::OFF ) {
+					MIDI = Switch::ON;
+					MIDI_text_box.on();
+				}
+				else {
+					MIDI = Switch::OFF;
+					MIDI_text_box.off();
+				}
+				MIDI_text_box.set_text( "MIDI" );
+
+				if ( cursor[Y] == -1 ) // si está hasta arriba
+					etiqueta_field.set_cursor();
+				else
+					switch ( cursor[X] ) {
+						case 0:
+							status_field[ cursor[Y] ].set_cursor();
+							break;
+						case 1:
+							instrument_field[ cursor[Y] ].set_cursor();
+							break;
+						case 2:
+							transposition_field[ cursor[Y] ].set_cursor();
+							break;
+						case 3:
+							double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_left();
+							break;
+						case 4:
+							double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
+							break;
+						}
 				break;
 
 			 // Esc
@@ -536,7 +593,7 @@ void Orchestra::capture_key() noexcept
 				again = false;
 				break;
 
-			case '+' : // DUplicate
+			case 1 : // DUplicate
 				if ( info->n_variaciones < 16 ) {
 					for ( int32_t i = info->n_variaciones - 1; i > variacion; --i )
 						info->variacion[ i + 1 ] = info->variacion[ i ];
@@ -573,10 +630,12 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
 				break;
 
-			case '-' : // Eliminate
+			case 18 : // Eliminate
 				if ( info->n_variaciones > 1 ) {
 					if ( variacion == info->n_variaciones - 1 )
 						--variacion;
@@ -614,6 +673,8 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
+				if ( MIDI == Switch::ON )
+					keyboard->dump_variation( *info, variacion );
 				}
 				break;
 
@@ -667,6 +728,12 @@ void Orchestra::hide() noexcept
 {
 	etiqueta_field.hide();
 	variacion_text_box.hide();
+	MIDI_text_box.hide();
 	keyboard_scheme.hide();
 	base.hide();
+}
+
+void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept
+{
+	keyboard = _Teclado;
 }

@@ -1,3 +1,4 @@
+#include <bits/stdint-intn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -132,6 +133,13 @@ void Keyboard::dump_variation() noexcept
 	snd_rawmidi_close( device );
 	
 	device = NULL;
+}
+
+void Keyboard::dump_variation( const struct System &_Buffer, const int16_t &_Variacion ) noexcept
+{
+	set_buffer( _Buffer );
+	variacion = _Variacion;
+	dump_variation();
 }
 
 void Keyboard::set_name(const char *id)
