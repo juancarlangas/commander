@@ -32,7 +32,6 @@ class Orchestra {
 		std::string temp_word;
 		BoxedPopup base;
 			TextPopup variacion_text_box;
-			FieldPopup MIDI_text_box;
 			KeyboardScheme keyboard_scheme;
 			Field etiqueta_field;
 				std::array<CheckPopup, 8> status_field;
@@ -43,7 +42,6 @@ class Orchestra {
 		std::array<struct Font, 8> native_font;
 		struct Font cursor_font, MIDI_font, dimmed_font;
 		int16_t variacion;
-		bool MIDI;
 		struct System *info;
 		Keyboard *keyboard;
 };

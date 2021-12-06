@@ -29,6 +29,8 @@ public:
 	void set_program( const struct System &_Buffer ) noexcept;
 	void set_krome_program(const char, const short);
 	void set_song(const char);
+	void toggle_MIDI_state() noexcept;
+	enum Switch get_MIDI_state() noexcept;
 private:
 	struct System buffer;
 	int16_t variacion;
@@ -41,6 +43,8 @@ private:
 	char port[9];
 
 	unsigned char allSoundsOff[3];
+
+	enum Switch MIDI;
 };
 
 #endif

@@ -27,4 +27,5 @@ void print_computer(WINDOW *window, const short int oxygen, const short int mode
 
 void print_zoom(WINDOW *window, System *linea);
 
+void print_MIDI_state( WINDOW *&_Ventana, const enum Switch &_State ) noexcept;
 #endif

@@ -14,7 +14,8 @@ WINDOW 	*searchBox,		*searchWindow,
 		*lcdWindow,
 		*zoomBox,		*zoomWindow,
 		*displayBox,	*displayWindow,
-		*playlistBox,	*playlistWindow;
+		*playlistBox,	*playlistWindow,
+		*MIDI_state_window;
 
 WINDOW 	*ventana[2];
 PANEL 	*panel[2];
@@ -22,7 +23,7 @@ PANEL 	*panel[2];
 Orchestra orquestacion;
 
 short int init_ncurses(void)
-{
+{/*{{{*/
 	initscr();
 	raw();
 	noecho();
@@ -67,9 +68,11 @@ short int init_ncurses(void)
 	displayBox 		= newwin(y * 56 / 100,		x * 143 / 200,     	y * 32 / 100,     	x * 0 / 100	 	);
 	displayWindow 	= newwin(y * 56 / 100 - 3,	x * 143 / 200 - 2, 	y * 32 / 100 + 2, 	x * 0 / 100 + 1	);
 
-	zoomBox 		= newwin(y * 40 / 200, 		x * 98 / 200, 		y * 36 / 200, 		x * 0 / 200		);		
-	zoomWindow 		= newwin(y * 40 / 200 - 2, 	x * 98 / 200 - 2, 	y * 36 / 200 + 1, 	x * 0 / 200 + 1	);		
+	zoomBox 		= newwin(y * 40 / 200, 		x * 98 / 200, 		y * 36 / 200, 		x * 0 / 200	);		
+	zoomWindow 		= newwin(y * 40 / 200 - 2, 	x * 98 / 200 - 2, 	y * 36 / 200 + 1, 	x * 0 / 200 + 1	);
 	
+	MIDI_state_window = newwin( 1, 4, y * 10 / 200, x * 180 / 200 );
+
 	// Salvar / cargar playlist
 	ventana[DIALOG_WINDOW]	= newwin(3,			x * 40 / 100,		y * 40 / 100,		x * 30 / 100	);
 	ventana[INPUT_BOX]		= newwin(1,			x * 40 / 100 - 2,	y * 40 / 100 + 1,	x * 30 / 100 + 1);
@@ -80,15 +83,15 @@ short int init_ncurses(void)
 	hide_panel(panel[DIALOG_WINDOW]);
 	hide_panel(panel[INPUT_BOX]);
 
-	orquestacion.init( y * 180 / 200, x * 180 / 200, y * 10 / 200, x * 10 / 200 );
+	orquestacion.init( y * 180 / 200, x * 180 / 200, y * 20 / 200, x * 10 / 200 );
 
 	refresh();
 
 	return y;
-}
+}/*}}}*/
 	
 void draw_windows(void)
-{
+{/*{{{*/
 	/* playlistBox */
 		wattron(playlistBox, COLOR_PAIR(GRAY_DEFAULT));
 		wattron(playlistBox, A_BOLD);
@@ -119,7 +122,11 @@ void draw_windows(void)
 		wrefresh(searchBox);
 		wattron(searchWindow, COLOR_PAIR(BLUE_DEFAULT));
 		wattron(searchWindow, A_BOLD);
-	
+
+	// MIDI_state_window
+		wattron( MIDI_state_window, A_BOLD );
+		wattron( MIDI_state_window, A_BLINK );
+
 	/* DIALOG_WINDOW */
 		wattron(ventana[DIALOG_WINDOW], COLOR_PAIR(WHITE_DEFAULT));
 		wattron(ventana[DIALOG_WINDOW], A_BOLD);
@@ -131,10 +138,10 @@ void draw_windows(void)
 		wattron(ventana[INPUT_BOX], A_BOLD);
 	
 	return;
-}
+}/*}}}*/
 
 void tint_lcd(const short int mode)
-{
+{/*{{{*/
 	switch(mode) {
 		case COMBINATION:
 			wattron(lcdWindow, COLOR_PAIR(5));
@@ -146,10 +153,10 @@ void tint_lcd(const short int mode)
 
 	wrefresh( lcdWindow );
 	return;
-}
+}/*}}}*/
 
 void update_popups() noexcept
-{
+{/*{{{*/
 	update_panels();
 	doupdate();
-}
+}/*}}}*/

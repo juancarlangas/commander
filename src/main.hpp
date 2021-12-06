@@ -21,8 +21,3 @@
 #include "data/databases.hpp"
 #include "data/files.hpp"
 #include "../../lib/utilities/src/files.hpp"
-
-extern short int x, y;
-extern short int displayShowResults, playlistShowResults;
-
-extern Orchestra orquestacion;

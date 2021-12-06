@@ -5,6 +5,7 @@
 #include "midi/keyboards.hpp"
 #include <ncurses.h>
 
+	enum Switch MIDI = Switch::OFF;
 Keyboard::Keyboard() :
 	device( NULL ),
 	port( "hw:1,0,0" )
@@ -212,3 +213,13 @@ void Keyboard::set_song(const char song)
 
 	device = NULL;
 }
+
+void Keyboard::toggle_MIDI_state() noexcept
+{/*{{{*/
+	MIDI = ( MIDI == Switch::OFF ? ON : OFF );
+}/*}}}*/
+
+enum Switch Keyboard::get_MIDI_state() noexcept
+{/*{{{*/
+	return MIDI;
+}/*}}}*/

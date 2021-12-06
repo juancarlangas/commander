@@ -125,7 +125,7 @@ void print_search(WINDOW *window, char cadena[])
 }
 
 void print_lcd(WINDOW *window, System *linea )
-{
+{/*{{{*/
 	short int k = 0, yPos;
 	
 	wclear(window);
@@ -159,10 +159,10 @@ void print_lcd(WINDOW *window, System *linea )
 	wrefresh(window);
 
 	return;
-}
+}/*}}}*/
 
 void print_computer(WINDOW *window, const short int oxygen, const short int mode, const Variation var)
-{
+{/*{{{*/
 	wattron(window, A_BOLD);
 
 	switch (oxygen) {
@@ -210,10 +210,10 @@ void print_computer(WINDOW *window, const short int oxygen, const short int mode
 	wrefresh(window);
 
 	return;
-}
+}/*}}}*/
 
 void print_zoom(WINDOW *window, System *linea)
-{
+{/*{{{*/
 	//static char message[50];
 
 	wclear(window);
@@ -250,4 +250,20 @@ void print_zoom(WINDOW *window, System *linea)
 		wrefresh(window);
 	
 	return;
-}
+}/*}}}*/
+
+void print_MIDI_state( WINDOW *&_Ventana, const enum Switch &_State ) noexcept
+{/*{{{*/
+	wclear( _Ventana );
+
+	if ( _State == Switch::OFF ) {
+		wattron( _Ventana, COLOR_PAIR( YELLOW_DEFAULT ) );
+		wattron( _Ventana, A_BLINK );
+	}
+	else {
+		wattron( _Ventana, COLOR_PAIR( GREEN_DEFAULT ) );
+		wattroff( _Ventana, A_BLINK );
+	}
+	mvwaddstr( _Ventana, 0, 0, "MIDI" );
+	wrefresh( _Ventana );
+}/*}}}*/

@@ -31,6 +31,7 @@
 #define COMPUTER 	4
 #define DIGITS		5
 #define ZOOM		6
+#define MIDI_STATE	7
 
 /* WINDOWS GENERAL */
 #define DIALOG_WINDOW	0

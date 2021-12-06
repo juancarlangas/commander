@@ -3,6 +3,8 @@
 #define WINDOWS_H
 
 #include "../common/common.hpp"
+#include "elements/windows/popups/text_popups/field_popup.hpp"
+#include "orchestra.hpp"
 
 //C functions
 extern	WINDOW 	*searchBox,		*searchWindow,
@@ -11,7 +13,10 @@ extern	WINDOW 	*searchBox,		*searchWindow,
 				*computerBox,	*computerWindow,
 				*displayBox,	*displayWindow,
 				*playlistBox,	*playlistWindow,
-				*digitsBox,		*digitsWindow;
+				*digitsBox,		*digitsWindow,
+				*MIDI_state_window;
+
+extern Orchestra orquestacion;
 
 extern WINDOW 	*ventana[2];
 extern PANEL 	*panel[2];

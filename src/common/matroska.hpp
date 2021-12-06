@@ -31,6 +31,7 @@ enum matroska {	NEXT = 0,
 				DELETE_VALUE,
 				EXPORTATE,
 				SELECT_PART,
+				TOGGLE_MIDI_STATE,
 				EXIT				};
 
 enum matroska get_command(	const int digit,

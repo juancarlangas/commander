@@ -85,6 +85,11 @@ void Window::set_font_reverse( const bool &_Is_Reverse ) noexcept
 		wattroff( area, A_REVERSE );
 }
 
+void Window::set_font_blinking( const bool &_Is_Blinking ) noexcept
+{
+	_Is_Blinking ? wattron( area, A_BLINK ) : wattroff( area, A_BLINK );
+}
+
 void BoxedWindow::define_box(	const int32_t &_Top, const int32_t &_Right,
 							const int32_t &_Bottom, const int32_t &_Left,
 							const int32_t &_TopLeft, const int32_t &_TopRight,

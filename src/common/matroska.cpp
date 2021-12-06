@@ -10,7 +10,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 	switch (digit) {
 
 		case '\n': //ESCAPE SEQUENCE*
-			if (strstr(":add", cadena) != NULL && strstr(cadena, ":add") != NULL)
+			if (strstr(":add", cadena) != NULL && strstr(cadena, ":add") != NULL)/*{{{*/
 				//if (cadena[0] == '\0'); // Se garantiza que no hay búsquedas
 					comando = ADD_VALUE;
 
@@ -45,6 +45,10 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 			else
 				comando = INTRO;
 
+			break;/*}}}*/
+
+		case 11: // <C-M>
+			comando = TOGGLE_MIDI_STATE;
 			break;
 
 		case 18 : // CTRL-R

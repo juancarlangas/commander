@@ -3,6 +3,8 @@
 #include "elements/windows/popups/double_X_slider.hpp"
 #include "graphics/colors.hpp"
 #include "graphics/ncurses.hpp"
+#include "printing.hpp"
+#include "windows.hpp"
 #include <ncurses.h>
 #include <panel.h>
 #include <string>
@@ -22,9 +24,13 @@ Orchestra::Orchestra() :
 					{ RED_DEFAULT, "Bold " } } },
 	cursor_font { WHITE_DEFAULT, "Bold" },
 	MIDI_font { GREEN_DEFAULT, "Bold" },
-	dimmed_font { GRAY_DEFAULT, "Bold" },
-	MIDI { Switch::OFF }//,
+	dimmed_font { GRAY_DEFAULT, "Bold" }
 {}/*}}}*/
+
+void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept
+{/*{{{*/
+	keyboard = _Teclado;
+}/*}}}*/
 
 void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 						const int32_t _Ypos, const int32_t _Xpos ) noexcept
@@ -44,17 +50,12 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 	variacion_text_box.set_font_width( "Bold" );
 	variacion_text_box.update();
 
-	// MIDI Connection indicator
-	MIDI_text_box.init( 3, 4, _Ypos + 1, _Xpos + _Xsize - 10, MIDI_font, cursor_font, dimmed_font );
-	MIDI_text_box.update();
-
 	// keyboard_text_box
 	keyboard_scheme.init( 5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 80 / 200 ) );
 	keyboard_scheme.set_font_color( WHITE_DEFAULT );
 	keyboard_scheme.set_font_width( "Bold" );
 	keyboard_scheme.auto_draw();
 	keyboard_scheme.update();
-
 
 	// Etiqueta
 	etiqueta_field.create( "Etiqueta", 3, _Xsize * 80 / 200, _Ypos + 1, _Xpos + ( _Xsize / 4 ),
@@ -86,6 +87,25 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 	hide();
 }/*}}}*/
 
+void KeyboardScheme::auto_draw() noexcept
+{/*{{{*/
+	int32_t key, pixel, nota;
+	for ( pixel = 0; pixel < 3; ++pixel )
+		for ( key = 0; key < 61; ++key ) {
+			nota = key % 12;
+			if ( ( pixel == 0 or pixel == 1 ) and
+					( nota == Notas::C_SUS or
+					  nota == Notas::D_SUS or
+					  nota == Notas::F_SUS or
+					  nota == Notas::G_SUS or
+					  nota == Notas::A_SUS ) )
+				wattroff( area, A_REVERSE );
+			else
+				wattron( area, A_REVERSE );
+			mvwaddch( area, pixel, key, ' ' );
+		}
+}/*}}}*/
+
 void Orchestra::show( struct System *&_Row ) noexcept
 {/*{{{*/
 	// solo obtiene la información y aparece los páneles
@@ -94,7 +114,6 @@ void Orchestra::show( struct System *&_Row ) noexcept
 
 	base.show();
 	variacion_text_box.show();
-	MIDI_text_box.show();
 	keyboard_scheme.show();
 	etiqueta_field.show();
 
@@ -113,9 +132,6 @@ void Orchestra::update() noexcept
 	variacion_text_box.set_text( "Variacion " + std::to_string( variacion + 1 ) +
 								" de " + std::to_string( info->n_variaciones ) );
 	etiqueta_field.set_content( info->variacion[ variacion ].etiqueta );
-
-	MIDI == Switch::ON ? MIDI_text_box.on() :  MIDI_text_box.off();
-	MIDI_text_box.set_text( "MIDI" );
 
 	for ( int32_t i = 0; i < 8; ++i ) {
 
@@ -155,6 +171,14 @@ void Orchestra::update() noexcept
 	}
 }/*}}}*/
 
+void Orchestra::hide() noexcept
+{/*{{{*/
+	etiqueta_field.hide();
+	variacion_text_box.hide();
+	keyboard_scheme.hide();
+	base.hide();
+}/*}}}*/
+
 void Orchestra::capture_key() noexcept
 {/*{{{*/
 	// este arreglo cursor[2] (coordenadas X, Y) representa la malla por donde transitará
@@ -178,7 +202,33 @@ void Orchestra::capture_key() noexcept
 
 	do {
 		switch ( tecla = getch() ) {
-			case 353 : // Shift-TAB
+			case 11: // TOGGLE_MIDI_STATE
+				keyboard->toggle_MIDI_state();/*{{{*/
+				print_MIDI_state( MIDI_state_window, keyboard->get_MIDI_state() );
+
+				if ( cursor[Y] == -1 ) // si está hasta arriba
+					etiqueta_field.set_cursor();
+				else
+					switch ( cursor[X] ) {
+						case 0:
+							status_field[ cursor[Y] ].set_cursor();
+							break;
+						case 1:
+							instrument_field[ cursor[Y] ].set_cursor();
+							break;
+						case 2:
+							transposition_field[ cursor[Y] ].set_cursor();
+							break;
+						case 3:
+							double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_left();
+							break;
+						case 4:
+							double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
+							break;
+					}
+				break;/*}}}*/
+
+			case 353 : // Variación anterior
 				if ( variacion > 0 ) { // si se puede subir{{{
 					--variacion;
 					update();
@@ -213,7 +263,7 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
-					if ( MIDI == Switch::ON )
+					if ( keyboard->get_MIDI_state() == Switch::ON )
 						keyboard->dump_variation( *info, variacion );
 				}
 				break;/*}}}*/
@@ -253,7 +303,7 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ]].set_cursor_at_right();
 								break;
 						}
-					if ( MIDI == Switch::ON )
+					if ( keyboard->get_MIDI_state() == Switch::ON )
 						keyboard->dump_variation( *info, variacion );
 				}
 				break;/*}}}*/
@@ -285,7 +335,7 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
 								break;
 						}
-					if ( MIDI == Switch::ON )
+					if ( keyboard->get_MIDI_state() == Switch::ON )
 						keyboard->dump_variation( *info, variacion );
 				}
 				break;/*}}}*/
@@ -317,8 +367,8 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
 								break;
 						}
-				if ( MIDI == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+					if ( keyboard->get_MIDI_state() == Switch::ON )
+						keyboard->dump_variation( *info, variacion );
 				}
 				break;/*}}}*/
 
@@ -371,7 +421,7 @@ void Orchestra::capture_key() noexcept
 							double_X_slider[ cursor[ Coordinates::Y ] ].set_cursor_at_right();
 							break;
 					}
-					if ( MIDI == Switch::ON )
+					if ( keyboard->get_MIDI_state() == Switch::ON )
 						keyboard->dump_variation( *info, variacion );
 				}
 				break;/*}}}*/
@@ -435,7 +485,7 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_right();
 							break;
 					}
-					if ( MIDI == Switch::ON )
+					if ( keyboard->get_MIDI_state() == Switch::ON )
 						keyboard->dump_variation( *info, variacion );
 				}
 				break;/*}}}*/
@@ -468,7 +518,8 @@ void Orchestra::capture_key() noexcept
 					temp_word.append( " " );
 					instrument_field[ cursor[Y] ].set_text( temp_word );
 				}
-				if ( MIDI == Switch::ON )
+
+				if ( keyboard->get_MIDI_state() == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 
 				break;/*}}}*/
@@ -486,7 +537,7 @@ void Orchestra::capture_key() noexcept
 					temp_word = temp_word.substr( 0, temp_word.length() - 1 );
 					transposition_field[ cursor[Y] ].set_text( temp_word );
 				}
-				if ( MIDI == Switch::ON )
+				if ( keyboard->get_MIDI_state() == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 
 				break;/*}}}*/
@@ -501,7 +552,7 @@ void Orchestra::capture_key() noexcept
 						if ( double_X_slider[ cursor[Y] ].decrease_right_slider() == Moved::YES )
 							--( info->variacion[ variacion ].track[ cursor[Y] ].upper_key );
 					}
-				if ( MIDI == Switch::ON )
+				if ( keyboard->get_MIDI_state() == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 				}
 
@@ -517,7 +568,7 @@ void Orchestra::capture_key() noexcept
 						if ( double_X_slider[ cursor[Y] ].increase_right_slider() == Moved::YES )
 							++( info->variacion[ variacion ].track[ cursor[Y] ].upper_key );
 					}
-				if ( MIDI == Switch::ON )
+				if ( keyboard->get_MIDI_state() == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 				}
 				break;/*}}}*/
@@ -536,41 +587,8 @@ void Orchestra::capture_key() noexcept
 					default:
 						break;
 				 }
-				if ( MIDI == Switch::ON )
+				if ( keyboard->get_MIDI_state() == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
-				break;/*}}}*/
-
-			case 11 : // Toggle Connection
-				if ( MIDI == Switch::OFF ) {/*{{{*/
-					MIDI = Switch::ON;
-					MIDI_text_box.on();
-				}
-				else {
-					MIDI = Switch::OFF;
-					MIDI_text_box.off();
-				}
-				MIDI_text_box.set_text( "MIDI" );
-
-				if ( cursor[Y] == -1 ) // si está hasta arriba
-					etiqueta_field.set_cursor();
-				else
-					switch ( cursor[X] ) {
-						case 0:
-							status_field[ cursor[Y] ].set_cursor();
-							break;
-						case 1:
-							instrument_field[ cursor[Y] ].set_cursor();
-							break;
-						case 2:
-							transposition_field[ cursor[Y] ].set_cursor();
-							break;
-						case 3:
-							double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_left();
-							break;
-						case 4:
-							double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
-							break;
-						}
 				break;/*}}}*/
 
 			case 27 :
@@ -617,7 +635,7 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
-				if ( MIDI == Switch::ON )
+				if ( keyboard->get_MIDI_state() == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 				}
 				break;/*}}}*/
@@ -660,7 +678,7 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
-				if ( MIDI == Switch::ON )
+				if ( keyboard->get_MIDI_state() == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 				}
 				break;/*}}}*/
@@ -690,37 +708,4 @@ void Orchestra::capture_key() noexcept
 				}/*}}}*/
 		}
 	} while ( again );
-}/*}}}*/
-
-void Orchestra::hide() noexcept
-{/*{{{*/
-	etiqueta_field.hide();
-	variacion_text_box.hide();
-	MIDI_text_box.hide();
-	keyboard_scheme.hide();
-	base.hide();
-}/*}}}*/
-
-void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept
-{/*{{{*/
-	keyboard = _Teclado;
-}/*}}}*/
-
-void KeyboardScheme::auto_draw() noexcept
-{/*{{{*/
-	int32_t key, pixel, nota;
-	for ( pixel = 0; pixel < 3; ++pixel )
-		for ( key = 0; key < 61; ++key ) {
-			nota = key % 12;
-			if ( ( pixel == 0 or pixel == 1 ) and
-					( nota == Notas::C_SUS or
-					  nota == Notas::D_SUS or
-					  nota == Notas::F_SUS or
-					  nota == Notas::G_SUS or
-					  nota == Notas::A_SUS ) )
-				wattroff( area, A_REVERSE );
-			else
-				wattron( area, A_REVERSE );
-			mvwaddch( area, pixel, key, ' ' );
-		}
 }/*}}}*/

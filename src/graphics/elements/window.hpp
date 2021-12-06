@@ -21,6 +21,7 @@ class Window {
 		void set_font_color( const int32_t &color ) noexcept;
 		void set_font_width( const std::string_view ) noexcept;
 		void set_font_reverse( const bool & ) noexcept;
+		void set_font_blinking( const bool & ) noexcept;
 		void update() noexcept;
 	protected:
 		WINDOW *area;
