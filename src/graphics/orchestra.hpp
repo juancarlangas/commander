@@ -29,6 +29,7 @@ class Orchestra {
 		void capture_key() noexcept;
 		void link_MIDI_device( Keyboard * ) noexcept;
 	private:
+		std::string temp_word;
 		BoxedPopup base;
 			TextPopup variacion_text_box;
 			FieldPopup MIDI_text_box;

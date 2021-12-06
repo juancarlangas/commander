@@ -12,7 +12,7 @@ using Coordinates::X;
 using Coordinates::Y;
 
 Orchestra::Orchestra() :
-	native_font { { { GREEN_DEFAULT, "Bold" },
+	native_font { { { GREEN_DEFAULT, "Bold" },/*{{{*/
 					{ BLUE_DEFAULT, "Bold" },
 					{ YELLOW_DEFAULT, "Bold" },
 					{ BLUE_DEFAULT, "Regular" },
@@ -24,11 +24,11 @@ Orchestra::Orchestra() :
 	MIDI_font { GREEN_DEFAULT, "Bold" },
 	dimmed_font { GRAY_DEFAULT, "Bold" },
 	MIDI { Switch::OFF }//,
-{}
+{}/*}}}*/
 
 void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 						const int32_t _Ypos, const int32_t _Xpos ) noexcept
-{
+{/*{{{*/
 	variacion = 0;
 
 	// Base
@@ -84,10 +84,10 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 	}
 
 	hide();
-}
+}/*}}}*/
 
 void Orchestra::show( struct System *&_Row ) noexcept
-{
+{/*{{{*/
 	// solo obtiene la información y aparece los páneles
 
 	info = _Row;
@@ -106,10 +106,10 @@ void Orchestra::show( struct System *&_Row ) noexcept
 	}
 
 	update();
-}
+}/*}}}*/
 
 void Orchestra::update() noexcept
-{
+{/*{{{*/
 	variacion_text_box.set_text( "Variacion " + std::to_string( variacion + 1 ) +
 								" de " + std::to_string( info->n_variaciones ) );
 	etiqueta_field.set_content( info->variacion[ variacion ].etiqueta );
@@ -153,10 +153,10 @@ void Orchestra::update() noexcept
 		transposition_field[ i ].set_text(
 				std::to_string( info->variacion[ variacion ].track[ i ].transposition ) );
 	}
-}
+}/*}}}*/
 
 void Orchestra::capture_key() noexcept
-{
+{/*{{{*/
 	// este arreglo cursor[2] (coordenadas X, Y) representa la malla por donde transitará
 	// virtualmente el cursor. 5 columnas por 9 filas. El Y=-1 representa la posición de la
 	// etiqueta. Cuando cursor[Y] == -1, dicha etiqueta obtendrá el cursor independiéntemente
@@ -171,24 +171,18 @@ void Orchestra::capture_key() noexcept
 	 * temp_word será copiada diréctamente a la base de datos. Esto no aplica para el
 	 * status_field o para el double_X_slider, ya que el efecto en la base de datos
 	 * y sobre el teclado serán inmediatos */
-	std::string temp_word { info->variacion[ variacion ].etiqueta };
+	temp_word = info->variacion[ variacion ].etiqueta;
 	int32_t tecla;
 	char tecla_c_string[3];
 	bool again = true;
 
-	/*
-	 * Los textos serán guardados hasta que haya cambio de campo o se oprima ENTER.
-	 * Siempre que haya uso de temp_word se salvará previamente.
-	 * Los objetos como el status_field, transposition_field y double_X_slider actualizan la
-	 * base de dactos ipsofacto.
-	 */
 	do {
 		switch ( tecla = getch() ) {
-			// LEFT
-			case KEY_LEFT :
-				if ( variacion > 0 ) { // si se puede subir
+			case 353 : // Shift-TAB
+				if ( variacion > 0 ) { // si se puede subir{{{
 					--variacion;
 					update();
+
 					if ( cursor[Y] == -1 ) { // si está hasta arriba
 						info->variacion[ variacion + 1 ].etiqueta = temp_word; // guardamos
 						temp_word = info->variacion[ variacion ].etiqueta; // copiamos nuevo
@@ -219,14 +213,13 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
-				if ( MIDI == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+					if ( MIDI == Switch::ON )
+						keyboard->dump_variation( *info, variacion );
 				}
-				break;
+				break;/*}}}*/
 
-			// RIGHT
-			case KEY_RIGHT : // NEXT_VARIATION
-				if ( variacion < info->n_variaciones - 1 ) {
+			case 9 : // TAB
+				if ( variacion < info->n_variaciones - 1 ) {/*{{{*/
 					++variacion;
 					update();
 					if ( cursor[ Coordinates::Y ] == -1 ) {
@@ -260,14 +253,77 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ]].set_cursor_at_right();
 								break;
 						}
+					if ( MIDI == Switch::ON )
+						keyboard->dump_variation( *info, variacion );
+				}
+				break;/*}}}*/
+
+			case KEY_LEFT :
+				if ( cursor[ Coordinates::X ] > 0 ) {/*{{{*/
+					--cursor[ Coordinates::X ];
+					if ( cursor[ Coordinates::Y ] >= 0 ) // Zona de objetos
+						switch ( cursor[ Coordinates::X ] ) {
+							case 0 : // Check <- Instrumento
+								info->instrumento[ cursor[Y] ] = temp_word;
+								status_field[ cursor[ Coordinates::Y ] ].set_cursor();
+								break;
+							case 1 : // Instrumento <- Transposition
+								info->variacion[ variacion ].track[ cursor[Y] ].transposition =
+									std::stoi( temp_word );
+								temp_word = info->instrumento[ cursor[Y] ];
+								instrument_field[ cursor[Y] ].set_cursor();
+								break;
+							case 2 : // Transpotision <- Left slider
+								double_X_slider[ cursor[ Coordinates::Y ] ].leave_cursor();
+								temp_word = 
+									info->variacion[variacion].track[ cursor[Y] ].transposition == 0
+									? "0" : std::to_string(
+									info->variacion[ variacion ].track[ cursor[Y] ].transposition );
+								transposition_field[ cursor[ Coordinates::Y ] ].set_cursor();
+								break;
+							case 3 :
+								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
+								break;
+						}
+					if ( MIDI == Switch::ON )
+						keyboard->dump_variation( *info, variacion );
+				}
+				break;/*}}}*/
+
+			case KEY_RIGHT :
+				if ( cursor[ Coordinates::X ] < 4 ) {/*{{{*/
+					++cursor[ Coordinates::X ];
+					if ( cursor[ Coordinates::Y ] >= 0 )
+						switch ( cursor[ Coordinates::X ] ) {
+							case 1 : // check -> Instrument
+								status_field[ cursor[ Coordinates::Y ] ].leave_cursor();
+								temp_word = info->instrumento[ cursor [Y] ];
+								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
+								break;
+							case 2 : // Instrument -> transposition
+								info->instrumento[ cursor[Y] ] = temp_word;
+								temp_word = 
+									info->variacion[variacion].track[ cursor[Y] ].transposition == 0
+									? "0" : std::to_string(
+									info->variacion[ variacion ].track[ cursor[Y] ].transposition );
+								transposition_field[ cursor[ Coordinates::Y ] ].set_cursor();
+								break;
+							case 3 : // Transposition -> Left slider
+								info->variacion[ variacion ].track[ cursor[Y] ].transposition =
+									std::stoi( temp_word );
+								double_X_slider[ cursor[ Coordinates::Y ] ].set_cursor_at_left();
+								break;
+							case 4 :
+								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
+								break;
+						}
 				if ( MIDI == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 				}
-				break;
+				break;/*}}}*/
 
-			// KEY_DOWN
 			case KEY_DOWN :
-				if ( cursor[ Coordinates::Y ] < 7 ) { // Si puede bajar todavía
+				if ( cursor[ Coordinates::Y ] < 7 ) { // Si puede bajar todavía{{{
 					++cursor[ Coordinates::Y ];
 					switch ( cursor[ Coordinates::X ] ) {
 						case 0: // Check
@@ -315,14 +371,13 @@ void Orchestra::capture_key() noexcept
 							double_X_slider[ cursor[ Coordinates::Y ] ].set_cursor_at_right();
 							break;
 					}
-					break;
-				if ( MIDI == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+					if ( MIDI == Switch::ON )
+						keyboard->dump_variation( *info, variacion );
 				}
-				break;
+				break;/*}}}*/
 
 			case KEY_UP :
-				if ( cursor[ Coordinates::Y ] > -1 ) { // aún no está en la etiqueta
+				if ( cursor[ Coordinates::Y ] > -1 ) { // aún no está en la etiqueta{{{
 					--cursor[ Coordinates::Y ];
 					switch ( cursor[ Coordinates::X ] ) {
 						case 0: // check: nada que salvar
@@ -380,80 +435,13 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_right();
 							break;
 					}
-					break;
-				if ( MIDI == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+					if ( MIDI == Switch::ON )
+						keyboard->dump_variation( *info, variacion );
 				}
-				break;
-
-			// Shift + TAB
-			case 353 :
-				if ( cursor[ Coordinates::X ] > 0 ) {
-					--cursor[ Coordinates::X ];
-					if ( cursor[ Coordinates::Y ] >= 0 ) // Zona de objetos
-						switch ( cursor[ Coordinates::X ] ) {
-							case 0 : // Check <- Instrumento
-								info->instrumento[ cursor[Y] ] = temp_word;
-								status_field[ cursor[ Coordinates::Y ] ].set_cursor();
-								break;
-							case 1 : // Instrumento <- Transposition
-								info->variacion[ variacion ].track[ cursor[Y] ].transposition =
-									std::stoi( temp_word );
-								temp_word = info->instrumento[ cursor[Y] ];
-								instrument_field[ cursor[Y] ].set_cursor();
-								break;
-							case 2 : // Transpotision <- Left slider
-								double_X_slider[ cursor[ Coordinates::Y ] ].leave_cursor();
-								temp_word = 
-									info->variacion[variacion].track[ cursor[Y] ].transposition == 0
-									? "0" : std::to_string(
-									info->variacion[ variacion ].track[ cursor[Y] ].transposition );
-								transposition_field[ cursor[ Coordinates::Y ] ].set_cursor();
-								break;
-							case 3 :
-								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
-								break;
-						}
-				if ( MIDI == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
-				}
-				break;
-
-			// TAB
-			case 9 :
-				if ( cursor[ Coordinates::X ] < 4 ) {
-					++cursor[ Coordinates::X ];
-					if ( cursor[ Coordinates::Y ] >= 0 )
-						switch ( cursor[ Coordinates::X ] ) {
-							case 1 : // check -> Instrument
-								status_field[ cursor[ Coordinates::Y ] ].leave_cursor();
-								temp_word = info->instrumento[ cursor [Y] ];
-								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
-								break;
-							case 2 : // Instrument -> transposition
-								info->instrumento[ cursor[Y] ] = temp_word;
-								temp_word = 
-									info->variacion[variacion].track[ cursor[Y] ].transposition == 0
-									? "0" : std::to_string(
-									info->variacion[ variacion ].track[ cursor[Y] ].transposition );
-								transposition_field[ cursor[ Coordinates::Y ] ].set_cursor();
-								break;
-							case 3 : // Transposition -> Left slider
-								info->variacion[ variacion ].track[ cursor[Y] ].transposition =
-									std::stoi( temp_word );
-								double_X_slider[ cursor[ Coordinates::Y ] ].set_cursor_at_left();
-								break;
-							case 4 :
-								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
-								break;
-						}
-				if ( MIDI == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
-				}
-				break;
+				break;/*}}}*/
 
 			case ' ' :
-				if ( cursor[ Coordinates::Y ] == -1 ) {
+				if ( cursor[ Coordinates::Y ] == -1 ) {/*{{{*/
 					temp_word.append( " " );
 					etiqueta_field.set_content( temp_word );
 				}
@@ -471,10 +459,10 @@ void Orchestra::capture_key() noexcept
 						instrument_field[ cursor[Y] ].on();
 						transposition_field[ cursor[ Y ] ].on();
 						double_X_slider[ cursor[ Y ] ].on();
-					}
-					instrument_field[ cursor[Y] ].set_text( info->instrumento[ cursor[Y] ] );
-					transposition_field[ cursor[Y] ].set_value(
-							info->variacion[ variacion ].track[ cursor[Y] ].transposition );
+				}
+				instrument_field[ cursor[Y] ].set_text( info->instrumento[ cursor[Y] ] );
+				transposition_field[ cursor[Y] ].set_value(
+						info->variacion[ variacion ].track[ cursor[Y] ].transposition );
 				}
 				else if ( cursor[X] == 1 ) {
 					temp_word.append( " " );
@@ -483,10 +471,10 @@ void Orchestra::capture_key() noexcept
 				if ( MIDI == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 
-				break;
+				break;/*}}}*/
 
 			case KEY_BACKSPACE :
-				if ( cursor[ Coordinates::Y ] == -1 ) {
+				if ( cursor[ Coordinates::Y ] == -1 ) {/*{{{*/
 					temp_word = temp_word.substr( 0, temp_word.length() - 1 );
 					etiqueta_field.set_content( temp_word );
 				}
@@ -501,10 +489,10 @@ void Orchestra::capture_key() noexcept
 				if ( MIDI == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 
-				break;
+				break;/*}}}*/
 
 			case 546 : // CTRL-KEY_LEFT
-				if ( cursor[Y] > -1 ) { // Zona de controles
+				if ( cursor[Y] > -1 ) { // Zona de controles{{{
 					if ( cursor[X] == 3 ) { // left slider
 						if ( double_X_slider[ cursor[Y] ].decrease_left_slider() == Moved::YES )
 							--( info->variacion[ variacion ].track[ cursor[Y] ].lower_key );
@@ -517,10 +505,10 @@ void Orchestra::capture_key() noexcept
 					keyboard->dump_variation( *info, variacion );
 				}
 
-				break;
+				break;/*}}}*/
 
 			case 561 : // CTRL-KEY_RIGHT
-				if ( cursor[Y] > -1 ) {
+				if ( cursor[Y] > -1 ) {/*{{{*/
 					if ( cursor[X] == 3 ) {
 						if ( double_X_slider[ cursor[Y] ].increase_left_slider() == Moved::YES )
 							++( info->variacion[ variacion ].track[ cursor[Y] ].lower_key );
@@ -532,10 +520,10 @@ void Orchestra::capture_key() noexcept
 				if ( MIDI == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 				}
-				break;
+				break;/*}}}*/
 
 			case '\n' :
-				if ( cursor[Y] == -1 )
+				if ( cursor[Y] == -1 )/*{{{*/
 					info->variacion[ variacion ].etiqueta = temp_word;
 				else switch ( cursor[X] ) {
 					case 1 :
@@ -550,10 +538,10 @@ void Orchestra::capture_key() noexcept
 				 }
 				if ( MIDI == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
-				break;
+				break;/*}}}*/
 
 			case 11 : // Toggle Connection
-				if ( MIDI == Switch::OFF ) {
+				if ( MIDI == Switch::OFF ) {/*{{{*/
 					MIDI = Switch::ON;
 					MIDI_text_box.on();
 				}
@@ -583,18 +571,17 @@ void Orchestra::capture_key() noexcept
 							double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 							break;
 						}
-				break;
+				break;/*}}}*/
 
-			 // Esc
 			case 27 :
-				curs_set( false );
+				curs_set( false );/*{{{*/
 				hide();
 				update_popups();
 				again = false;
-				break;
+				break;/*}}}*/
 
 			case 1 : // DUplicate
-				if ( info->n_variaciones < 16 ) {
+				if ( info->n_variaciones < 16 ) {/*{{{*/
 					for ( int32_t i = info->n_variaciones - 1; i > variacion; --i )
 						info->variacion[ i + 1 ] = info->variacion[ i ];
 					++info->n_variaciones;
@@ -633,10 +620,10 @@ void Orchestra::capture_key() noexcept
 				if ( MIDI == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 				}
-				break;
+				break;/*}}}*/
 
 			case 18 : // Eliminate
-				if ( info->n_variaciones > 1 ) {
+				if ( info->n_variaciones > 1 ) {/*{{{*/
 					if ( variacion == info->n_variaciones - 1 )
 						--variacion;
 					for ( int32_t i = variacion + 1; i < info->n_variaciones; ++i )
@@ -676,10 +663,10 @@ void Orchestra::capture_key() noexcept
 				if ( MIDI == Switch::ON )
 					keyboard->dump_variation( *info, variacion );
 				}
-				break;
+				break;/*}}}*/
 
 			default :
-				if ( tecla == 32 or ( 44 <= tecla and tecla <= 122 ) or tecla == 263 ) {
+				if ( tecla == 32 or ( 44 <= tecla and tecla <= 122 ) or tecla == 263 ) {/*{{{*/
 					if ( cursor[Y] == -1 ) {
 						sprintf( tecla_c_string, "%c", tecla );
 						temp_word = temp_word + tecla_c_string;
@@ -700,13 +687,27 @@ void Orchestra::capture_key() noexcept
 							break;
 					}
 				break;
-				}
+				}/*}}}*/
 		}
 	} while ( again );
-}
+}/*}}}*/
+
+void Orchestra::hide() noexcept
+{/*{{{*/
+	etiqueta_field.hide();
+	variacion_text_box.hide();
+	MIDI_text_box.hide();
+	keyboard_scheme.hide();
+	base.hide();
+}/*}}}*/
+
+void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept
+{/*{{{*/
+	keyboard = _Teclado;
+}/*}}}*/
 
 void KeyboardScheme::auto_draw() noexcept
-{
+{/*{{{*/
 	int32_t key, pixel, nota;
 	for ( pixel = 0; pixel < 3; ++pixel )
 		for ( key = 0; key < 61; ++key ) {
@@ -722,18 +723,4 @@ void KeyboardScheme::auto_draw() noexcept
 				wattron( area, A_REVERSE );
 			mvwaddch( area, pixel, key, ' ' );
 		}
-}
-
-void Orchestra::hide() noexcept
-{
-	etiqueta_field.hide();
-	variacion_text_box.hide();
-	MIDI_text_box.hide();
-	keyboard_scheme.hide();
-	base.hide();
-}
-
-void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept
-{
-	keyboard = _Teclado;
-}
+}/*}}}*/

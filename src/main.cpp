@@ -499,9 +499,9 @@ int main()
 
 				break;
 			}
-			//////////////////////// EDIT_VALUE /////////////////////////77
+
 			case EDIT_VALUE:
-			{
+			{/*{{{*/
 				Form forma;
 
 				int difference = displayTable[dIndex] - &(dBase[mode].base[0]);
@@ -523,16 +523,16 @@ int main()
 				updateWindow[ZOOM]		= true;	
 
 				break;
-			}
-			//////////////////////////////// EDIT_ORCHESTRATION ///////////////////////////////////
+			}/*}}}*/
+
 			case EDIT_ORCHESTRATION :
-				// ida
+				// ida{{{
 				buffer = displayTable[ dIndex ];
-				keyboard.set_program( *buffer );
+				// keyboard.set_program( *buffer );
 				orquestacion.show( buffer );
 				update_popups(); // se decide poner aquí para no refrescar varias veces
 				orquestacion.capture_key();
-f
+
 				// retorno
 				update_popups();
 				draw_windows();
@@ -543,7 +543,7 @@ f
 				updateWindow[COMPUTER] 	= true;
 				updateWindow[DIGITS]	= true;
 				updateWindow[ZOOM]		= true;	
-				break;
+				break;/*}}}*/
 
 			///////////////////////// EXPORTATE /////////////////////
 			case EXPORTATE:
