@@ -558,8 +558,9 @@ void Orchestra::capture_key() noexcept
 
 				break;/*}}}*/
 
-			case 561 : // CTRL-KEY_RIGHT
-				if ( cursor[Y] > -1 ) {/*{{{*/
+			// CTRL-KEY_RIGHT{{{
+			case 561 :
+				if ( cursor[Y] > -1 ) {
 					if ( cursor[X] == 3 ) {
 						if ( double_X_slider[ cursor[Y] ].increase_left_slider() == Moved::YES )
 							++( info->variacion[ variacion ].track[ cursor[Y] ].lower_key );

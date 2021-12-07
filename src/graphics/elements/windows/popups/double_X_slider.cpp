@@ -6,17 +6,17 @@
 
 #include "graphics/colors.hpp"
 
-DoubleXslider::DoubleXslider() :
+DoubleXslider::DoubleXslider() :/*{{{*/
 	focused_slider { 0 }
-{}
+{}/*}}}*/
 
-void DoubleXslider::init(	const int32_t &_Ysize, const int32_t &_Xsize,
+void DoubleXslider::init(	const int32_t &_Ysize, const int32_t &_Xsize,/*{{{*/
 							const int32_t &_Ypos, const int32_t &_Xpos ) noexcept
 {
 	Popup::init( _Ysize, _Xsize, _Ypos, _Xpos );
-}
+}/*}}}*/
 
-void DoubleXslider::set_limits( const int16_t &_Lvalue, const int16_t &_Rvalue ) noexcept
+void DoubleXslider::set_limits( const int16_t &_Lvalue, const int16_t &_Rvalue ) noexcept/*{{{*/
 {
 	if ( _Rvalue - _Lvalue + 1 != x_size ) {
 		std::cerr <<
@@ -27,9 +27,9 @@ void DoubleXslider::set_limits( const int16_t &_Lvalue, const int16_t &_Rvalue )
 
 	min_value = _Lvalue;
 	max_value = _Rvalue;
-}
+}/*}}}*/
 
-void DoubleXslider::off() noexcept
+void DoubleXslider::off() noexcept/*{{{*/
 {
 	is_active = false;
 	lPos = 0;
@@ -41,9 +41,9 @@ void DoubleXslider::off() noexcept
 	set_font_reverse( true );
 	mvwaddch( area, 0, 0, '>' );
 	wrefresh( area );
-}
+}/*}}}*/
 
-void DoubleXslider::on() noexcept
+void DoubleXslider::on() noexcept/*{{{*/
 {
 	is_active = true;
 	lPos = lValue - MIN_KEY + 1;
@@ -61,36 +61,36 @@ void DoubleXslider::on() noexcept
 	mvwaddch( area, 0, rPos, ' ' );
 
 	wrefresh( area );
-}
+}/*}}}*/
 
-void DoubleXslider::set_values( const int16_t &_Lvalue, const int16_t &_Rvalue ) noexcept
+void DoubleXslider::set_values( const int16_t &_Lvalue, const int16_t &_Rvalue ) noexcept/*{{{*/
 {
 	// Como el control comienza con min_value, al recibir un valor absouluto obtiene la diferencia
 	// para colocarlo visualmente en el lugar correcto.
 	lValue = _Lvalue;
 	rValue = _Rvalue;
 
-}
+}/*}}}*/
 
-void DoubleXslider::set_cursor_at_left() noexcept
+void DoubleXslider::set_cursor_at_left() noexcept/*{{{*/
 {
 	set_font_color( WHITE_DEFAULT );
 	set_font_reverse( true );
 	mvwaddch( area, 0, lPos, ' ' );
 	curs_set( false );
 	wrefresh( area );
-}
+}/*}}}*/
 
-void DoubleXslider::set_cursor_at_right() noexcept
+void DoubleXslider::set_cursor_at_right() noexcept/*{{{*/
 {
 	set_font_color( WHITE_DEFAULT );
 	set_font_reverse( true );
 	mvwaddch( area, 0, rPos, ' ' );
 	curs_set( false );
 	wrefresh( area );
-}
+}/*}}}*/
 
-void DoubleXslider::leave_cursor() noexcept
+void DoubleXslider::leave_cursor() noexcept/*{{{*/
 {
 	if ( is_active ) {
 		wattron( area, COLOR_PAIR( inherit_font.color ) );
@@ -104,9 +104,9 @@ void DoubleXslider::leave_cursor() noexcept
 	}
 
 	wrefresh( area );
-}
+}/*}}}*/
 
-void DoubleXslider::swap_cursor() noexcept
+void DoubleXslider::swap_cursor() noexcept/*{{{*/
 {
 	wattron( area, A_REVERSE ); // sí o sí
 	if ( focused_slider == 0 ) {
@@ -125,15 +125,21 @@ void DoubleXslider::swap_cursor() noexcept
 	}
 
 	wrefresh( area );
-}
+}/*}}}*/
 
-bool DoubleXslider::decrease_left_slider() noexcept
+bool DoubleXslider::decrease_left_slider() noexcept/*{{{*/
 {
 	if ( lValue > MIN_KEY ) {
 		wattron( area, COLOR_PAIR( inherit_font.color ) );
 		inherit_font.style == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
-		wattroff( area, A_REVERSE );
-		mvwaddch( area, 0, lPos, '-' );
+		if ( lValue == rValue ) { // Si están a la par, en vez de poner raya pondrá fader
+			wattron( area, A_REVERSE );
+			mvwaddch( area, 0, lPos, ' ' );
+		}
+		else {
+			wattroff( area, A_REVERSE );
+			mvwaddch( area, 0, lPos, '-' );
+		}
 		--lValue;
 		--lPos;
 		wattron( area, COLOR_PAIR( cursor_font.color ) );
@@ -146,9 +152,9 @@ bool DoubleXslider::decrease_left_slider() noexcept
 	}
 	else
 		return false;
-}
+}/*}}}*/
 
-bool DoubleXslider::decrease_right_slider() noexcept
+bool DoubleXslider::decrease_right_slider() noexcept/*{{{*/
 {
 	if ( rValue > lValue ) {
 		wattroff( area, A_REVERSE );
@@ -165,9 +171,9 @@ bool DoubleXslider::decrease_right_slider() noexcept
 	}
 	else
 		return false;
-}
+}/*}}}*/
 
-bool DoubleXslider::increase_left_slider() noexcept
+bool DoubleXslider::increase_left_slider() noexcept/*{{{*/
 {
 	if ( lValue < rValue ) {
 		wattroff( area, A_REVERSE );
@@ -183,15 +189,21 @@ bool DoubleXslider::increase_left_slider() noexcept
 	}
 	else
 		return false;
-}
+}/*}}}*/
 
-bool DoubleXslider::increase_right_slider() noexcept
+bool DoubleXslider::increase_right_slider() noexcept/*{{{*/
 {
 	if ( rValue < MAX_KEY ) {
 		wattron( area, COLOR_PAIR( inherit_font.color ) );
 		inherit_font.style == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
-		wattroff( area, A_REVERSE );
-		mvwaddch( area, 0, rPos, '-' );
+		if ( lValue == rValue ) { // Lo mismo aquí
+			wattron( area, A_REVERSE );
+			mvwaddch( area, 0, rPos, ' ' );
+		}
+		else {
+			wattroff( area, A_REVERSE );
+			mvwaddch( area, 0, rPos, '-' );
+		}
 		++rValue;
 		++rPos;
 		wattron( area, COLOR_PAIR( cursor_font.color ) );
@@ -203,10 +215,10 @@ bool DoubleXslider::increase_right_slider() noexcept
 	}
 	else
 		return false;
-}
+}/*}}}*/
 
-void DoubleXslider::clean() noexcept
+void DoubleXslider::clean() noexcept/*{{{*/
 {
 	wclear( area );
 	update();
-}
+}/*}}}*/

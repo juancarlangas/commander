@@ -4,7 +4,7 @@ Commander 1.0.1 Alpha
 value.
 
 - The Orchestration editor now return to the first variation when it comes from a new patch,
-instead of returning to the same
+instead of returning to the same. O.K.
 
 Korg 4.7.3
 ==========
