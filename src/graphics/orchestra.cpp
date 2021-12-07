@@ -709,3 +709,8 @@ void Orchestra::capture_key() noexcept
 		}
 	} while ( again );
 }/*}}}*/
+
+void Orchestra::reset_variation() noexcept/*{{{*/
+{
+	variacion = 0;
+}/*}}}*/

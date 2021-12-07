@@ -502,7 +502,9 @@ int main()
 			case EDIT_ORCHESTRATION :/*{{{*/
 				// ida
 				buffer = displayTable[ dIndex ];
-				// keyboard.set_program( *buffer );
+				if ( keyboard.get_MIDI_state() == Switch::ON )
+					keyboard.set_program( *buffer );
+				orquestacion.reset_variation();
 				orquestacion.show( buffer );
 				update_popups(); // se decide poner aquí para no refrescar varias veces
 				orquestacion.capture_key();
@@ -510,6 +512,7 @@ int main()
 				// retorno
 				update_popups();
 				draw_windows();
+
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;
 				updateWindow[DISPLAY]	= true;
@@ -517,6 +520,7 @@ int main()
 				updateWindow[COMPUTER] 	= true;
 				updateWindow[DIGITS]	= true;
 				updateWindow[ZOOM]		= true;	
+
 				break;/*}}}*/
 
 			case TOGGLE_MIDI_STATE:/*{{{*/
@@ -584,7 +588,7 @@ int main()
 	endwin();
 
 	delete [] displayTable;
-	buffer = NULL;/*}}}*/
+	buffer = NULL;
 
-	return EXIT_SUCCESS;
+	return EXIT_SUCCESS;/*}}}*/
 }
