@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
+#include <cstdlib>
+#include <panel.h>
 
 #include "graphics/orchestra.hpp"
 #include "midi/keyboards.hpp"
@@ -21,3 +23,4 @@
 #include "data/databases.hpp"
 #include "data/files.hpp"
 #include "../../lib/utilities/src/files.hpp"
+#include "graphics/colors.hpp"

@@ -5,6 +5,7 @@
 #include "graphics/elements/window.hpp"
 #include "graphics/fields.hpp"
 #include "data/databases.hpp"
+#include "graphics/elements/windows/boxed_windows/boxed_popup.hpp"
 #include "elements/windows/popups/check_popup.hpp"
 #include "elements/windows/popups/text_popups/field_popup.hpp"
 #include "elements/windows/popups/double_X_slider.hpp"

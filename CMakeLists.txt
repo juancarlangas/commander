@@ -19,6 +19,8 @@ ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/orchestra.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/window.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/windows/popup.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/windows/boxed_window.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/windows/boxed_windows/boxed_popup.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/windows/popups/check_popup.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/windows/popups/double_X_slider.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/windows/popups/text_popup.cpp"

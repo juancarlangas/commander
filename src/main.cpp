@@ -1,12 +1,4 @@
 #include "main.hpp"
-#include "common/common.hpp"
-#include "common/matroska.hpp"
-#include "data/databases.hpp"
-#include "graphics/colors.hpp"
-#include "graphics/ncurses.hpp"
-#include "graphics/windows.hpp"
-#include <cstdlib>
-#include <panel.h>
 
 int main()
 {
@@ -46,17 +38,18 @@ int main()
 	int i;
 	short int k;/*}}}*/
 
-	// System
-	short int	mode = COMBINATOR,/*{{{*/
+	// System{{{
+	short int	mode = COMBINATOR,
 				winMode = MODE_DISPLAY;
 	enum matroska command = BEGIN;/*}}}*/
 
-	// Keyboards
-	Keyboard keyboard;/*{{{*/
+	// Keyboards{{{
+	Keyboard keyboard;
 	keyboard.set_name("X50");
 
 	orquestacion.link_MIDI_device( &keyboard );/*}}}*/
 
+	// Engine{{{
 	do {
 		for (i = LCD; i <= ZOOM; i++)
 			updateWindow[i] = false;
@@ -585,13 +578,13 @@ int main()
 
 		command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
 
-	} while (command != EXIT);
+	} while (command != EXIT);/*}}}*/
 
+	// Ending{{{
 	endwin();
 
 	delete [] displayTable;
-	buffer = NULL;
+	buffer = NULL;/*}}}*/
 
 	return EXIT_SUCCESS;
-
 }

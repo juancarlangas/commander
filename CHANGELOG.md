@@ -1,3 +1,11 @@
+Commander 1.0.1 Alpha
+=====================
+- Correction of the missing left fader when the adjustin comes from having the same left and right
+value.
+
+- The Orchestration editor now return to the first variation when it comes from a new patch,
+instead of returning to the same
+
 Korg 4.7.3
 ==========
 
