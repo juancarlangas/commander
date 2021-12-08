@@ -5,8 +5,9 @@
 #include "midi/keyboards.hpp"
 #include <ncurses.h>
 
-	enum Switch MIDI = Switch::OFF;
-Keyboard::Keyboard() :
+enum Switch MIDI = Switch::OFF;
+
+Keyboard::Keyboard() :/*{{{*/
 	device( NULL ),
 	port( "hw:1,0,0" )
 {
@@ -14,37 +15,37 @@ Keyboard::Keyboard() :
 	activeMode = false;
 	passiveMode = false;
 	part = 1;
-}
+}/*}}}*/
 
-void Keyboard::set_buffer( const struct System &_Buffer ) noexcept
+void Keyboard::set_buffer( const struct System &_Buffer ) noexcept/*{{{*/
 {
 	buffer = _Buffer;
-}
+}/*}}}*/
 
-void Keyboard::reset_variation() noexcept
+void Keyboard::reset_variation() noexcept/*{{{*/
 {
 	variacion = buffer.variacion_inicial;
-}
+}/*}}}*/
 
-void Keyboard::prev_variation() noexcept
+void Keyboard::prev_variation() noexcept/*{{{*/
 {
 	if ( variacion > 0 )
 		set_variation( variacion - 1 );
-}
+}/*}}}*/
 
-void Keyboard::next_variation() noexcept
+void Keyboard::next_variation() noexcept/*{{{*/
 {
 	if ( variacion < buffer.n_variaciones - 1 )
 		set_variation( variacion + 1 );
-}
+}/*}}}*/
 
-void Keyboard::set_variation( const int16_t _Variacion ) noexcept
+void Keyboard::set_variation( const int16_t _Variacion ) noexcept/*{{{*/
 {
 	variacion = _Variacion;
 	dump_variation();
-}
+}/*}}}*/
 
-void Keyboard::dump_variation() noexcept
+void Keyboard::dump_variation() noexcept/*{{{*/
 {
 	// sleep
 	/*
@@ -134,21 +135,41 @@ void Keyboard::dump_variation() noexcept
 	snd_rawmidi_close( device );
 	
 	device = NULL;
-}
+}/*}}}*/
 
-void Keyboard::dump_variation( const struct System &_Buffer, const int16_t &_Variacion ) noexcept
+void Keyboard::dump_variation( const struct System &_Buffer, const int16_t &_Variacion ) noexcept/*{{{*/
 {
 	set_buffer( _Buffer );
 	variacion = _Variacion;
 	dump_variation();
-}
+}/*}}}*/
 
-void Keyboard::set_name(const char *id)
+void Keyboard::set_name(const char *id)/*{{{*/
 {
-	sprintf(name, id);
-}
+	sprintf(name, "%s", id);
+}/*}}}*/
 
-void Keyboard::set_modality(short toMode)
+void Keyboard::select_page( const enum Page &_Pagina ) noexcept/*{{{*/
+{
+	// sleep
+	static struct timespec keyboardTimer;
+		keyboardTimer.tv_sec 	= 0;
+		keyboardTimer.tv_nsec	= 200000000;
+
+	// cambio de página
+	unsigned char pageSysEx[2][7] =    {{0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x00, 0xF7},
+										{0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7}};
+
+	snd_rawmidi_open(NULL, &device, port, SND_RAWMIDI_SYNC);
+		snd_rawmidi_write( device, pageSysEx[ _Pagina ], 7 );
+		nanosleep( &keyboardTimer, NULL );
+	snd_rawmidi_close(device); /*CLOSE*/
+	device = NULL;
+
+	set_variation( buffer.variacion_inicial );
+}/*}}}*/
+
+void Keyboard::set_modality(short toMode)/*{{{*/
 {
 	snd_rawmidi_t *device = NULL;
 	const char *port = "hw:1,0,0";
@@ -163,9 +184,9 @@ void Keyboard::set_modality(short toMode)
 	snd_rawmidi_close(device);
 	
 	device = NULL;
-}
+}/*}}}*/
 
-void Keyboard::set_program( const struct System &_Buffer ) noexcept
+void Keyboard::set_program( const struct System &_Buffer ) noexcept/*{{{*/
 {
 	set_buffer( _Buffer );
 
@@ -197,9 +218,9 @@ void Keyboard::set_program( const struct System &_Buffer ) noexcept
 	device = NULL;
 
 	set_variation( buffer.variacion_inicial );
-}
+}/*}}}*/
 
-void Keyboard::set_song(const char song)
+void Keyboard::set_song(const char song)/*{{{*/
 {
 	snd_rawmidi_t *device = NULL;
 	const char *port = "hw:1,0,0";
@@ -212,14 +233,14 @@ void Keyboard::set_song(const char song)
 	snd_rawmidi_close(device); /*CLOSE*/
 
 	device = NULL;
-}
+}/*}}}*/
 
-void Keyboard::toggle_MIDI_state() noexcept
-{/*{{{*/
+void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
+{
 	MIDI = ( MIDI == Switch::OFF ? ON : OFF );
 }/*}}}*/
 
-enum Switch Keyboard::get_MIDI_state() noexcept
-{/*{{{*/
+enum Switch Keyboard::get_MIDI_state() noexcept/*{{{*/
+{
 	return MIDI;
 }/*}}}*/

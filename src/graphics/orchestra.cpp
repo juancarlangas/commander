@@ -199,11 +199,12 @@ void Orchestra::capture_key() noexcept
 	int32_t tecla;
 	char tecla_c_string[3];
 	bool again = true;
+	bool will_dump;
 
 	do {
 		switch ( tecla = getch() ) {
-			case 11: // TOGGLE_MIDI_STATE
-				keyboard->toggle_MIDI_state();/*{{{*/
+			case 11: // TOGGLE_MIDI_STATE{{{
+				keyboard->toggle_MIDI_state();
 				print_MIDI_state( MIDI_state_window, keyboard->get_MIDI_state() );
 
 				if ( cursor[Y] == -1 ) // si está hasta arriba
@@ -226,10 +227,12 @@ void Orchestra::capture_key() noexcept
 							double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 							break;
 					}
+				will_dump = false;
+
 				break;/*}}}*/
 
-			case 353 : // Variación anterior
-				if ( variacion > 0 ) { // si se puede subir{{{
+			case 353 : // Variación anterior{{{
+				if ( variacion > 0 ) { // si se puede subir
 					--variacion;
 					update();
 
@@ -263,13 +266,17 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
-					if ( keyboard->get_MIDI_state() == Switch::ON )
+
+					if ( keyboard->get_MIDI_state() == Switch::ON ) {
+						keyboard->select_page( Page::TIMBRE );
 						keyboard->dump_variation( *info, variacion );
+					}
+					will_dump = false;
 				}
 				break;/*}}}*/
 
-			case 9 : // TAB
-				if ( variacion < info->n_variaciones - 1 ) {/*{{{*/
+			case 9 : // TAB{{{
+				if ( variacion < info->n_variaciones - 1 ) {
 					++variacion;
 					update();
 					if ( cursor[ Coordinates::Y ] == -1 ) {
@@ -303,13 +310,16 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ]].set_cursor_at_right();
 								break;
 						}
-					if ( keyboard->get_MIDI_state() == Switch::ON )
+					if ( keyboard->get_MIDI_state() == Switch::ON ) {
+						keyboard->select_page( Page::TIMBRE );
 						keyboard->dump_variation( *info, variacion );
+					}
+					will_dump = false;
 				}
 				break;/*}}}*/
 
-			case KEY_LEFT :
-				if ( cursor[ Coordinates::X ] > 0 ) {/*{{{*/
+			case KEY_LEFT :/*{{{*/
+				if ( cursor[ Coordinates::X ] > 0 ) {
 					--cursor[ Coordinates::X ];
 					if ( cursor[ Coordinates::Y ] >= 0 ) // Zona de objetos
 						switch ( cursor[ Coordinates::X ] ) {
@@ -335,13 +345,12 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
 								break;
 						}
-					if ( keyboard->get_MIDI_state() == Switch::ON )
-						keyboard->dump_variation( *info, variacion );
+					will_dump = true;
 				}
 				break;/*}}}*/
 
-			case KEY_RIGHT :
-				if ( cursor[ Coordinates::X ] < 4 ) {/*{{{*/
+			case KEY_RIGHT :/*{{{*/
+				if ( cursor[ Coordinates::X ] < 4 ) {
 					++cursor[ Coordinates::X ];
 					if ( cursor[ Coordinates::Y ] >= 0 )
 						switch ( cursor[ Coordinates::X ] ) {
@@ -367,13 +376,12 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
 								break;
 						}
-					if ( keyboard->get_MIDI_state() == Switch::ON )
-						keyboard->dump_variation( *info, variacion );
+					will_dump = true;
 				}
 				break;/*}}}*/
 
-			case KEY_DOWN :
-				if ( cursor[ Coordinates::Y ] < 7 ) { // Si puede bajar todavía{{{
+			case KEY_DOWN :/*{{{*/
+				if ( cursor[ Coordinates::Y ] < 7 ) { // Si puede bajar todavía
 					++cursor[ Coordinates::Y ];
 					switch ( cursor[ Coordinates::X ] ) {
 						case 0: // Check
@@ -421,13 +429,12 @@ void Orchestra::capture_key() noexcept
 							double_X_slider[ cursor[ Coordinates::Y ] ].set_cursor_at_right();
 							break;
 					}
-					if ( keyboard->get_MIDI_state() == Switch::ON )
-						keyboard->dump_variation( *info, variacion );
+					will_dump = true;
 				}
 				break;/*}}}*/
 
-			case KEY_UP :
-				if ( cursor[ Coordinates::Y ] > -1 ) { // aún no está en la etiqueta{{{
+			case KEY_UP :/*{{{*/
+				if ( cursor[ Coordinates::Y ] > -1 ) { // aún no está en la etiqueta
 					--cursor[ Coordinates::Y ];
 					switch ( cursor[ Coordinates::X ] ) {
 						case 0: // check: nada que salvar
@@ -485,13 +492,12 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_right();
 							break;
 					}
-					if ( keyboard->get_MIDI_state() == Switch::ON )
-						keyboard->dump_variation( *info, variacion );
+					will_dump = true;
 				}
 				break;/*}}}*/
 
-			case ' ' :
-				if ( cursor[ Coordinates::Y ] == -1 ) {/*{{{*/
+			case ' ' :/*{{{*/
+				if ( cursor[ Coordinates::Y ] == -1 ) {
 					temp_word.append( " " );
 					etiqueta_field.set_content( temp_word );
 				}
@@ -518,14 +524,12 @@ void Orchestra::capture_key() noexcept
 					temp_word.append( " " );
 					instrument_field[ cursor[Y] ].set_text( temp_word );
 				}
-
-				if ( keyboard->get_MIDI_state() == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+				will_dump = true;
 
 				break;/*}}}*/
 
-			case KEY_BACKSPACE :
-				if ( cursor[ Coordinates::Y ] == -1 ) {/*{{{*/
+			case KEY_BACKSPACE :/*{{{*/
+				if ( cursor[ Coordinates::Y ] == -1 ) {
 					temp_word = temp_word.substr( 0, temp_word.length() - 1 );
 					etiqueta_field.set_content( temp_word );
 				}
@@ -537,13 +541,12 @@ void Orchestra::capture_key() noexcept
 					temp_word = temp_word.substr( 0, temp_word.length() - 1 );
 					transposition_field[ cursor[Y] ].set_text( temp_word );
 				}
-				if ( keyboard->get_MIDI_state() == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+				will_dump = true;
 
 				break;/*}}}*/
 
-			case 546 : // CTRL-KEY_LEFT
-				if ( cursor[Y] > -1 ) { // Zona de controles{{{
+			case 546 : // CTRL-KEY_LEFT{{{
+				if ( cursor[Y] > -1 ) { // Zona de controles
 					if ( cursor[X] == 3 ) { // left slider
 						if ( double_X_slider[ cursor[Y] ].decrease_left_slider() == Moved::YES )
 							--( info->variacion[ variacion ].track[ cursor[Y] ].lower_key );
@@ -552,8 +555,7 @@ void Orchestra::capture_key() noexcept
 						if ( double_X_slider[ cursor[Y] ].decrease_right_slider() == Moved::YES )
 							--( info->variacion[ variacion ].track[ cursor[Y] ].upper_key );
 					}
-				if ( keyboard->get_MIDI_state() == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+					will_dump = true;
 				}
 
 				break;/*}}}*/
@@ -569,13 +571,12 @@ void Orchestra::capture_key() noexcept
 						if ( double_X_slider[ cursor[Y] ].increase_right_slider() == Moved::YES )
 							++( info->variacion[ variacion ].track[ cursor[Y] ].upper_key );
 					}
-				if ( keyboard->get_MIDI_state() == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+					will_dump = true;
 				}
 				break;/*}}}*/
 
-			case '\n' :
-				if ( cursor[Y] == -1 )/*{{{*/
+			case '\n' :/*{{{*/
+				if ( cursor[Y] == -1 )
 					info->variacion[ variacion ].etiqueta = temp_word;
 				else switch ( cursor[X] ) {
 					case 1 :
@@ -588,20 +589,26 @@ void Orchestra::capture_key() noexcept
 					default:
 						break;
 				 }
-				if ( keyboard->get_MIDI_state() == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+					if ( keyboard->get_MIDI_state() == Switch::ON ) {
+						keyboard->select_page( Page::TIMBRE );
+						keyboard->dump_variation( *info, variacion );
+					}
+
 				break;/*}}}*/
 
-			case 27 :
-				curs_set( false );/*{{{*/
+			case 27 :/*{{{*/
+				curs_set( false );
 				hide();
 				update_popups();
 				again = false;
+
+				will_dump = false;
+
 				break;/*}}}*/
 
-			case 1 : // DUplicate
-				if ( info->n_variaciones < 16 ) {/*{{{*/
-					for ( int32_t i = info->n_variaciones - 1; i > variacion; --i )
+			case 1 : // DUplicate{{{
+				if ( info->n_variaciones < 16 ) {
+					for ( int32_t i = info->n_variaciones - 1; i >= variacion; --i )
 						info->variacion[ i + 1 ] = info->variacion[ i ];
 					++info->n_variaciones;
 					++variacion;
@@ -636,13 +643,16 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
-				if ( keyboard->get_MIDI_state() == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+					if ( keyboard->get_MIDI_state() == Switch::ON ) {
+						keyboard->select_page( Page::TIMBRE );
+						keyboard->dump_variation( *info, variacion );
+					}
+					will_dump = false;
 				}
 				break;/*}}}*/
 
-			case 18 : // Eliminate
-				if ( info->n_variaciones > 1 ) {/*{{{*/
+			case 18 : // Eliminate{{{
+				if ( info->n_variaciones > 1 ) {
 					if ( variacion == info->n_variaciones - 1 )
 						--variacion;
 					for ( int32_t i = variacion + 1; i < info->n_variaciones; ++i )
@@ -679,13 +689,16 @@ void Orchestra::capture_key() noexcept
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
-				if ( keyboard->get_MIDI_state() == Switch::ON )
-					keyboard->dump_variation( *info, variacion );
+					if ( keyboard->get_MIDI_state() == Switch::ON ) {
+						keyboard->select_page( Page::TIMBRE );
+						keyboard->dump_variation( *info, variacion );
+					}
+					will_dump = false;
 				}
 				break;/*}}}*/
 
-			default :
-				if ( tecla == 32 or ( 44 <= tecla and tecla <= 122 ) or tecla == 263 ) {/*{{{*/
+			default :/*{{{*/
+				if ( tecla == 32 or ( 44 <= tecla and tecla <= 122 ) or tecla == 263 ) {
 					if ( cursor[Y] == -1 ) {
 						sprintf( tecla_c_string, "%c", tecla );
 						temp_word = temp_word + tecla_c_string;
@@ -705,11 +718,20 @@ void Orchestra::capture_key() noexcept
 						default:
 							break;
 					}
-				break;
-				}/*}}}*/
+				will_dump = false;
+				break;/*}}}*/
+				}
 		}
+		/* Por ahora eliminamos esta parte, vamos a reservar el dumping a la tecla ENTER
+		 * y a los cambios de variación. Y probaremos cómo se siente!!
+		 */
+		if ( will_dump and keyboard->get_MIDI_state() == Switch::ON ) {
+			// keyboard->select_page( Page::TIMBRE );
+			// keyboard->dump_variation( *info, variacion );
+		}
+
 	} while ( again );
-}/*}}}*/
+}
 
 void Orchestra::reset_variation() noexcept/*{{{*/
 {

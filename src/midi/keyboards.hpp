@@ -2,17 +2,17 @@
 #define KEYBOARDS_H
 
 #include <bits/stdint-intn.h>
-#define PLAY 	0
-#define TIMBRE 	1
-
 #include <alsa/asoundlib.h>
 #include "data/databases.hpp"
 
-enum Page { COMBI, GLOBAL, MULTI };
+enum Section { COMBI, GLOBAL, MULTI };
+enum Page { PLAY = 0, TIMBRE };
 
 class Keyboard {
 public:
 	Keyboard();
+	void connect() noexcept;
+	void disconnect() noexcept;
 	void set_buffer( const struct System & ) noexcept;
 	void prev_variation() noexcept;
 	void next_variation() noexcept;
@@ -20,8 +20,9 @@ public:
 	void reset_variation() noexcept;
 	void dump_variation() noexcept;
 	void dump_variation( const struct System &, const int16_t & ) noexcept;
+	void select_page( const enum Page & ) noexcept;
 	void select_part(const short);
-	void select_page( const enum Page ) noexcept;
+	void select_section( const enum Section ) noexcept;
 	short part;
 	short midiChannel;
 	void set_name(const char *);

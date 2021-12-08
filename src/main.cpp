@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include "common/common.hpp"
 
 int main()
 {
@@ -136,8 +137,8 @@ int main()
 				keyboard.next_variation();/*{{{*/
 				break;/*}}}*/
 				
-			case INTRO:
-				switch (winMode) {/*{{{*/
+			case INTRO:/*{{{*/
+				switch (winMode) {
 					case MODE_DISPLAY:
 						buffer = displayTable[ dIndex ];
 						break;
@@ -500,26 +501,31 @@ int main()
 			}/*}}}*/
 
 			case EDIT_ORCHESTRATION :/*{{{*/
-				// ida
-				buffer = displayTable[ dIndex ];
-				if ( keyboard.get_MIDI_state() == Switch::ON )
+				if ( winMode == MODE_DISPLAY ) {
+					// ida
+					/* Tal vez esto no sea útil
+					if ( keyboard.get_MIDI_state() == Switch::ON )
+					buffer = displayTable[ dIndex ];
 					keyboard.set_program( *buffer );
-				orquestacion.reset_variation();
-				orquestacion.show( buffer );
-				update_popups(); // se decide poner aquí para no refrescar varias veces
-				orquestacion.capture_key();
+					*/
+					buffer = displayTable[ dIndex ];
+					orquestacion.reset_variation();
+					orquestacion.show( buffer );
+					update_popups(); // se decide poner aquí para no refrescar varias veces
+					orquestacion.capture_key();
 
-				// retorno
-				update_popups();
-				draw_windows();
+					// retorno
+					update_popups();
+					draw_windows();
 
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;	
+					updateWindow[LCD]		= true;
+					updateWindow[SEARCH] 	= true;
+					updateWindow[DISPLAY]	= true;
+					updateWindow[PLAYLIST] 	= true;
+					updateWindow[COMPUTER] 	= true;
+					updateWindow[DIGITS]	= true;
+					updateWindow[ZOOM]		= true;	
+				}
 
 				break;/*}}}*/
 
