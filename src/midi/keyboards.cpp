@@ -244,3 +244,8 @@ enum Switch Keyboard::get_MIDI_state() noexcept/*{{{*/
 {
 	return MIDI;
 }/*}}}*/
+
+bool Keyboard::is_connected() noexcept
+{
+	return MIDI == Switch::ON ? true : false;
+}

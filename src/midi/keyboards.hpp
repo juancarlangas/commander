@@ -32,6 +32,7 @@ public:
 	void set_song(const char);
 	void toggle_MIDI_state() noexcept;
 	enum Switch get_MIDI_state() noexcept;
+	bool is_connected() noexcept;
 private:
 	struct System buffer;
 	int16_t variacion;

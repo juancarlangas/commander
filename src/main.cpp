@@ -155,7 +155,8 @@ int main()
 						break;
 				}
 
-				keyboard.set_program( *buffer );
+				if ( keyboard.is_connected() )
+					keyboard.set_program( *buffer );
 
 				updateWindow[LCD] = true;
 
