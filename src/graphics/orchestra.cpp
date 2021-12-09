@@ -589,10 +589,12 @@ void Orchestra::capture_key() noexcept
 					default:
 						break;
 				 }
-					if ( keyboard->get_MIDI_state() == Switch::ON ) {
-						keyboard->select_page( Page::TIMBRE );
-						keyboard->dump_variation( *info, variacion );
-					}
+
+				// Dumpeamos sí o sí
+				if ( keyboard->get_MIDI_state() == Switch::ON ) {
+					keyboard->select_page( Page::TIMBRE );
+					keyboard->dump_variation( *info, variacion );
+				}
 
 				break;/*}}}*/
 

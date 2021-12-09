@@ -79,6 +79,8 @@ void DoubleXslider::set_cursor_at_left() noexcept/*{{{*/
 	mvwaddch( area, 0, lPos, ' ' );
 	curs_set( false );
 	wrefresh( area );
+
+	focused_slider = 0;
 }/*}}}*/
 
 void DoubleXslider::set_cursor_at_right() noexcept/*{{{*/
@@ -88,6 +90,8 @@ void DoubleXslider::set_cursor_at_right() noexcept/*{{{*/
 	mvwaddch( area, 0, rPos, ' ' );
 	curs_set( false );
 	wrefresh( area );
+
+	focused_slider = 1;
 }/*}}}*/
 
 void DoubleXslider::leave_cursor() noexcept/*{{{*/

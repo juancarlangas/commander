@@ -1,5 +1,21 @@
-Commander 1.0.1 Alpha
-=====================
+Commander 1.1
+=============
+
+- Numbers in sounds on Orchestration
+
+- New combinations databases. The old combinations.csv will be called repertorio.csv
+
+- Save with CTRL-E at the fly with no need to loose the query.
+
+- Coloring keyboard while changing the faders.
+
+- Modulator Wheel Check Box or Value Box per instrument and per variation
+
+- The Orchestration editor now return to the DEFAULT variation (as is specified in the database)
+when it comes from a new patch, instead of returning to the same.
+
+Commander 1.0
+=============
 - Correction of the missing left fader when the adjustin comes from having the same left and right
 value. O.K.
 
@@ -8,14 +24,12 @@ instead of returning to the same. O.K.
 
 - Correction of duplicated and/or swapped focused faders.
 
-- Numbers in sounds on Orchestration
-
-- New combinations databases. The old combinations.csv will be called repertorio.csv
-
 - Not to change to white when editing the instrument name of an inactive track (after the
 previous improvement there will be no need to editig instrument name on Orchestration.
 
-- Save with CTRL-E at the fly with no need to loose the query.
+- Better track coloring
+
+- Fix of no hiding Orchestration when shows Tagging
 
 Korg 4.7.3
 ==========
