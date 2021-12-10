@@ -22,10 +22,18 @@ value. O.K.
 - The Orchestration editor now return to the first variation when it comes from a new patch,
 instead of returning to the same. O.K.
 
-- Correction of duplicated and/or swapped focused faders.
+- Correction of duplicated and/or swapped focused faders. O.K.
 
-- Not to change to white when editing the instrument name of an inactive track (after the
-previous improvement there will be no need to editig instrument name on Orchestration.
+- Change to F1 the toggling midi State function.
+
+- Asgning to the toggling MIDI state the behavior of opening and closing the MIDI interface,
+with the target of improving performance and avoiding laggings and surprising disconnections.
+
+- Not to change to white when editing the instrument name of an inactive track. This is
+produced because the cursor color is always white. We have to improve that.
+(after the previous improvement there will be no need to editig instrument name on Orchestration.
+
+- Returning of the favourites patches.
 
 - Better track coloring
 

@@ -10,12 +10,12 @@ void TextPopup::set_text( const char *_Texto ) noexcept
 	wrefresh( area );
 }	
 
-void TextPopup::set_text( const std::string &_Texto ) noexcept
+void TextPopup::set_text( const std::string &_Texto ) noexcept/*{{{*/
 {
 	wclear( area );
 	waddstr( area, _Texto.c_str() );
 	wrefresh( area );
-}
+}/*}}}*/
 
 void TextPopup::set_text( const char &_Caracter ) noexcept
 {
