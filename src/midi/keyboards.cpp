@@ -17,6 +17,18 @@ Keyboard::Keyboard() :/*{{{*/
 	part = 1;
 }/*}}}*/
 
+void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
+{
+	if ( MIDI == Switch::OFF ) {
+		snd_rawmidi_open( NULL, &device, port, SND_RAWMIDI_SYNC );
+		MIDI = Switch::ON;
+	}
+	else {
+		snd_rawmidi_close( device );
+		MIDI = Switch::OFF;
+	}
+}/*}}}*/
+
 void Keyboard::set_buffer( const struct System &_Buffer ) noexcept/*{{{*/
 {
 	buffer = _Buffer;
@@ -125,16 +137,12 @@ void Keyboard::dump_variation() noexcept/*{{{*/
 			x50_transposition[i][11] = buffer.variacion[variacion].track[i].transposition;
 	}
 
-	snd_rawmidi_open( NULL, &device, port, SND_RAWMIDI_SYNC );
-		for ( int16_t channel = 0; channel < 8; ++channel ) {
-			snd_rawmidi_write( device, x50_on_off[channel], 13 );
-			snd_rawmidi_write( device, x50_lower_key[channel], 13);
-			snd_rawmidi_write( device, x50_upper_key[channel], 13);
-			snd_rawmidi_write( device, x50_transposition[channel], 13);
-		}
-	snd_rawmidi_close( device );
-	
-	device = NULL;
+	for ( int16_t channel = 0; channel < 8; ++channel ) {
+		snd_rawmidi_write( device, x50_on_off[channel], 13 );
+		snd_rawmidi_write( device, x50_lower_key[channel], 13);
+		snd_rawmidi_write( device, x50_upper_key[channel], 13);
+		snd_rawmidi_write( device, x50_transposition[channel], 13);
+	}
 }/*}}}*/
 
 void Keyboard::dump_variation( const struct System &_Buffer, const int16_t &_Variacion ) noexcept/*{{{*/
@@ -160,11 +168,8 @@ void Keyboard::select_page( const enum Page &_Pagina ) noexcept/*{{{*/
 	unsigned char pageSysEx[2][7] =    {{0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x00, 0xF7},
 										{0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7}};
 
-	snd_rawmidi_open(NULL, &device, port, SND_RAWMIDI_SYNC);
-		snd_rawmidi_write( device, pageSysEx[ _Pagina ], 7 );
-		nanosleep( &keyboardTimer, NULL );
-	snd_rawmidi_close(device); /*CLOSE*/
-	device = NULL;
+	snd_rawmidi_write( device, pageSysEx[ _Pagina ], 7 );
+	nanosleep( &keyboardTimer, NULL );
 
 	set_variation( buffer.variacion_inicial );
 }/*}}}*/
@@ -172,18 +177,13 @@ void Keyboard::select_page( const enum Page &_Pagina ) noexcept/*{{{*/
 void Keyboard::set_modality(short toMode)/*{{{*/
 {
 	snd_rawmidi_t *device = NULL;
-	const char *port = "hw:1,0,0";
 	unsigned char sysex[7] = {0xF0, 0x42, 0x00, 0x7A, 0x4E, 0x00, 0xF7}; //Ch = sysex[2] (LSB)
 
 	if (toMode == MULTI)
 		sysex[5] = 0x04;
 
 	
-	snd_rawmidi_open(NULL, &device, port, SND_RAWMIDI_SYNC);
-		snd_rawmidi_write(device, sysex, 7);
-	snd_rawmidi_close(device);
-	
-	device = NULL;
+	snd_rawmidi_write(device, sysex, 7);
 }/*}}}*/
 
 void Keyboard::set_program( const struct System &_Buffer ) noexcept/*{{{*/
@@ -206,16 +206,13 @@ void Keyboard::set_program( const struct System &_Buffer ) noexcept/*{{{*/
 	lsb[2] = buffer.bnk - 65; /*LSB*/
 	pc[1] = buffer.num; /*PC*/
 
-	snd_rawmidi_open(NULL, &device, port, SND_RAWMIDI_SYNC);
-		snd_rawmidi_write( device, pageSysEx[COMBI], 7 );
-		nanosleep( &keyboardTimer, NULL );
-			snd_rawmidi_write(device, msb, 3);
-			snd_rawmidi_write(device, lsb, 3);
-			snd_rawmidi_write(device, pc, 2);
-		snd_rawmidi_write( device, pageSysEx[TIMBRE], 7 );
-		nanosleep( &keyboardTimer, NULL );
-	snd_rawmidi_close(device); /*CLOSE*/
-	device = NULL;
+	snd_rawmidi_write( device, pageSysEx[COMBI], 7 );
+	nanosleep( &keyboardTimer, NULL );
+		snd_rawmidi_write(device, msb, 3);
+		snd_rawmidi_write(device, lsb, 3);
+		snd_rawmidi_write(device, pc, 2);
+	snd_rawmidi_write( device, pageSysEx[TIMBRE], 7 );
+	nanosleep( &keyboardTimer, NULL );
 
 	set_variation( buffer.variacion_inicial );
 }/*}}}*/
@@ -223,21 +220,11 @@ void Keyboard::set_program( const struct System &_Buffer ) noexcept/*{{{*/
 void Keyboard::set_song(const char song)/*{{{*/
 {
 	snd_rawmidi_t *device = NULL;
-	const char *port = "hw:1,0,0";
 	unsigned char songSelect[2] = {0xF3, 0x00};
 
 	
-	snd_rawmidi_open(NULL, &device, port, SND_RAWMIDI_SYNC); /*Open*/
-		songSelect[1] = song; /*SongSelect */
-			snd_rawmidi_write(device, songSelect, 2);	
-	snd_rawmidi_close(device); /*CLOSE*/
-
-	device = NULL;
-}/*}}}*/
-
-void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
-{
-	MIDI = ( MIDI == Switch::OFF ? ON : OFF );
+	songSelect[1] = song; /*SongSelect */
+		snd_rawmidi_write(device, songSelect, 2);	
 }/*}}}*/
 
 enum Switch Keyboard::get_MIDI_state() noexcept/*{{{*/
