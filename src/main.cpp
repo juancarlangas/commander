@@ -184,9 +184,6 @@ int main()
 				updateWindow[DISPLAY] = true;
 				updateWindow[ZOOM]	  = true;
 
-				if ( keyboard.is_connected() )
-					keyboard.set_program( *buffer );
-
 				break;/*}}}*/
 
 			case CHANGE_WINDOW:/*{{{*/
@@ -611,8 +608,17 @@ int main()
 				wclear(zoomWindow);
 				wrefresh(zoomWindow);
 			}/*}}}*/
-		}
 
+			/* ENVÍO MIDI:{{{
+			 * se realiza en esta parte ya que visualmente deseamos que primero haga los cambios
+			 * en la pantalla y después se tome el tiempo de terminar con el proceso MIDI. Hacer esto
+			 * garantiza una percepción fluida del software.
+			 *
+			 * Por lo pronto reservamos esta funcionalidad para el comando FAVOURITE*/
+			if ( command == FAVOURITE and keyboard.is_connected() )
+				keyboard.set_program( *buffer );/*}}}*/
+
+		}
 		command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
 
 	} while (command != EXIT);

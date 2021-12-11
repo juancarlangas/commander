@@ -37,7 +37,7 @@ Reached, Thanks to GOD!
 
 - Exporting with :w rather than :export. .. Reached .. G.A.D.
 
-- Auto closing MIDI device when exits ( if isnt closed yet )
+- Auto closing MIDI device when exits ( if isnt closed yet ) O.K.
 
 - First moving the Display Index rather than waits to the MIDI change
 
