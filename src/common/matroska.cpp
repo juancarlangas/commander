@@ -28,7 +28,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 					comando = ESCAPE;
 			}
 
-			else if (strstr(":w", cadena) != NULL && strstr(cadena, ":save") != NULL)
+			else if (strstr(":wpl", cadena) != NULL && strstr(cadena, ":wpl") != NULL)
 				comando = SAVE_PLAYLIST;
 
 			else if (strstr(":load", cadena) != NULL && strstr(cadena, ":load") != NULL)
@@ -37,7 +37,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 			else if (strstr(":clear", cadena) != NULL && strstr(cadena, ":clear") != NULL)
 				comando = CLEAR_PLAYLIST;
 
-			else if (strstr(":export", cadena) != NULL && strstr(cadena, ":export") != NULL)
+			else if (strstr(":w", cadena) != NULL && strstr(cadena, ":w") != NULL)
 				comando = EXPORTATE;
 
 			else if ( strcmp( ":q", cadena ) == 0 )

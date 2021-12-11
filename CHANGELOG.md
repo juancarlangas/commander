@@ -30,9 +30,9 @@ instead of returning to the same. O.K.
 with the target of improving performance and avoiding laggings and surprising disconnections...
 Reached, Thanks to GOD!
 
-- Returning of the favourites patches.
+- Returning of the favourites patches. .O.K. Thanks to God!
 
-- Exporting with :w rather than :export.
+- Exporting with :w rather than :export. .. Reached .. G.A.D.
 
 - Auto closing MIDI device when exits ( if isnt closed yet )
 
