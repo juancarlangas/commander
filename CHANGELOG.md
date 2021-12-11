@@ -24,16 +24,25 @@ instead of returning to the same. O.K.
 
 - Correction of duplicated and/or swapped focused faders. O.K.
 
-- Change to F1 the toggling midi State function.
+- Change to F1 the toggling midi State function... Reached
 
 - Asgning to the toggling MIDI state the behavior of opening and closing the MIDI interface,
-with the target of improving performance and avoiding laggings and surprising disconnections.
-
-- Not to change to white when editing the instrument name of an inactive track. This is
-produced because the cursor color is always white. We have to improve that.
-(after the previous improvement there will be no need to editig instrument name on Orchestration.
+with the target of improving performance and avoiding laggings and surprising disconnections...
+Reached, Thanks to GOD!
 
 - Returning of the favourites patches.
+
+- Exporting with :w rather than :export.
+
+- Auto closing MIDI device when exits ( if isnt closed yet )
+
+- First moving the Display Index rather than waits to the MIDI change
+
+- Fixing of the columns in DisplayWindow
+
+- Not to change to white when editing the instrument name of a track. This is produced because
+the cursor color is always white. We have to improve that. (after the previous improvement
+there will be no need to editig instrument name on Orchestration )
 
 - Better track coloring
 

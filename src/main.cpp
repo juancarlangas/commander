@@ -1,5 +1,6 @@
 #include "main.hpp"
 #include "common/common.hpp"
+#include "common/matroska.hpp"
 
 int main()
 {
@@ -50,7 +51,7 @@ int main()
 
 	orquestacion.link_MIDI_device( &keyboard );/*}}}*/
 
-	// Engine{{{
+	// Engine
 	do {
 		for (i = LCD; i <= ZOOM; i++)
 			updateWindow[i] = false;
@@ -84,8 +85,8 @@ int main()
 				keyboard.dump_variation();
 				break;/*}}}*/
 
-			case SET_MODE:
-				for (k = 0; k <= LONG_STRING - 1; k++)/*{{{*/
+			case SET_MODE:/*{{{*/
+				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
 				if (mode == COMBINATOR)
@@ -108,8 +109,8 @@ int main()
 
 				break;/*}}}*/
 
-			case ESCAPE:
-				for (k = 0; k <= LONG_STRING - 1; k++)/*{{{*/
+			case ESCAPE:/*{{{*/
+				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
 				llenado_displayTable(displayTable, dBase[mode].base, nRows[mode], keyword, &dRows);
@@ -129,12 +130,12 @@ int main()
 
 				break;/*}}}*/
 
-			case PREV_VARIATION:
-				keyboard.prev_variation();/*{{{*/
+			case PREV_VARIATION:/*{{{*/
+				keyboard.prev_variation();
 				break;/*}}}*/
 
-			case NEXT_VARIATION :
-				keyboard.next_variation();/*{{{*/
+			case NEXT_VARIATION :/*{{{*/
+				keyboard.next_variation();
 				break;/*}}}*/
 				
 			case INTRO:/*{{{*/
@@ -162,8 +163,34 @@ int main()
 
 				break;/*}}}*/
 
-			case CHANGE_WINDOW:
-/*{{{*/
+			case FAVOURITE:/*{{{*/
+				buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter - 48 );
+
+				for (k = 0; k <= LONG_STRING - 1; k++)
+					keyword[k] = '\0';
+
+				llenado_displayTable(displayTable, dBase[mode].base, nRows[mode], keyword, &dRows);
+
+				charIndex = 0;
+				dTop = 0;
+				dIndex = buffer - dBase[COMBINATIONS].base; // Maravilloso!!! Aritmética de pointer.
+
+				if (winMode == MODE_PLAYLIST) {
+					winMode = MODE_DISPLAY;
+					updateWindow[PLAYLIST] = true;
+				}
+				updateWindow[LCD] 	  = true;
+				updateWindow[SEARCH]  = true;
+				updateWindow[DISPLAY] = true;
+				updateWindow[ZOOM]	  = true;
+
+				if ( keyboard.is_connected() )
+					keyboard.set_program( *buffer );
+
+				break;/*}}}*/
+
+			case CHANGE_WINDOW:/*{{{*/
+
 				if (winMode == MODE_DISPLAY && plRows > 0) {
 					winMode = MODE_PLAYLIST;
 					if (plIndexA < plTop && plIndexB < plTop) {// <-- Que no se quede volando
@@ -180,8 +207,8 @@ int main()
 
 				break;/*}}}*/
 
-			case MOVE_INDEX:
-/*{{{*/
+			case MOVE_INDEX:/*{{{*/
+
 				if (caracter == KEY_UP || caracter == KEY_LEFT)
 					switch (winMode) {
 						case MODE_DISPLAY:
@@ -213,8 +240,8 @@ int main()
 
 				break;/*}}}*/
 
-			case ADD:
-				playlistTable[(plRows)++] = *displayTable[dIndex];/*{{{*/
+			case ADD:/*{{{*/
+				playlistTable[(plRows)++] = *displayTable[dIndex];
 				if (plRows > plTop + playlistShowResults)
 					(plTop)++;
 
@@ -225,8 +252,8 @@ int main()
 
 				break;/*}}}*/
 
-			case SUPR:
-				for (i = plIndexA; i <= plRows - 1; i++)  //succión{{{
+			case SUPR:/*{{{*/
+				for (i = plIndexA; i <= plRows - 1; i++)  //succión
 					playlistTable[i] = playlistTable[i + 1];
 				if (plIndexA == plRows - 1) { //fin de lista
 					decrease_index(&plTop, &plIndexA );
@@ -246,8 +273,8 @@ int main()
 
 				break;/*}}}*/
 
-			case DEL:
-/*{{{*/
+			case DEL:/*{{{*/
+
 				charIndex--;
 				keyword[charIndex] = '\0';
 
@@ -266,8 +293,8 @@ int main()
 
 				break;/*}}}*/
 
-			case DRAG_UP: case DRAG_DOWN:
-/*{{{*/
+			case DRAG_UP: case DRAG_DOWN:/*{{{*/
+
 				if (winMode == MODE_PLAYLIST && caracter == 566 && plIndexB > 0) {
 					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
 					decrease_index(&plTop, &plIndexB );
@@ -286,8 +313,8 @@ int main()
 				
 				break;/*}}}*/
 
-			case READ_CHAR:
-/*{{{*/
+			case READ_CHAR:/*{{{*/
+
 				//agregate
 				keyword[charIndex++] = caracter;
 				keyword[charIndex] = '\0';
@@ -322,8 +349,8 @@ int main()
 				}
 				break;/*}}}*/
 
-			case SAVE_PLAYLIST:
-/*{{{*/
+			case SAVE_PLAYLIST:/*{{{*/
+
 				show_panel(panel[DIALOG_WINDOW]);
 				show_panel(panel[INPUT_BOX]);
 				update_panels();
@@ -365,8 +392,8 @@ int main()
 
 				break;/*}}}*/
 
-			case LOAD_PLAYLIST:
-/*{{{*/
+			case LOAD_PLAYLIST:/*{{{*/
+
 				show_panel(panel[DIALOG_WINDOW]);
 				show_panel(panel[INPUT_BOX]);
 				update_panels();
@@ -408,11 +435,10 @@ int main()
 				updateWindow[ZOOM]		= true;
 				updateWindow[PLAYLIST]	= true;
 
-				break;
-/*}}}*/
+				break;/*}}}*/
 
-			case CLEAR_PLAYLIST:
-/*{{{*/
+			case CLEAR_PLAYLIST:/*{{{*/
+
 				plRows = 0;
 				save_playlist(playlistTable, plRows, "default");
 
@@ -436,8 +462,8 @@ int main()
 
 				break;/*}}}*/
 
-			case ADD_VALUE:
-			{/*{{{*/
+			case ADD_VALUE:/*{{{*/
+			{
 				Form forma;
 
 				if (forma.capture_value() == true) {
@@ -457,8 +483,8 @@ int main()
 				break;
 			}/*}}}*/
 
-			case DELETE_VALUE:
-			{/*{{{*/
+			case DELETE_VALUE:/*{{{*/
+			{
 				int difference = displayTable[dIndex] - &(dBase[mode].base[0]);
 
 				dBase[mode].delete_value(difference);
@@ -589,7 +615,7 @@ int main()
 
 		command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
 
-	} while (command != EXIT);/*}}}*/
+	} while (command != EXIT);
 
 	// Ending{{{
 	endwin();

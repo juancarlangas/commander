@@ -5,7 +5,7 @@
 #include "../common/common.hpp"
 #include "colors.hpp"
 
-Form::Form()
+Form::Form()/*{{{*/
 {
 	getmaxyx(stdscr, y, x); // se crea en tiempo real justo para que de tiempo de obtener x y y
 
@@ -38,9 +38,9 @@ Form::Form()
 
 	for ( int32_t i = 0; i < 8; ++i )
 		field[i].hide();
-}
+}/*}}}*/
 
-bool Form::capture_value()
+bool Form::capture_value()/*{{{*/
 {
 	// Initialize
 		*row.title = '\0';
@@ -66,9 +66,9 @@ bool Form::capture_value()
 	hide();
 
 	return success;
-}
+}/*}}}*/
 
-bool Form::capture_value(System get)
+bool Form::capture_value(System get)/*{{{*/
 {
 	row = get;
 	
@@ -86,9 +86,9 @@ bool Form::capture_value(System get)
 	hide();
 
 	return success;
-}
+}/*}}}*/
 
-bool Form::capture()
+bool Form::capture()/*{{{*/
 {
 	char word[LONG_STRING];
 
@@ -160,14 +160,14 @@ bool Form::capture()
 	} while (next == true);
 
 	return success;
-}
+}/*}}}*/
 
-System Form::get_value()
+System Form::get_value()/*{{{*/
 {
 	return row;
-}
+}/*}}}*/
 
-void Form::show()
+void Form::show()/*{{{*/
 {
 	show_panel( panel );
 	curs_set(true);
@@ -177,9 +177,9 @@ void Form::show()
 
 	::update_panels();
 	::doupdate();
-}
+}/*}}}*/
 
-void Form::hide()
+void Form::hide()/*{{{*/
 {
 	for (short w = TITLE; w <= 9; w++)
 		field[w].hide();
@@ -189,4 +189,4 @@ void Form::hide()
 	
 	::update_panels();
 	::doupdate();
-}
+}/*}}}*/

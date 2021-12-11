@@ -56,7 +56,6 @@ class Database {
 	public:
 		Database();
 		~Database();
-		void load(const char*, const char *);
 		int get_activeRows(const char *,const char *);
 		void cargar( const std::string & ) noexcept;
 		void cargar_especifico( const std::string &, int32_t ) noexcept;
@@ -69,12 +68,15 @@ class Database {
 		void clonar_from_old( Database & ) noexcept;
 		void escribir( const std::string & ) noexcept;
 		struct System get_cancion( const int ) noexcept;
+		struct System *get_favourite_row( const int32_t & ) noexcept;
 		System *base;
 	private:
 		int32_t activeRows;
 		int32_t n_canciones;
 		void clean_row(int);
 		const char *homedir;
+		struct System *favorito[10];
+		void fill_favourites() noexcept;
 	};
 
 #endif

@@ -1,4 +1,5 @@
 #include <bits/stdint-intn.h>
+#include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,21 +19,21 @@
 #include "common/string.hpp"
 #include "utilities/src/files.hpp"
 
-Database::Database() : activeRows( 0 )
+Database::Database() : activeRows( 0 )/*{{{*/
 {
 	n_canciones = activeRows;
 
 	// homedir
 	if ((homedir = getenv("HOME")) == NULL)
 		homedir = getpwuid(getuid())->pw_dir;
-}
+}/*}}}*/
 
-Database::~Database()
+Database::~Database()/*{{{*/
 {
 	delete [] base;
-}
+}/*}}}*/
 
-void Database::clean_row(int line)
+void Database::clean_row(int line)/*{{{*/
 {
 	*base[line].title = '\0';
 	*base[line].artist = '\0';
@@ -42,12 +43,12 @@ void Database::clean_row(int line)
 	*base[line].type = '\0';
 	base[line].bnk = 0;
 	base[line].num = 0;
-}
+}/*}}}*/
 
-void Database::cargar( const std::string &_Path ) noexcept
+void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 {
 	activeRows = n_canciones = Files::contar_lineas( _Path );
-	base = new struct System[ n_canciones ]();
+	base = new struct System[ 1000 ]();
 
 	std::ifstream archivo{ _Path };
 	if ( archivo.fail() ) {
@@ -194,9 +195,27 @@ void Database::cargar( const std::string &_Path ) noexcept
 		strcpy( base[i].keywords,	base[i].key_words.c_str() );
 		strcpy( base[i].type,		base[i].tipo.c_str() );
 	}
-}
 
-void Database::cargar_especifico( const std::string &_Path, int32_t _Indice ) noexcept
+	// Favoritos{{{
+	int32_t i { 0 };
+	int16_t favoritos_leidos { 0 };
+	
+	while ( i < n_canciones and favoritos_leidos < 10 ) {
+		if ( base[ i ].key_words.substr( 0, 10 ) == "Favourite_" ) {
+			favorito[ std::stoi( base[ i ].key_words.substr( 10, 1 ) ) ] = base + i;
+			++favoritos_leidos;
+		}
+		++i;
+	}
+
+	if ( i == n_canciones ) {
+		std::cerr << "Database::cargar() no encontró el número suficiente de favoritos"
+			<< std::endl;
+		exit( EXIT_FAILURE );
+	}/*}}}*/
+}/*}}}*/
+
+void Database::cargar_especifico( const std::string &_Path, int32_t _Indice ) noexcept/*{{{*/
 {
 	std::ifstream archivo{ _Path };
 	if ( archivo.fail() ) {
@@ -326,9 +345,9 @@ void Database::cargar_especifico( const std::string &_Path, int32_t _Indice ) no
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 			}
 	}
-}
+}/*}}}*/
 
-void Database::escribir( const std::string &_Path ) noexcept
+void Database::escribir( const std::string &_Path ) noexcept/*{{{*/
 {
 	std::ofstream archivo{ _Path };
 
@@ -399,27 +418,27 @@ void Database::escribir( const std::string &_Path ) noexcept
 	}
 
 	archivo.close();
-}
+}/*}}}*/
 
-void Database::add_value(System row)
+void Database::add_value(System row)/*{{{*/
 {
 	base[activeRows++] = row;
-}
+}/*}}}*/
 
-void Database::edit_value(int line, System row)
+void Database::edit_value(int line, System row)/*{{{*/
 {
 	base[line] = row;
-}
+}/*}}}*/
 
-void Database::delete_value(int line)
+void Database::delete_value(int line)/*{{{*/
 {
 	for (int i = line; i < activeRows - 1; i++)
 		base[i] = base[i + 1];
 
 	clean_row(activeRows--);
-}
+}/*}}}*/
 
-void Database::ordenate()
+void Database::ordenate()/*{{{*/
 {
 	int32_t a, b;
 	int32_t k;
@@ -530,9 +549,14 @@ void Database::ordenate()
 				}
 			}
 		}
-}
+}/*}}}*/
 
-struct System Database::get_cancion( const int _Index ) noexcept
+struct System Database::get_cancion( const int _Index ) noexcept/*{{{*/
 {
 	return base[ _Index ];
+}/*}}}*/
+
+struct System *Database::get_favourite_row( const int32_t &_Row ) noexcept
+{
+	return favorito[ _Row ];
 }

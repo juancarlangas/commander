@@ -119,7 +119,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 			break;
 
 		default:
-			if ( ( 48 <= digit and digit <= 122 ) || digit == '/' )
+			if ( ( 58 <= digit and digit <= 122 ) || digit == '/' )
 				comando = READ_CHAR;
 			else if (48 <= digit && digit <= 57)
 				comando = FAVOURITE;
