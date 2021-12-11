@@ -13,6 +13,7 @@ public:
 	Keyboard();
 	void connect() noexcept;
 	void disconnect() noexcept;
+	void toggle_MIDI_state() noexcept;
 	void set_buffer( const struct System & ) noexcept;
 	void prev_variation() noexcept;
 	void next_variation() noexcept;
@@ -30,7 +31,6 @@ public:
 	void set_program( const struct System &_Buffer ) noexcept;
 	void set_krome_program(const char, const short);
 	void set_song(const char);
-	void toggle_MIDI_state() noexcept;
 	enum Switch get_MIDI_state() noexcept;
 	bool is_connected() noexcept;
 private:

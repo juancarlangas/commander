@@ -617,6 +617,9 @@ int main()
 
 	} while (command != EXIT);
 
+	if ( keyboard.get_MIDI_state() == Switch::ON )
+		keyboard.disconnect();
+
 	// Ending{{{
 	endwin();
 

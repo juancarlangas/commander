@@ -17,6 +17,15 @@ Keyboard::Keyboard() :/*{{{*/
 	part = 1;
 }/*}}}*/
 
+void Keyboard::disconnect() noexcept/*{{{*/
+{
+	if ( device != NULL ) {
+		snd_rawmidi_close( device );
+		device = NULL;
+		MIDI = Switch::OFF;
+	}
+}/*}}}*/
+
 void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
 {
 	if ( MIDI == Switch::OFF ) {
@@ -24,8 +33,7 @@ void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
 		MIDI = Switch::ON;
 	}
 	else {
-		snd_rawmidi_close( device );
-		MIDI = Switch::OFF;
+		disconnect();
 	}
 }/*}}}*/
 

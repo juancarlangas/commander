@@ -14,6 +14,9 @@ Commander 1.1
 - The Orchestration editor now return to the DEFAULT variation (as is specified in the database)
 when it comes from a new patch, instead of returning to the same.
 
+
+- MIDI error messages managment.
+
 Commander 1.0
 =============
 - Correction of the missing left fader when the adjustin comes from having the same left and right
