@@ -205,9 +205,9 @@ void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 	int32_t i { 0 };
 	int16_t favoritos_leidos { 0 };
 	
-	while ( i < n_canciones and favoritos_leidos < 10 ) {
+	while ( i < n_canciones and favoritos_leidos < N_FAVORITOS ) {
 		if ( base[ i ].key_words.substr( 0, 10 ) == "Favourite_" ) {
-			favorito[ std::stoi( base[ i ].key_words.substr( 10 ) ) - 1 ] = base + i - 1;
+			favorito[ std::stoi( base[ i ].key_words.substr( 10 ) ) - 1 ] = base + i;
 			++favoritos_leidos;
 		}
 		++i;
@@ -561,7 +561,7 @@ struct System Database::get_cancion( const int _Index ) noexcept/*{{{*/
 	return base[ _Index ];
 }/*}}}*/
 
-struct System *Database::get_favourite_row( const int32_t &_Row ) noexcept
+struct System *Database::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
 {
-	return favorito[ _Row ];
-}
+	return favorito[ _FavNumber - 1 ];
+}/*}}}*/

@@ -2,7 +2,7 @@
 #include "common/common.hpp"
 #include "common/matroska.hpp"
 
-int main()
+int32_t main()
 {
 	// ncurses{{{
 	y = init_ncurses();
@@ -52,7 +52,7 @@ int main()
 
 	orquestacion.link_MIDI_device( &keyboard );/*}}}*/
 
-	// Engine
+	// Engine{{{
 	do {
 		for (i = LCD; i <= ZOOM; i++)
 			updateWindow[i] = false;
@@ -165,7 +165,7 @@ int main()
 				break;/*}}}*/
 
 			case FAVOURITE:/*{{{*/
-				buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter - 48 );
+				buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter - KEY_F0 );
 
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
@@ -622,12 +622,12 @@ int main()
 		}
 		command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
 
-	} while (command != EXIT);
+	} while (command != EXIT);/*}}}*/
 
+	// Ending{{{
 	if ( keyboard.get_MIDI_state() == Switch::ON )
 		keyboard.disconnect();
 
-	// Ending{{{
 	endwin();
 
 	delete [] displayTable;

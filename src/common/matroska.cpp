@@ -52,59 +52,24 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 20: if (windowMode == MODE_DISPLAY) comando = EDIT_VALUE; break; //<C-T>
 		case 15: if ( windowMode == MODE_DISPLAY ) comando = EDIT_ORCHESTRATION; break; //<C-O>
 		case 519: if (windowMode == MODE_DISPLAY) comando = DELETE_VALUE; break; //<C-Supr>
-
-
-		case '+':
-			if (windowMode == MODE_DISPLAY && dIndex >= 0)
-				comando = ADD;
-			break;
-
-		case 27:
-			comando = ESCAPE;
-			break;
-
-		case ' ':
-			comando = SELECT;
-			break;
-
-		case '\t':
-			comando = CHANGE_WINDOW;
-			break;
-
-		// Flechas
-		case KEY_UP: case KEY_DOWN:
-			comando = MOVE_INDEX;
-			break;
-
+		case '+': if (windowMode == MODE_DISPLAY && dIndex >= 0) comando = ADD; break;
+		case 27: comando = ESCAPE; break;
+		case ' ': comando = SELECT; break;
+		case '\t': comando = CHANGE_WINDOW; break;
+		case KEY_UP: case KEY_DOWN: comando = MOVE_INDEX; break;
 		case KEY_LEFT:	comando = PREV_VARIATION; break;
 		case KEY_RIGHT:	comando = NEXT_VARIATION; break;
-
-		case 566: case 525:
-			if (digit == 566)
-				comando = DRAG_UP;
-			else
-				comando = DRAG_DOWN;
-			break;
-
-		case KEY_DC:
-			if (windowMode == MODE_PLAYLIST)
-				comando = SUPR;
-			break;
-
-		case KEY_BACKSPACE:
-			if (ci > 0)
-				comando = DEL;
-			break;
-
-		case 3:
-			comando = EXIT;
-			break;
+		case 566: comando = DRAG_UP; break;
+		case 525: comando = DRAG_DOWN; break;
+		case KEY_DC: if (windowMode == MODE_PLAYLIST) comando = SUPR; break;
+		case KEY_BACKSPACE: if (ci > 0) comando = DEL; break;
+		case 3: comando = EXIT; break;
 
 		default:
-			if ( ( 58 <= digit and digit <= 122 ) || digit == '/' )
-				comando = READ_CHAR;
-			else if (48 <= digit && digit <= 57)
+			if ( KEY_F(1) <= digit and digit <= KEY_F(12) )
 				comando = FAVOURITE;
+			else if ( ( 58 <= digit and digit <= 122 ) || digit == '/' )
+				comando = READ_CHAR;
             break;
 	}
 
