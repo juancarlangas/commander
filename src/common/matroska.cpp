@@ -48,9 +48,11 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 
 			break;/*}}}*/
 
-		case KEY_F(1) : // <C-M>
-			comando = TOGGLE_MIDI_STATE;
-			break;
+		case 11: comando = TOGGLE_MIDI_STATE; break; //<C-K>
+		case 20: if (windowMode == MODE_DISPLAY) comando = EDIT_VALUE; break; //<C-T>
+		case 15: if ( windowMode == MODE_DISPLAY ) comando = EDIT_ORCHESTRATION; break; //<C-O>
+		case 519: if (windowMode == MODE_DISPLAY) comando = DELETE_VALUE; break; //<C-Supr>
+
 
 		case '+':
 			if (windowMode == MODE_DISPLAY && dIndex >= 0)
@@ -68,9 +70,6 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case '\t':
 			comando = CHANGE_WINDOW;
 			break;
-
-		// <C-F>
-		case 6 : comando = CHANGE_HOTKEYS_BEHAVIOR; break;
 
 		// Flechas
 		case KEY_UP: case KEY_DOWN:
@@ -95,21 +94,6 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case KEY_BACKSPACE:
 			if (ci > 0)
 				comando = DEL;
-			break;
-
-		case KEY_F(2):
-			if (windowMode == MODE_DISPLAY)
-				comando = EDIT_VALUE;
-			break;
-
-		case KEY_F( 3 ) :
-			if ( windowMode == MODE_DISPLAY )
-				comando = EDIT_ORCHESTRATION;
-			break;
-
-		case 519: //CTL+SUPR
-			if (windowMode == MODE_DISPLAY)
-				comando = DELETE_VALUE;
 			break;
 
 		case 3:
