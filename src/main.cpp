@@ -500,8 +500,8 @@ int main()
 				break;
 			}/*}}}*/
 
-			case EDIT_VALUE:
-			{/*{{{*/
+			case EDIT_VALUE:/*{{{*/
+			{
 				Form forma;
 
 				int difference = displayTable[dIndex] - &(dBase[mode].base[0]);

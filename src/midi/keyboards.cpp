@@ -1,4 +1,6 @@
 #include <bits/stdint-intn.h>
+#include <cstdlib>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -17,24 +19,26 @@ Keyboard::Keyboard() :/*{{{*/
 	part = 1;
 }/*}}}*/
 
+void Keyboard::connect() noexcept
+{
+	if ( snd_rawmidi_open( NULL, &device, port, SND_RAWMIDI_SYNC ) ) {
+		endwin();
+		std::cerr << "No se pudo abir " << port << " en Keyboad::connect()" << std::endl;
+		exit( EXIT_FAILURE );
+	}
+	MIDI = Switch::ON;
+}
+
 void Keyboard::disconnect() noexcept/*{{{*/
 {
-	if ( device != NULL ) {
-		snd_rawmidi_close( device );
-		device = NULL;
-		MIDI = Switch::OFF;
-	}
+	snd_rawmidi_close( device );
+	device = NULL;
+	MIDI = Switch::OFF;
 }/*}}}*/
 
 void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
 {
-	if ( MIDI == Switch::OFF ) {
-		snd_rawmidi_open( NULL, &device, port, SND_RAWMIDI_SYNC );
-		MIDI = Switch::ON;
-	}
-	else {
-		disconnect();
-	}
+	MIDI == Switch::OFF ? connect() : disconnect();
 }/*}}}*/
 
 void Keyboard::set_buffer( const struct System &_Buffer ) noexcept/*{{{*/
