@@ -9,6 +9,7 @@
 
 #define ROWS 1000
 #define MAXIMO_DE_CANCIONES 1000
+#define N_FAVORITOS 12
 
 enum Switch : bool { OFF = 0, ON };
 
@@ -75,7 +76,7 @@ class Database {
 		int32_t n_canciones;
 		void clean_row(int);
 		const char *homedir;
-		struct System *favorito[10];
+		struct System *favorito[ N_FAVORITOS ];
 		void fill_favourites() noexcept;
 	};
 

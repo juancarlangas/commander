@@ -609,7 +609,7 @@ void Orchestra::capture_key() noexcept
 				break;/*}}}*/
 
 			case 1 : // DUplicate{{{
-				if ( info->n_variaciones < 16 ) {
+				if ( info->n_variaciones < MAX_VARIATIONS ) {
 					for ( int32_t i = info->n_variaciones - 1; i >= variacion; --i )
 						info->variacion[ i + 1 ] = info->variacion[ i ];
 					++info->n_variaciones;

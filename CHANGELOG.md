@@ -14,6 +14,8 @@ Commander 1.1
 - The Orchestration editor now return to the DEFAULT variation (as is specified in the database)
 when it comes from a new patch, instead of returning to the same.
 
+- std::vector based Database
+
 
 - MIDI error messages managment.
 
@@ -39,9 +41,11 @@ Reached, Thanks to GOD!
 
 - Auto closing MIDI device when exits ( if isnt closed yet ) O.K.
 
-- First moving the Display Index rather than waits to the MIDI change
+- First moving the Display Index rather than waits to the MIDI change O.K.
 
-- Fixing of the columns in DisplayWindow
+- Urge: Ventana variación principal.
+
+ Fixing of the columns in DisplayWindow
 
 - Not to change to white when editing the instrument name of a track. This is produced because
 the cursor color is always white. We have to improve that. (after the previous improvement
@@ -50,6 +54,8 @@ there will be no need to editig instrument name on Orchestration )
 - Better track coloring
 
 - Fix of no hiding Orchestration when shows Tagging
+
+- WTF with the delete value mechanism??
 
 Korg 4.7.3
 ==========

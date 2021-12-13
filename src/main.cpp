@@ -43,6 +43,7 @@ int main()
 	// System{{{
 	short int	mode = COMBINATOR,
 				winMode = MODE_DISPLAY;
+	[[ maybe_unused ]]enum HotKeysMode hot_keys_mode = HotKeysMode::VARIATIONS;
 	enum matroska command = BEGIN;/*}}}*/
 
 	// Keyboards{{{

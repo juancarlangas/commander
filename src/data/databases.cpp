@@ -133,6 +133,11 @@ void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 		///////////////////////////// VARIACIONES ///////////////////////////////////////
 		// n_variaciones
 		base[n_linea].n_variaciones = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+		if ( base[n_linea].n_variaciones > MAX_VARIATIONS ) {
+			std::cerr << "Exceso de variaciones en Database::cargar(), línea " << n_linea
+				<< std::endl;
+			exit( EXIT_FAILURE );
+		}
 		linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 		// Label
@@ -202,7 +207,7 @@ void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 	
 	while ( i < n_canciones and favoritos_leidos < 10 ) {
 		if ( base[ i ].key_words.substr( 0, 10 ) == "Favourite_" ) {
-			favorito[ std::stoi( base[ i ].key_words.substr( 10, 1 ) ) ] = base + i;
+			favorito[ std::stoi( base[ i ].key_words.substr( 10 ) ) - 1 ] = base + i - 1;
 			++favoritos_leidos;
 		}
 		++i;

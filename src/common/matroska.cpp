@@ -52,11 +52,6 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 			comando = TOGGLE_MIDI_STATE;
 			break;
 
-		case 18 : // CTRL-R
-			if ( windowMode == MODE_DISPLAY and dIndex >= 0 )
-				comando = CARGAR_ESPECIFICO;
-			break;
-
 		case '+':
 			if (windowMode == MODE_DISPLAY && dIndex >= 0)
 				comando = ADD;
@@ -73,6 +68,9 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case '\t':
 			comando = CHANGE_WINDOW;
 			break;
+
+		// <C-F>
+		case 6 : comando = CHANGE_HOTKEYS_BEHAVIOR; break;
 
 		// Flechas
 		case KEY_UP: case KEY_DOWN:

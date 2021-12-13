@@ -52,6 +52,8 @@
 
 typedef enum {VAR1 = 1, VAR2} Variation;
 
+#define MAX_VARIATIONS 10
+
 class Configuration {
 public:
 	Configuration();
