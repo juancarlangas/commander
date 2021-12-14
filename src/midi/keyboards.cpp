@@ -227,6 +227,7 @@ void Keyboard::set_program( const struct System &_Buffer ) noexcept/*{{{*/
 	nanosleep( &keyboardTimer, NULL );
 
 	set_variation( buffer.variacion_inicial );
+	dump_variation();
 }/*}}}*/
 
 void Keyboard::set_song(const char song)/*{{{*/
