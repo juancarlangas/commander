@@ -19,7 +19,7 @@ Keyboard::Keyboard() :/*{{{*/
 	part = 1;
 }/*}}}*/
 
-void Keyboard::connect() noexcept
+void Keyboard::connect() noexcept/*{{{*/
 {
 	if ( snd_rawmidi_open( NULL, &device, port, SND_RAWMIDI_SYNC ) ) {
 		endwin();
@@ -27,7 +27,7 @@ void Keyboard::connect() noexcept
 		exit( EXIT_FAILURE );
 	}
 	MIDI = Switch::ON;
-}
+}/*}}}*/
 
 void Keyboard::disconnect() noexcept/*{{{*/
 {
@@ -54,19 +54,18 @@ void Keyboard::reset_variation() noexcept/*{{{*/
 void Keyboard::prev_variation() noexcept/*{{{*/
 {
 	if ( variacion > 0 )
-		set_variation( variacion - 1 );
+		--variacion;
 }/*}}}*/
 
 void Keyboard::next_variation() noexcept/*{{{*/
 {
 	if ( variacion < buffer.n_variaciones - 1 )
-		set_variation( variacion + 1 );
+		++variacion;
 }/*}}}*/
 
 void Keyboard::set_variation( const int16_t _Variacion ) noexcept/*{{{*/
 {
 	variacion = _Variacion;
-	dump_variation();
 }/*}}}*/
 
 void Keyboard::dump_variation() noexcept/*{{{*/

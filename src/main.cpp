@@ -47,10 +47,10 @@ int32_t main()
 	enum matroska command = BEGIN;/*}}}*/
 
 	// Keyboards{{{
-	Keyboard keyboard;
-	keyboard.set_name("X50");
+	Keyboard x50;
+	x50.set_name("X50");
 
-	orquestacion.link_MIDI_device( &keyboard );/*}}}*/
+	orquestacion.link_MIDI_device( &x50 );/*}}}*/
 
 	// Engine{{{
 	do {
@@ -65,6 +65,8 @@ int32_t main()
 
 				if (nRows[COMBINATOR] > 0)
 					buffer = dBase[COMBINATIONS].base;
+
+				x50.set_buffer( *buffer );
 
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;
@@ -81,9 +83,9 @@ int32_t main()
 				dBase[ COMBINATIONS ].cargar_especifico( config_directory + "/combinations-2.csv",
 						buffer - dBase[ COMBINATIONS ].base );
 				buffer = displayTable[ dIndex ];
-				// keyboard.select_page( TIMBRE );
-				keyboard.set_buffer( *buffer );
-				keyboard.dump_variation();
+				// x50.select_page( TIMBRE );
+				x50.set_buffer( *buffer );
+				x50.dump_variation();
 				break;/*}}}*/
 
 			case SET_MODE:/*{{{*/
@@ -131,12 +133,22 @@ int32_t main()
 
 				break;/*}}}*/
 
+			case SET_VARIATION:/*{{{*/
+				x50.set_variation( caracter - 48 - 1 );
+				if ( x50.is_connected() )
+					x50.dump_variation();
+				break;/*}}}*/
+
 			case PREV_VARIATION:/*{{{*/
-				keyboard.prev_variation();
+				x50.prev_variation();
+				if ( x50.is_connected() )
+					x50.dump_variation();
 				break;/*}}}*/
 
 			case NEXT_VARIATION :/*{{{*/
-				keyboard.next_variation();
+				x50.next_variation();
+				if ( x50.is_connected() )
+					x50.dump_variation();
 				break;/*}}}*/
 				
 			case INTRO:/*{{{*/
@@ -157,8 +169,11 @@ int32_t main()
 						break;
 				}
 
-				if ( keyboard.is_connected() )
-					keyboard.set_program( *buffer );
+				if ( x50.is_connected() )
+					x50.set_program( *buffer );
+				else
+					// solo actualizamos el buffer para poder trabajar online
+					x50.set_buffer( *buffer );
 
 				updateWindow[LCD] = true;
 
@@ -529,9 +544,9 @@ int32_t main()
 				if ( winMode == MODE_DISPLAY ) {
 					// ida
 					/* Tal vez esto no sea útil
-					if ( keyboard.get_MIDI_state() == Switch::ON )
+					if ( x50.get_MIDI_state() == Switch::ON )
 					buffer = displayTable[ dIndex ];
-					keyboard.set_program( *buffer );
+					x50.set_program( *buffer );
 					*/
 					buffer = displayTable[ dIndex ];
 					orquestacion.reset_variation();
@@ -555,7 +570,7 @@ int32_t main()
 				break;/*}}}*/
 
 			case TOGGLE_MIDI_STATE:/*{{{*/
-				keyboard.toggle_MIDI_state();
+				x50.toggle_MIDI_state();
 				updateWindow[ MIDI_STATE ] = true;
 				break;/*}}}*/
 
@@ -598,7 +613,7 @@ int32_t main()
 			print_lcd( lcdWindow, buffer );
 
 		if ( updateWindow[ MIDI_STATE ] )
-			print_MIDI_state( MIDI_state_window, keyboard.get_MIDI_state() );
+			print_MIDI_state( MIDI_state_window, x50.get_MIDI_state() );
 
 		if (updateWindow[ZOOM] == true) {
 			if (winMode == MODE_PLAYLIST)
@@ -616,8 +631,8 @@ int32_t main()
 			 * garantiza una percepción fluida del software.
 			 *
 			 * Por lo pronto reservamos esta funcionalidad para el comando FAVOURITE*/
-			if ( command == FAVOURITE and keyboard.is_connected() )
-				keyboard.set_program( *buffer );/*}}}*/
+			if ( command == FAVOURITE and x50.is_connected() )
+				x50.set_program( *buffer );/*}}}*/
 
 		}
 		command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
@@ -625,8 +640,8 @@ int32_t main()
 	} while (command != EXIT);/*}}}*/
 
 	// Ending{{{
-	if ( keyboard.get_MIDI_state() == Switch::ON )
-		keyboard.disconnect();
+	if ( x50.get_MIDI_state() == Switch::ON )
+		x50.disconnect();
 
 	endwin();
 
