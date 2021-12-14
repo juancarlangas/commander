@@ -134,7 +134,8 @@ int32_t main()
 				break;/*}}}*/
 
 			case SET_VARIATION:/*{{{*/
-				x50.set_variation( caracter - 48 - 1 );
+				static int32_t int_caracter = caracter - 48;
+				x50.set_variation( int_caracter != 0 ? int_caracter - 1 : 9 );
 				if ( x50.is_connected() )
 					x50.dump_variation();
 				break;/*}}}*/

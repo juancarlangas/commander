@@ -65,7 +65,8 @@ void Keyboard::next_variation() noexcept/*{{{*/
 
 void Keyboard::set_variation( const int16_t _Variacion ) noexcept/*{{{*/
 {
-	variacion = _Variacion;
+	if ( _Variacion < buffer.n_variaciones )
+		variacion = _Variacion;
 }/*}}}*/
 
 void Keyboard::dump_variation() noexcept/*{{{*/
