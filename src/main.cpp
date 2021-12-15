@@ -23,9 +23,9 @@ int32_t main()
 	int nRows[1];
     const std::string config_directory{ directory };
 
-	nRows[COMBINATIONS] = Files::contar_lineas( config_directory + "/combinations-2.csv" );
+	nRows[COMBINATIONS] = Files::contar_lineas( config_directory + "/catalogo.csv" );
 
-    dBase[COMBINATIONS].cargar( config_directory + "/combinations-2.csv" );/*}}}*/
+    dBase[COMBINATIONS].cargar( config_directory + "/catalogo.csv" );/*}}}*/
 
 	// Tables{{{
 	System **displayTable = new System *[ nRows[COMBINATIONS] ]();
@@ -80,7 +80,7 @@ int32_t main()
 				break;/*}}}*/
 
 			case CARGAR_ESPECIFICO :/*{{{*/
-				dBase[ COMBINATIONS ].cargar_especifico( config_directory + "/combinations-2.csv",
+				dBase[ COMBINATIONS ].cargar_especifico( config_directory + "/catalogo.csv",
 						buffer - dBase[ COMBINATIONS ].base );
 				buffer = displayTable[ dIndex ];
 				// x50.select_page( TIMBRE );
@@ -133,12 +133,14 @@ int32_t main()
 
 				break;/*}}}*/
 
-			case SET_VARIATION:/*{{{*/
-				static int32_t int_caracter = caracter - 48;
-				x50.set_variation( int_caracter != 0 ? int_caracter - 1 : 9 );
+			case SET_VARIATION: {/*{{{*/
+				// la conversión de 1 a 9 es -48, pero por indice de arreglo restamos uno más
+				int32_t caracter_a_variacion = caracter == 48 ? 9 : ( caracter - 49 );
+				x50.set_variation( caracter_a_variacion );
 				if ( x50.is_connected() )
 					x50.dump_variation();
-				break;/*}}}*/
+				break;
+			}/*}}}*/
 
 			case PREV_VARIATION:/*{{{*/
 				x50.prev_variation();
@@ -153,14 +155,14 @@ int32_t main()
 				break;/*}}}*/
 				
 			case INTRO:/*{{{*/
-				switch (winMode) {
+				switch ( winMode ) {
 					case MODE_DISPLAY:
 						buffer = displayTable[ dIndex ];
 						break;
 					case MODE_PLAYLIST:
 						buffer = &playlistTable[ plIndexA ];
 						//avance carro
-						if (plIndexB < plRows - 1) {
+						if ( plIndexB < plRows - 1 ) {
 							plIndexB++;
 							plIndexA = plIndexB;
 						}
@@ -576,7 +578,7 @@ int32_t main()
 				break;/*}}}*/
 
 			case EXPORTATE:/*{{{*/
-				dBase[COMBINATIONS].escribir( config_directory + "/combinations-2.csv" );
+				dBase[COMBINATIONS].escribir( config_directory + "/catalogo.csv" );
 
 				*keyword = '\0';
 
@@ -624,7 +626,8 @@ int32_t main()
 			else {
 				wclear(zoomWindow);
 				wrefresh(zoomWindow);
-			}/*}}}*/
+			}
+		}/*}}}*/
 
 			/* ENVÍO MIDI:{{{
 			 * se realiza en esta parte ya que visualmente deseamos que primero haga los cambios
@@ -635,7 +638,6 @@ int32_t main()
 			if ( command == FAVOURITE and x50.is_connected() )
 				x50.set_program( *buffer );/*}}}*/
 
-		}
 		command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
 
 	} while (command != EXIT);/*}}}*/
