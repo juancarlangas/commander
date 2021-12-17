@@ -18,13 +18,13 @@ int32_t main()
    	sprintf(directory, "%s/.commander", homedir);/*}}}*/
 
 	// Databases{{{
-	Database dBase[1];	// C++ Object (1 for combs, 1 for seqs)
-
-	int nRows[1];
     const std::string config_directory{ directory };
 
-	nRows[COMBINATIONS] = Files::contar_lineas( config_directory + "/catalogo.csv" );
+	Combinations combinaciones { config_directory + "/combinaciones.csv" };
 
+	Database dBase[1];	// C++ Object (1 for combs, 1 for seqs)
+	int nRows[1];
+	nRows[COMBINATIONS] = Files::contar_lineas( config_directory + "/catalogo.csv" );
     dBase[COMBINATIONS].cargar( config_directory + "/catalogo.csv" );/*}}}*/
 
 	// Tables{{{
@@ -43,13 +43,13 @@ int32_t main()
 	// System{{{
 	short int	mode = COMBINATOR,
 				winMode = MODE_DISPLAY;
-	[[ maybe_unused ]]enum HotKeysMode hot_keys_mode = HotKeysMode::VARIATIONS;
 	enum matroska command = BEGIN;/*}}}*/
 
 	// Keyboards{{{
 	Keyboard x50;
 	x50.set_name("X50");
 
+	orquestacion.link_combinations ( &combinaciones );
 	orquestacion.link_MIDI_device( &x50 );/*}}}*/
 
 	// Engine{{{
@@ -579,6 +579,7 @@ int32_t main()
 
 			case EXPORTATE:/*{{{*/
 				dBase[COMBINATIONS].escribir( config_directory + "/catalogo.csv" );
+				combinaciones.escribir( config_directory + "/combinaciones.csv" );
 
 				*keyword = '\0';
 

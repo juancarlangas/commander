@@ -20,6 +20,7 @@
 #include "common/string.hpp"
 #include "common/matroska.hpp"
 #include "data/tables.hpp"
+#include "data/combinations.hpp"
 #include "data/databases.hpp"
 #include "data/files.hpp"
 #include "../../lib/utilities/src/files.hpp"

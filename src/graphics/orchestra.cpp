@@ -13,8 +13,8 @@
 using Coordinates::X;
 using Coordinates::Y;
 
-Orchestra::Orchestra() :
-	native_font { { { GREEN_DEFAULT, "Bold" },/*{{{*/
+Orchestra::Orchestra() :/*{{{*/
+	native_font { { { GREEN_DEFAULT, "Bold" },
 					{ BLUE_DEFAULT, "Bold" },
 					{ YELLOW_DEFAULT, "Bold" },
 					{ BLUE_DEFAULT, "Regular" },
@@ -27,15 +27,20 @@ Orchestra::Orchestra() :
 	dimmed_font { GRAY_DEFAULT, "Bold" }
 {}/*}}}*/
 
-void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept
-{/*{{{*/
+void Orchestra::link_combinations( Combinations * _CombPtr) noexcept/*{{{*/
+{
+	comb_ptr = _CombPtr;
+}/*}}}*/
+
+void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept/*{{{*/
+{
 	keyboard = _Teclado;
 }/*}}}*/
 
-void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
+void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
+
 						const int32_t _Ypos, const int32_t _Xpos ) noexcept
-{/*{{{*/
-	variacion = 0;
+{	variacion = 0;
 
 	// Base
 	base.init( _Ysize, _Xsize, _Ypos, _Xpos, 1 );
@@ -87,9 +92,9 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,
 	hide();
 }/*}}}*/
 
-void KeyboardScheme::auto_draw() noexcept
-{/*{{{*/
-	int32_t key, pixel, nota;
+void KeyboardScheme::auto_draw() noexcept/*{{{*/
+
+{	int32_t key, pixel, nota;
 	for ( pixel = 0; pixel < 3; ++pixel )
 		for ( key = 0; key < 61; ++key ) {
 			nota = key % 12;
@@ -106,8 +111,8 @@ void KeyboardScheme::auto_draw() noexcept
 		}
 }/*}}}*/
 
-void Orchestra::show( struct System *&_Row ) noexcept
-{/*{{{*/
+void Orchestra::show( struct System *&_Row ) noexcept/*{{{*/
+{
 	// solo obtiene la información y aparece los páneles
 
 	info = _Row;
@@ -127,8 +132,8 @@ void Orchestra::show( struct System *&_Row ) noexcept
 	update();
 }/*}}}*/
 
-void Orchestra::update() noexcept
-{/*{{{*/
+void Orchestra::update() noexcept/*{{{*/
+{
 	variacion_text_box.set_text( "Variacion " + std::to_string( variacion + 1 ) +
 								" de " + std::to_string( info->n_variaciones ) );
 	etiqueta_field.set_content( info->variacion[ variacion ].etiqueta );
@@ -165,23 +170,23 @@ void Orchestra::update() noexcept
 			double_X_slider[ i ].off();
 		}
 
-		instrument_field[ i ].set_text( info->instrumento[ i ] );
+		instrument_field[ i ].set_text( comb_ptr->get_instrument_name( info->bnk, info->num, i ) );
 		transposition_field[ i ].set_text(
 				std::to_string( info->variacion[ variacion ].track[ i ].transposition ) );
 	}
 }/*}}}*/
 
-void Orchestra::hide() noexcept
-{/*{{{*/
-	etiqueta_field.hide();
+void Orchestra::hide() noexcept/*{{{*/
+
+{	etiqueta_field.hide();
 	variacion_text_box.hide();
 	keyboard_scheme.hide();
 	base.hide();
 }/*}}}*/
 
-void Orchestra::capture_key() noexcept
-{/*{{{*/
-	// este arreglo cursor[2] (coordenadas X, Y) representa la malla por donde transitará
+void Orchestra::capture_key() noexcept/*{{{*/
+
+{	// este arreglo cursor[2] (coordenadas X, Y) representa la malla por donde transitará
 	// virtualmente el cursor. 5 columnas por 9 filas. El Y=-1 representa la posición de la
 	// etiqueta. Cuando cursor[Y] == -1, dicha etiqueta obtendrá el cursor independiéntemente
 	// del valor de cursor[X]
@@ -247,7 +252,8 @@ void Orchestra::capture_key() noexcept
 								status_field[ cursor[Y] ].set_cursor();
 								break;
 							case 1:
-								info->instrumento[ cursor[Y] ] = temp_word;
+								comb_ptr->set_instrument_name(
+										info->bnk, info->num, cursor[Y], temp_word );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
 							case 2:
@@ -290,8 +296,8 @@ void Orchestra::capture_key() noexcept
 								status_field[ cursor[ Coordinates::Y ] ].set_cursor();
 								break;
 							case 1:
-								info->instrumento[ cursor[Y] ] = temp_word;
-								temp_word = info->instrumento[ cursor[Y] ];
+								comb_ptr->set_instrument_name(
+										info->bnk, info->num, cursor[Y], temp_word );
 								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
 								break;
 							case 2:
@@ -324,13 +330,15 @@ void Orchestra::capture_key() noexcept
 					if ( cursor[ Coordinates::Y ] >= 0 ) // Zona de objetos
 						switch ( cursor[ Coordinates::X ] ) {
 							case 0 : // Check <- Instrumento
-								info->instrumento[ cursor[Y] ] = temp_word;
+								comb_ptr->set_instrument_name(
+										info->bnk, info->num, cursor[Y], temp_word );
 								status_field[ cursor[ Coordinates::Y ] ].set_cursor();
 								break;
 							case 1 : // Instrumento <- Transposition
 								info->variacion[ variacion ].track[ cursor[Y] ].transposition =
 									std::stoi( temp_word );
-								temp_word = info->instrumento[ cursor[Y] ];
+								temp_word = comb_ptr->get_instrument_name(
+										info->bnk, info->num, cursor[Y] );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
 							case 2 : // Transpotision <- Left slider
@@ -356,10 +364,13 @@ void Orchestra::capture_key() noexcept
 						switch ( cursor[ Coordinates::X ] ) {
 							case 1 : // check -> Instrument
 								status_field[ cursor[ Coordinates::Y ] ].leave_cursor();
-								temp_word = info->instrumento[ cursor [Y] ];
+								temp_word = comb_ptr->get_instrument_name(
+										info->bnk, info->num, cursor[Y] );
 								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
 								break;
 							case 2 : // Instrument -> transposition
+								comb_ptr->set_instrument_name(
+										info->bnk, info->num, cursor[Y], temp_word );
 								info->instrumento[ cursor[Y] ] = temp_word;
 								temp_word = 
 									info->variacion[variacion].track[ cursor[Y] ].transposition == 0
@@ -395,8 +406,10 @@ void Orchestra::capture_key() noexcept
 							if ( cursor[ Coordinates::Y ] == 0 )
 								info->variacion[ variacion ].etiqueta = temp_word;
 							else
-								info->instrumento[ cursor[Y] - 1 ] = temp_word;
-							temp_word = info->instrumento[ cursor[Y] ];
+								comb_ptr->set_instrument_name(
+										info->bnk, info->num, cursor[Y] - 1, temp_word );
+							temp_word = comb_ptr->get_instrument_name(
+									info->bnk, info->num, cursor[Y] );
 							instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
 							break;
 						case 2:
@@ -448,13 +461,15 @@ void Orchestra::capture_key() noexcept
 							break;
 
 						case 1: // instrumento: se salva siempre
-							info->instrumento[ cursor[Y] + 1 ] = temp_word;
+							comb_ptr->set_instrument_name(
+									info->bnk, info->num, cursor[Y] + 1, temp_word );
 							if ( cursor[ Coordinates::Y ] == -1 ) {
 								temp_word = info->variacion[ variacion ].etiqueta;
 								etiqueta_field.set_cursor();
 							}
 							else {
-								temp_word = info->instrumento[ cursor[Y] ];
+								temp_word = comb_ptr->get_instrument_name(
+										info->bnk, info->num, cursor[Y] );
 								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
 							}
 							break;
@@ -516,7 +531,8 @@ void Orchestra::capture_key() noexcept
 						transposition_field[ cursor[ Y ] ].on();
 						double_X_slider[ cursor[ Y ] ].on();
 				}
-				instrument_field[ cursor[Y] ].set_text( info->instrumento[ cursor[Y] ] );
+				instrument_field[ cursor[Y] ].set_text(
+						comb_ptr->get_instrument_name( info->bnk, info->num, cursor[Y] ) );
 				transposition_field[ cursor[Y] ].set_value(
 						info->variacion[ variacion ].track[ cursor[Y] ].transposition );
 				}
@@ -580,7 +596,7 @@ void Orchestra::capture_key() noexcept
 					info->variacion[ variacion ].etiqueta = temp_word;
 				else switch ( cursor[X] ) {
 					case 1 :
-						info->instrumento[ cursor[Y] ] = temp_word;
+						comb_ptr->set_instrument_name( info->bnk, info->num, cursor[Y], temp_word );
 						break;
 					case 2 :
 						info->variacion[ variacion ].track[ cursor[Y] ].transposition =
@@ -626,7 +642,8 @@ void Orchestra::capture_key() noexcept
 								status_field[ cursor[Y] ].set_cursor();
 								break;
 							case 1:
-								info->instrumento[ cursor[Y] ] = temp_word;
+								comb_ptr->set_instrument_name(
+										info->bnk, info->num, cursor[Y], temp_word );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
 							case 2:
@@ -672,7 +689,8 @@ void Orchestra::capture_key() noexcept
 								status_field[ cursor[Y] ].set_cursor();
 								break;
 							case 1:
-								info->instrumento[ cursor[Y] ] = temp_word;
+								comb_ptr->set_instrument_name(
+										info->bnk, info->num, cursor[Y], temp_word );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
 							case 2:

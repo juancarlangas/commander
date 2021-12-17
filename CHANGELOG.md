@@ -16,6 +16,8 @@ when it comes from a new patch, instead of returning to the same.
 
 - std::vector based Database
 
+- The posibility of moving cursor not mathematically but graphically (the cursor will move
+down and up to the nearest fader ( not the relative ).
 
 - MIDI error messages managment.
 
@@ -43,8 +45,6 @@ Reached, Thanks to GOD!
 
 - First moving the Display Index rather than waits to the MIDI change O.K.
 
-- Urge: Ventana variación principal.
-
  Fixing of the columns in DisplayWindow
 
 - Not to change to white when editing the instrument name of a track. This is produced because
@@ -56,6 +56,8 @@ there will be no need to editig instrument name on Orchestration )
 - Fix of no hiding Orchestration when shows Tagging
 
 - WTF with the delete value mechanism??
+
+- Writing compound instrument names
 
 Korg 4.7.3
 ==========
