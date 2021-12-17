@@ -11,7 +11,7 @@ extern WINDOW *debugWindow;
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
 
-void print_displayTable(	WINDOW *window,
+void print_displayTable(	WINDOW *window,/*{{{*/
 							System *displayTable[],
 							const int32_t top, const short resultRows, 
 							const int index,
@@ -45,7 +45,7 @@ void print_displayTable(	WINDOW *window,
 
 		if (i == index && winMode == 1)
 			wattron(window, A_REVERSE);
-		mvwprintw(window, 1 + row++, 0, "%35s  %-30s  %-16s  %-12s", 	displayTable[i]->title,
+		mvwprintw(window, 1 + row++, 0, "%30s  %-20s  %-16s  %-12s", 	displayTable[i]->title,
 																		displayTable[i]->artist,
 																		displayTable[i]->genre,
 																		displayTable[i]->keywords);
@@ -56,9 +56,9 @@ void print_displayTable(	WINDOW *window,
 	wrefresh(window);
 	
 	return;
-}
+}/*}}}*/
 
-void print_playlist(	WINDOW *window,
+void print_playlist(	WINDOW *window,/*{{{*/
 						System playlistTable[], const int32_t top, const short resultRows, 
 						const int indexA, const int indexB, short int winMode )
 {
@@ -89,9 +89,9 @@ void print_playlist(	WINDOW *window,
 	wrefresh(window);
 	
 	return;
-}
+}/*}}}*/
 
-void lcd(	WINDOW *window, 
+void lcd(	WINDOW *window, /*{{{*/
 			const short int yPos, const short int xPos, const short int limit,
 			const bool cursor, const char cadena[])
 {
@@ -113,19 +113,19 @@ void lcd(	WINDOW *window,
 	wrefresh(window);
 
 	return;
-}
+}/*}}}*/
 
-void print_search(WINDOW *window, char cadena[])
+void print_search(WINDOW *window, char cadena[])/*{{{*/
 {
 	wclear(window);
 	lcd(window, 0, 2, 11, TRUE, cadena);
 	wrefresh(window);
 
 	return;	
-}
+}/*}}}*/
 
-void print_lcd(WINDOW *window, System *linea )
-{/*{{{*/
+void print_lcd(WINDOW *window, System *linea )/*{{{*/
+{
 	short int k = 0, yPos;
 	
 	wclear(window);

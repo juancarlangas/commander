@@ -66,10 +66,10 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 3: comando = EXIT; break;
 
 		default:
-			if ( KEY_F(1) <= digit and digit <= KEY_F(12) )
-				comando = FAVOURITE;
-			else if (  48 <= digit and digit <= 57 )
+			if ( KEY_F(1) <= digit and digit <= KEY_F(10) )
 				comando = SET_VARIATION;
+			else if (  48 <= digit and digit <= 57 )
+				comando = FAVOURITE;
 			else if ( ( 58 <= digit and digit <= 122 ) || digit == '/' )
 				comando = READ_CHAR;
             break;

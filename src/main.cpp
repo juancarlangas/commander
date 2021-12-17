@@ -135,8 +135,8 @@ int32_t main()
 
 			case SET_VARIATION: {/*{{{*/
 				// la conversión de 1 a 9 es -48, pero por indice de arreglo restamos uno más
-				int32_t caracter_a_variacion = caracter == 48 ? 9 : ( caracter - 49 );
-				x50.set_variation( caracter_a_variacion );
+				int32_t funcion_a_variacion = caracter - KEY_F0;
+				x50.set_variation( funcion_a_variacion );
 				if ( x50.is_connected() )
 					x50.dump_variation();
 				break;
@@ -182,8 +182,9 @@ int32_t main()
 
 				break;/*}}}*/
 
-			case FAVOURITE:/*{{{*/
-				buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter - KEY_F0 );
+			case FAVOURITE: {/*{{{*/
+				int32_t caracter_a_numero = caracter == 48 ? 9 : ( caracter - 49 );
+				buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
 
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
@@ -203,7 +204,8 @@ int32_t main()
 				updateWindow[DISPLAY] = true;
 				updateWindow[ZOOM]	  = true;
 
-				break;/*}}}*/
+				break;
+			}/*}}}*/
 
 			case CHANGE_WINDOW:/*{{{*/
 

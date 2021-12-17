@@ -563,5 +563,5 @@ struct System Database::get_cancion( const int _Index ) noexcept/*{{{*/
 
 struct System *Database::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
 {
-	return favorito[ _FavNumber - 1 ];
+	return favorito[ _FavNumber ];
 }/*}}}*/

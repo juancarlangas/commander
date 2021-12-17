@@ -59,6 +59,8 @@ there will be no need to editig instrument name on Orchestration )
 
 - Writing compound instrument names
 
+- Fixing of losing index when selects a Favourite by pressing number keys.
+
 Korg 4.7.3
 ==========
 
