@@ -45,10 +45,11 @@ void print_displayTable(	WINDOW *window,/*{{{*/
 
 		if (i == index && winMode == 1)
 			wattron(window, A_REVERSE);
-		mvwprintw(window, 1 + row++, 0, "%30s  %-20s  %-16s  %-12s", 	displayTable[i]->title,
-																		displayTable[i]->artist,
-																		displayTable[i]->genre,
-																		displayTable[i]->keywords);
+		mvwprintw( window, 1 + row++, 0, "%32s  %-20s  %-15s  %-15s", 
+				displayTable[i]->titulo.substr( 0, 31 ).c_str(),
+				displayTable[i]->artista.substr( 0, 20 ).c_str(),
+				displayTable[i]->genero.substr( 0, 15 ).c_str(),
+				displayTable[i]->key_words.substr( 0, 14 ).c_str() );
 		wattroff(window, A_REVERSE);
 		wattroff(window, A_BOLD);
 	}

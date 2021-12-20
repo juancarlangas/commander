@@ -1,13 +1,13 @@
 #ifndef DOUBLE_X_SLIDER_HPP
 #define DOUBLE_X_SLIDER_HPP
 
-#include "graphics/elements/windows/popup.hpp"
+#include "graphics/elements/windows/popups/orchestra_element.hpp"
 #include <bits/stdint-intn.h>
 
 #define MIN_KEY 36
 #define MAX_KEY 96
 
-class DoubleXslider : public Popup {
+class DoubleXslider : public OrchestraElement {
 	public:
 		DoubleXslider();
 		void init( const int32_t &, const int32_t &, const int32_t &, const int32_t & ) noexcept;

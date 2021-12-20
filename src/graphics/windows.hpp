@@ -3,7 +3,7 @@
 #define WINDOWS_H
 
 #include "../common/common.hpp"
-#include "elements/windows/popups/text_popups/field_popup.hpp"
+#include "elements/windows/popups/orchestra_elements/text_popups/field_popup.hpp"
 #include "orchestra.hpp"
 
 //C functions

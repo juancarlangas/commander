@@ -1,6 +1,6 @@
 #include "graphics/orchestra.hpp"
-#include "elements/windows/popups/text_popup.hpp"
-#include "elements/windows/popups/double_X_slider.hpp"
+#include "elements/windows/popups/orchestra_elements/text_popup.hpp"
+#include "elements/windows/popups/orchestra_elements/double_X_slider.hpp"
 #include "graphics/colors.hpp"
 #include "graphics/ncurses.hpp"
 #include "printing.hpp"
@@ -38,9 +38,9 @@ void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept/*{{{*/
 }/*}}}*/
 
 void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
-
 						const int32_t _Ypos, const int32_t _Xpos ) noexcept
-{	variacion = 0;
+{
+	variacion = 0;
 
 	// Base
 	base.init( _Ysize, _Xsize, _Ypos, _Xpos, 1 );
@@ -50,13 +50,14 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 	base.update();
 
 	// Indicador de variación
-	variacion_text_box.init( 3, 20, _Ypos + 1, _Xpos + 2 );
+	variacion_text_box.Window::init( 3, 20, _Ypos + 1, _Xpos + 2 );
 	variacion_text_box.set_font_color( GRAY_DEFAULT );
 	variacion_text_box.set_font_width( "Bold" );
 	variacion_text_box.update();
 
 	// keyboard_text_box
-	keyboard_scheme.init( 5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 80 / 200 ) );
+	keyboard_scheme.Window::init(
+			5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 80 / 200 ) );
 	keyboard_scheme.set_font_color( WHITE_DEFAULT );
 	keyboard_scheme.set_font_width( "Bold" );
 	keyboard_scheme.auto_draw();
@@ -72,20 +73,20 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 
 	for ( int32_t i = 0; i < 8; ++i ) {
 		status_field[i].init( y_starting_point + i, _Xpos + 2,
-				native_font[ i ], cursor_font, dimmed_font );
+				native_font[ i ], dimmed_font, cursor_font );
 		status_field[i].update();
 
 		instrument_field[i].init( 1, 32, y_starting_point + i, _Xpos + 5,
-				native_font[ i ], cursor_font, dimmed_font );
+				native_font[ i ], dimmed_font, cursor_font );
 		instrument_field[i].update();
 
 		transposition_field[i].init( 1, 4, y_starting_point + i, _Xpos + 39,
-				native_font[ i ], cursor_font, dimmed_font );
+				native_font[ i ], dimmed_font, cursor_font );
 		transposition_field[i].update();
 		
 		// invocamos su clase base porque no cuadra con su init
-		double_X_slider[i].Popup::init( 1, 62, y_starting_point + i, _Xpos + 44,
-				native_font[ i ], cursor_font, dimmed_font );
+		double_X_slider[i].OrchestraElement::init( 1, 62, y_starting_point + i, _Xpos + 44,
+				native_font[ i ], dimmed_font, cursor_font );
 		double_X_slider[i].update();
 	}
 
@@ -94,7 +95,8 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 
 void KeyboardScheme::auto_draw() noexcept/*{{{*/
 
-{	int32_t key, pixel, nota;
+{
+	int32_t key, pixel, nota;
 	for ( pixel = 0; pixel < 3; ++pixel )
 		for ( key = 0; key < 61; ++key ) {
 			nota = key % 12;
@@ -109,27 +111,6 @@ void KeyboardScheme::auto_draw() noexcept/*{{{*/
 				wattron( area, A_REVERSE );
 			mvwaddch( area, pixel, key, ' ' );
 		}
-}/*}}}*/
-
-void Orchestra::show( struct System *&_Row ) noexcept/*{{{*/
-{
-	// solo obtiene la información y aparece los páneles
-
-	info = _Row;
-
-	base.show();
-	variacion_text_box.show();
-	keyboard_scheme.show();
-	etiqueta_field.show();
-
-	for ( int32_t i = 0; i < 8; ++i ) {
-		status_field[i].show();
-		instrument_field[i].show();
-		transposition_field[i].show();
-		double_X_slider[i].show();
-	}
-
-	update();
 }/*}}}*/
 
 void Orchestra::update() noexcept/*{{{*/
@@ -174,6 +155,26 @@ void Orchestra::update() noexcept/*{{{*/
 		transposition_field[ i ].set_text(
 				std::to_string( info->variacion[ variacion ].track[ i ].transposition ) );
 	}
+}/*}}}*/
+
+void Orchestra::show( struct System *&_Row ) noexcept/*{{{*/
+{
+	// solo obtiene la información y aparece los páneles
+	info = _Row;
+
+	base.show();
+	variacion_text_box.show();
+	keyboard_scheme.show();
+	etiqueta_field.show();
+
+	for ( int32_t i = 0; i < 8; ++i ) {
+		status_field[i].show();
+		instrument_field[i].show();
+		transposition_field[i].show();
+		double_X_slider[i].show();
+	}
+
+	update();
 }/*}}}*/
 
 void Orchestra::hide() noexcept/*{{{*/
@@ -325,10 +326,10 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			case KEY_LEFT :/*{{{*/
-				if ( cursor[ Coordinates::X ] > 0 ) {
-					--cursor[ Coordinates::X ];
-					if ( cursor[ Coordinates::Y ] >= 0 ) // Zona de objetos
-						switch ( cursor[ Coordinates::X ] ) {
+				if ( cursor[X] > 0 ) {
+					--cursor[X];
+					if ( cursor[Y] >= 0 ) // Zona de objetos
+						switch ( cursor[X] ) {
 							case 0 : // Check <- Instrumento
 								comb_ptr->set_instrument_name(
 										info->bnk, info->num, cursor[Y], temp_word );

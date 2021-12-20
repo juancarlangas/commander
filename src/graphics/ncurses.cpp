@@ -103,10 +103,10 @@ void draw_windows(void)
 		wattron(displayBox, COLOR_PAIR(GRAY_DEFAULT));
 		wattron(displayBox, A_BOLD);
 		wborder(displayBox, 0, 0, 0, 0, ACS_LTEE, ACS_TTEE, ACS_LLCORNER, ACS_RTEE);
-		mvwprintw(displayBox, 1, 26, " SONG ");
-		mvwprintw(displayBox, 1, 32, " ARTIST ");
-		mvwprintw(displayBox, 1, 59, " GENRE ");
-		mvwprintw(displayBox, 1, 76, " KEYWORDS ");
+		mvwprintw(displayBox, 1, 28, " SONG ");
+		mvwprintw(displayBox, 1, 34, " ARTIST ");
+		mvwprintw(displayBox, 1, 56, " GENRE ");
+		mvwprintw(displayBox, 1, 73, " KEYWORDS ");
 		wrefresh(displayBox);
 
 	/* zoomBox*/

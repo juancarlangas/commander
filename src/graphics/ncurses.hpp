@@ -2,7 +2,7 @@
 #define NCURSES_HPP
 
 #include "graphics/elements/window.hpp"
-#include "graphics/elements/windows/popups/text_popups/field_popup.hpp"
+#include "graphics/elements/windows/popups/orchestra_elements/text_popups/field_popup.hpp"
 
 #define Y_PIXELS 32
 #define X_PIXELS 127

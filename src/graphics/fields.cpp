@@ -7,7 +7,7 @@
 #include <string_view>
 #include <string.h>
 
-void Field::create(	const char* legend,
+void Field::create(	const char* legend,/*{{{*/
 					const int high, const int width, const int _Y, const int _X,
 					const Type tipo, const short limite)
 {
@@ -26,33 +26,33 @@ void Field::create(	const char* legend,
 	mvwprintw(wCaja, 0, 1, " %s ", legend);
 
 	wattron(wEspacio, COLOR_PAIR(WHITE_DEFAULT));
-}
+}/*}}}*/
 
-void Field::show()
+void Field::show()/*{{{*/
 {
 	show_panel(pCaja);
 	show_panel(pEspacio);
-}
+}/*}}}*/
 
-void Field::hide()
+void Field::hide()/*{{{*/
 {
 	hide_panel(pCaja);
 	hide_panel(pEspacio);
-}
+}/*}}}*/
 
-void Field::get_cursor()
+void Field::get_cursor()/*{{{*/
 {
 	wprintw(wEspacio, "");
 	curs_set( true );
 	wrefresh(wEspacio);
-}
+}/*}}}*/
 
-void Field::set_cursor() noexcept
+void Field::set_cursor() noexcept/*{{{*/
 {
 	get_cursor();
-}
+}/*}}}*/
 
-void Field::set_string(const char *word)
+void Field::set_string(const char *word)/*{{{*/
 {
 	sprintf(cadena, "%s", word);
 	nCaracter = 0;
@@ -65,9 +65,9 @@ void Field::set_string(const char *word)
 	wclear(wEspacio);
 	waddstr(wEspacio, cadena);
 	wrefresh(wEspacio);
-}
+}/*}}}*/
 
-void Field::set_string(const char digit)
+void Field::set_string(const char digit)/*{{{*/
 {
 	cadena[0] = digit;
 	cadena[1] = '\0';
@@ -75,27 +75,27 @@ void Field::set_string(const char digit)
 	wclear(wEspacio);
 	waddstr(wEspacio, cadena);
 	wrefresh(wEspacio);
-}
+}/*}}}*/
 
-void Field::set_string(const short number)
+void Field::set_string(const short number)/*{{{*/
 {
 	sprintf(cadena, "%03d", number); 
 
 	wclear(wEspacio);
 	wprintw(wEspacio, "%s", cadena);
 	wrefresh(wEspacio);
-}
+}/*}}}*/
 
-void Field::set_content( const std::string &_Cadena ) noexcept
+void Field::set_content( const std::string &_Cadena ) noexcept/*{{{*/
 {
 	strcpy( cadena, _Cadena.c_str() );
 
 	wclear( wEspacio );
 	wprintw( wEspacio, "%s", cadena );
 	wrefresh( wEspacio );
-}
+}/*}}}*/
 
-bool Field::process_key(int tecla)
+bool Field::process_key(int tecla)/*{{{*/
 {
 	bool success = false;
 
@@ -147,19 +147,19 @@ bool Field::process_key(int tecla)
 	}
 
 	return true;
-}
+}/*}}}*/
 
-void Field::get_string(char word[])
+void Field::get_string(char word[])/*{{{*/
 {
 	sprintf(word, "%s", cadena);
-}
+}/*}}}*/
 
-void Field::set_font_color( const int32_t &_Color ) noexcept
+void Field::set_font_color( const int32_t &_Color ) noexcept/*{{{*/
 {
 	wattron( wEspacio, COLOR_PAIR( _Color ) );
-}
+}/*}}}*/
 
-void Field::set_font_width( const std::string_view _Style ) noexcept
+void Field::set_font_width( const std::string_view _Style ) noexcept/*{{{*/
 {
 	if ( _Style != "Bold" and _Style != "Regular" ) {
 		std::cerr << _Style << " no se reconoce como un estilo en Field::set_font_width()"
@@ -171,4 +171,4 @@ void Field::set_font_width( const std::string_view _Style ) noexcept
 		wattroff( wEspacio, A_BOLD );
 	else
 		wattron( wEspacio, A_BOLD );
-}
+}/*}}}*/

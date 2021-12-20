@@ -45,9 +45,13 @@ Reached, Thanks to GOD!
 
 - First moving the Display Index rather than waits to the MIDI change O.K.
 
- Fixing of the columns in DisplayWindow
+- Fixing of the columns in DisplayWindow O.K. G.A.D.
 
-- Not to change to white when editing the instrument name of a track. This is produced because
+- Selecting variation with Function keys O.K. G.A.D.
+
+- NEW PARADIGMA in the --field popup--. The on() and off() methods will change an internal hasCursor
+bool balue. And this variable will be used when requires to print on it. Whe will get the goal of
+not to change to white when editing the instrument name of a track. This is produced because
 the cursor color is always white. We have to improve that. (after the previous improvement
 there will be no need to editig instrument name on Orchestration )
 
@@ -60,6 +64,8 @@ there will be no need to editig instrument name on Orchestration )
 - Writing compound instrument names
 
 - Fixing of losing index when selects a Favourite by pressing number keys.
+
+- Selecting a Favourite backwards.
 
 Korg 4.7.3
 ==========

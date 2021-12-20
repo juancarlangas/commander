@@ -6,8 +6,6 @@
 class Popup : public Window {
 	public:
 		void init( const int32_t, const int32_t, const int32_t, const int32_t ) noexcept;
-		void init( const int32_t, const int32_t, const int32_t, const int32_t,
-				const struct Font &, const struct Font &, const struct Font & ) noexcept;
 		void show() noexcept;
 		void hide() noexcept;
 	protected:

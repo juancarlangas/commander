@@ -50,10 +50,10 @@ void DoubleXslider::on() noexcept/*{{{*/
 	rPos = rValue - MIN_KEY + 1;
 
 	wclear( area );
-	wattron( area, COLOR_PAIR( inherit_font.color ) );
+	wattron( area, COLOR_PAIR( active_font.color ) );
 	set_font_reverse( true );
 	mvwaddch( area, 0, lPos, ' ' );
-	inherit_font.style == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
+	active_font.width == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
 	set_font_reverse( false );
 	for ( int16_t i = lPos + 1; i < rPos; ++i )
 		mvwaddch( area, 0, i, '-' );
@@ -97,7 +97,7 @@ void DoubleXslider::set_cursor_at_right() noexcept/*{{{*/
 void DoubleXslider::leave_cursor() noexcept/*{{{*/
 {
 	if ( is_active ) {
-		wattron( area, COLOR_PAIR( inherit_font.color ) );
+		wattron( area, COLOR_PAIR( active_font.color ) );
 		wattron( area, A_REVERSE );
 		mvwaddch( area, 0, focused_slider == 0 ? lPos : rPos, ' ' );
 	}
@@ -114,14 +114,14 @@ void DoubleXslider::swap_cursor() noexcept/*{{{*/
 {
 	wattron( area, A_REVERSE ); // sí o sí
 	if ( focused_slider == 0 ) {
-		wattron( area, COLOR_PAIR( inherit_font.color ) );
+		wattron( area, COLOR_PAIR( active_font.color ) );
 		mvwaddch( area, 0, lPos, ' ' );
 		wattron( area, COLOR_PAIR( cursor_font.color ) );
 		mvwaddch( area, 0, rPos, ' ' );
 		focused_slider = 1;
 	}
 	else {
-		wattron( area, COLOR_PAIR( inherit_font.color ) );
+		wattron( area, COLOR_PAIR( active_font.color ) );
 		mvwaddch( area, 0, rPos, ' ' );
 		wattron( area, COLOR_PAIR( cursor_font.color ) );
 		mvwaddch( area, 0, lPos, ' ' );
@@ -134,8 +134,8 @@ void DoubleXslider::swap_cursor() noexcept/*{{{*/
 bool DoubleXslider::decrease_left_slider() noexcept/*{{{*/
 {
 	if ( lValue > MIN_KEY ) {
-		wattron( area, COLOR_PAIR( inherit_font.color ) );
-		inherit_font.style == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
+		wattron( area, COLOR_PAIR( active_font.color ) );
+		active_font.width == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
 		if ( lValue == rValue ) { // Si están a la par, en vez de poner raya pondrá fader
 			wattron( area, A_REVERSE );
 			mvwaddch( area, 0, lPos, ' ' );
@@ -198,8 +198,8 @@ bool DoubleXslider::increase_left_slider() noexcept/*{{{*/
 bool DoubleXslider::increase_right_slider() noexcept/*{{{*/
 {
 	if ( rValue < MAX_KEY ) {
-		wattron( area, COLOR_PAIR( inherit_font.color ) );
-		inherit_font.style == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
+		wattron( area, COLOR_PAIR( active_font.color ) );
+		active_font.width == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
 		if ( lValue == rValue ) { // Lo mismo aquí
 			wattron( area, A_REVERSE );
 			mvwaddch( area, 0, rPos, ' ' );
