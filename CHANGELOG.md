@@ -49,11 +49,9 @@ Reached, Thanks to GOD!
 
 - Selecting variation with Function keys O.K. G.A.D.
 
-- NEW PARADIGMA in the --field popup--. The on() and off() methods will change an internal hasCursor
-bool balue. And this variable will be used when requires to print on it. Whe will get the goal of
-not to change to white when editing the instrument name of a track. This is produced because
-the cursor color is always white. We have to improve that. (after the previous improvement
-there will be no need to editig instrument name on Orchestration )
+- Refactoring of the heritage of all the Orchestra related Windows. O.K.
+
+- Thaks to god and above, the track color is preserved during the typewritting. O.K.
 
 - Better track coloring
 

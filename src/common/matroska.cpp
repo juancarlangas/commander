@@ -63,7 +63,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 525: comando = DRAG_DOWN; break;
 		case KEY_DC: if (windowMode == MODE_PLAYLIST) comando = SUPR; break;
 		case KEY_BACKSPACE: if (ci > 0) comando = DEL; break;
-		case 3: comando = EXIT; break;
+		case 17: comando = EXIT; break;
 
 		default:
 			if ( KEY_F(1) <= digit and digit <= KEY_F(10) )
