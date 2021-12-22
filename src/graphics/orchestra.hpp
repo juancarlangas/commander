@@ -16,6 +16,11 @@ enum Notas { C, C_SUS, D, D_SUS, E, F, F_SUS, G, G_SUS, A, A_SUS, B };
 enum Coordinates { X, Y };
 enum Moved : bool { NO, YES };
 
+struct Clipboard {
+	int16_t n_variaciones;
+	struct Variacion variacion[ MAX_VARIATIONS ];
+};
+
 class KeyboardScheme : public TextPopup {
 	public:
 		void auto_draw() noexcept;
@@ -49,6 +54,7 @@ class Orchestra {
 		struct System *info;
 		Combinations *comb_ptr;
 		Keyboard *keyboard;
+		struct Clipboard clipboard;
 };
 
 #endif

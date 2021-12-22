@@ -50,13 +50,13 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 	base.update();
 
 	// Indicador de variación
-	variacion_text_box.Window::init( 3, 20, _Ypos + 1, _Xpos + 2 );
+	variacion_text_box.Popup::init( 3, 20, _Ypos + 1, _Xpos + 2 );
 	variacion_text_box.set_font_color( GRAY_DEFAULT );
 	variacion_text_box.set_font_width( "Bold" );
 	variacion_text_box.update();
 
 	// keyboard_text_box
-	keyboard_scheme.Window::init(
+	keyboard_scheme.Popup::init(
 			5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 80 / 200 ) );
 	keyboard_scheme.set_font_color( WHITE_DEFAULT );
 	keyboard_scheme.set_font_width( "Bold" );
@@ -679,6 +679,70 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						info->variacion[ i + 1 ] = info->variacion[ i ];
 					--info->n_variaciones;
 					update();
+					if ( cursor[Y] == -1 ) { // si está hasta arriba
+						info->variacion[ variacion + 1 ].etiqueta = temp_word; // guardamos
+						temp_word = info->variacion[ variacion ].etiqueta; // copiamos nuevo
+						etiqueta_field.set_cursor();
+					}
+					else
+						switch ( cursor[X] ) {
+							case 0:
+								status_field[ cursor[Y] ].set_cursor();
+								break;
+							case 1:
+								comb_ptr->set_instrument_name(
+										info->bnk, info->num, cursor[Y], temp_word );
+								instrument_field[ cursor[Y] ].set_cursor();
+								break;
+							case 2:
+								info->variacion[ variacion + 1 ].track[ cursor[Y] ].transposition =
+									std::stoi( temp_word );
+								temp_word = 
+									info->variacion[variacion].track[ cursor[Y] ].transposition == 0
+									? "0" : std::to_string(
+									info->variacion[ variacion ].track[ cursor[Y] ].transposition );
+								transposition_field[ cursor[Y] ].set_cursor();
+								break;
+							case 3:
+								double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_left();
+								break;
+							case 4:
+								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
+								break;
+						}
+					if ( keyboard->get_MIDI_state() == Switch::ON ) {
+						keyboard->select_page( Page::TIMBRE );
+						keyboard->dump_variation( *info, variacion );
+					}
+					will_dump = false;
+				}
+				break;/*}}}*/
+
+			case 3: // <C-c> COPY_ONE_VARIATION{{{
+				clipboard.n_variaciones = 1;
+				clipboard.variacion[0] = info->variacion[ variacion ];
+				break;/*}}}*/
+
+			case 25: // <C-y> YANK_ALL_VARIATIONS{{{
+				clipboard.n_variaciones = info->n_variaciones;
+				for ( int32_t i = 0; i < info->n_variaciones; ++i )
+					clipboard.variacion[i] = info->variacion[ i ];
+				break;/*}}}*/
+
+			case 16: // <C-p> PASTE_VARIATIONS{{{
+				// comprobamos que quepan
+				if ( MAX_VARIATIONS - info->n_variaciones >= clipboard.n_variaciones ) {
+					// empujamos
+					for ( int16_t i = variacion; i < info->n_variaciones; ++i )
+						info->variacion[ i + clipboard.n_variaciones ] = clipboard.variacion[i];
+					// metemos el clipboard
+					for ( int16_t i = 0; i < clipboard.n_variaciones; ++i )
+						info->variacion[variacion + i] = clipboard.variacion[i];
+					// Incrementamos n_variaciones
+					info->n_variaciones += clipboard.n_variaciones;
+
+					update();
+
 					if ( cursor[Y] == -1 ) { // si está hasta arriba
 						info->variacion[ variacion + 1 ].etiqueta = temp_word; // guardamos
 						temp_word = info->variacion[ variacion ].etiqueta; // copiamos nuevo

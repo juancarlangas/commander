@@ -5,15 +5,14 @@
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
 
-void decrease_index( int *top, int *index )
+void decrease_index( int *top, int *index )/*{{{*/
 {
-	
-	if (*index > 0) {
-		if (*index == *top)
-			(*top)--;
-		(*index)--;
+	if ( *index > 0 ) { // que se pueda subir
+		if ( *index == *top )
+			( *top )--;
+		( *index )--;
 	}
-}
+}/*}}}*/
 
 void increase_index(	int *top, const int resultRows, int *index, 
 						const short int winMode	)

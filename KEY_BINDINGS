@@ -1,0 +1,35 @@
+Normal Mode
+===========
+<C-k>		TOGGLE_MIDI_STATE
+<C-t>		EDIT_VALUE
+<C-o>		EDIT_ORCHESTRATION
+<C-Supr>	DELETE_VALUE
+<C-q>		EXIT
++			ADD
+<Esc>		ESCAPE
+<Tab>		CHANGE_WINDOW
+<C-Up>		DRAG_UP
+<C-Down>	DRAG_DOWN
+<C-Right>	NEXT_VARIATION
+<C-Left>	PREV_VARIATION
+<DC>		SUPR
+<Backspace>	DEL
+
+Tagging mode
+============
+<Tab>		NEXT
+<S-Tab>		PREV
+
+Orchesra mode
+=============
+<Tab>		NEXT_VARIATION
+<S-Tab>		PREV_VARIATION
+<C-k>		TOGGLE_MIDI_STATE
+<C-Right>	MOVE_FADER
+<C-Left>	MOVE_FADER
+<C-a>		DUplicate
+<C-r>		DELETE_VARIATION
+<C-c>		COPY_ONE_VARIATION
+<C-y>		YANK_ALL_VARIATIONS
+<C-p>		PASTE_ALL_VARIATIONS
+<Esc>		ESCAPE

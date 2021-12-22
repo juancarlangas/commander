@@ -54,7 +54,6 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 519: if (windowMode == MODE_DISPLAY) comando = DELETE_VALUE; break; //<C-Supr>
 		case '+': if (windowMode == MODE_DISPLAY && dIndex >= 0) comando = ADD; break;
 		case 27: comando = ESCAPE; break;
-		case ' ': comando = SELECT; break;
 		case '\t': comando = CHANGE_WINDOW; break;
 		case KEY_UP: case KEY_DOWN: comando = MOVE_INDEX; break;
 		case KEY_LEFT:	comando = PREV_VARIATION; break;

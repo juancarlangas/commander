@@ -3,50 +3,45 @@
 #include "../common/common.hpp"
 #include <stdlib.h>
 #include <string.h>
+#include <string>
+#include <string_view>
 #include "../common/string.hpp"
 
-void llenado_displayTable(	System *displayTable[], System dataBase[], 
-							const int dbRows, const char string[],
-							int *dRows)
+void llenado_displayTable(	System *_DisplayTable[], System _DataBase[], /*{{{*/
+							const int _DBRows, const std::string_view _Cadena, int *_DisplayRows )
 {
-	short int match;
-	short int i;
+	switch ( _Cadena.data()[0] ) {
 
-	switch (string[0]) {
-		case '\0': /*CLEAN*/
-			*dRows = dbRows;
-			for (i = 0; i <= dbRows - 1; i++)
-				displayTable[i] = dataBase + i;
+		case '\0': // RESET_QUERY
+			*_DisplayRows = _DBRows; // reiniciamos
+			for ( int32_t i = 0; i < _DBRows; ++i )
+				_DisplayTable[i] = _DataBase + i;
 			break;
 
-		case '/':
-			*dRows = 0;
+		case '/': // Caracter de escape
+			*_DisplayRows = 0;
 			break;
 
-		default: /*WORD*/
-			*dRows = 0;
+		default: // Palabra
+			*_DisplayRows = 0; // Reiniciamos
 
-			for (i = 0; i <= dbRows - 1; i++) {
-				match = 0;
+			for ( int32_t i = 0; i < _DBRows; ++i )
+				if (	_DataBase[i].titulo.find( _Cadena ) != std::string::npos or
+						_DataBase[i].artista.find( _Cadena ) != std::string::npos or
+						_DataBase[i].genero.find( _Cadena ) != std::string::npos or
+						_DataBase[i].mood.find( _Cadena ) != std::string::npos or
+						_DataBase[i].key_words.find( _Cadena ) != std::string::npos ) {
 
-				match += compare(dataBase[i].title, string);
-				match += compare(dataBase[i].artist, string);
-				match += compare(dataBase[i].genre, string);
-				match += compare(dataBase[i].section, string);
-				match += compare(dataBase[i].keywords, string);
-
-				if (match) {
-					(*dRows)++;
-					displayTable[*dRows - 1] = dataBase + i;
+					_DisplayTable[ *_DisplayRows ] = _DataBase + i;
+					( *_DisplayRows )++;
 				}
-			}
 			break;
 	}
 
 	return;
-}
+}/*}}}*/
 
-void llenado_favourite(int fav[], System base[], const int baseRows)
+void llenado_favourite(int fav[], System base[], const int baseRows)/*{{{*/
 {
 	int i, count = 1;
 
@@ -55,9 +50,9 @@ void llenado_favourite(int fav[], System base[], const int baseRows)
 			fav[count++ % 10] = i;
 
 	return;
-}
+}/*}}}*/
 
-short int compare(const char stringSystem[], const char stringUser[])
+short int compare(const char stringSystem[], const char stringUser[])/*{{{*/
 {
 	char wordSystem[LONG_STRING], wordUser[LONG_STRING];
 	short int check;
@@ -73,4 +68,4 @@ short int compare(const char stringSystem[], const char stringUser[])
 		check = 0;
 
 	return check;
-}
+}/*}}}*/
