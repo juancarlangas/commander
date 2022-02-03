@@ -143,9 +143,13 @@ bool Form::capture()/*{{{*/
 							case KEYWORDS:
 								sprintf(row.keywords, "%s", word);
 								break;
-							case TYPE:
-								sprintf(row.type, "%s", word);
+							case TYPE: {
+								// hacemos esta perracera para evitar warning sobre intentar
+								// meter una cadena larga (40) en una variable de solo 10
+								std::string palabra { word };
+								sprintf( row.type, "%s", palabra.substr( 0, 10 ).c_str() );
 								break;
+								}
 							case BNK:
 								row.bnk = word[0];
 								break;

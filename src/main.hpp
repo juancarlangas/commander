@@ -23,7 +23,7 @@
 #include "data/combinations.hpp"
 #include "data/databases.hpp"
 #include "data/files.hpp"
-#include "../../lib/utilities/src/files.hpp"
+#include "utilities/src/files.hpp"
 #include "graphics/colors.hpp"
 
 enum HotKeysMode { VARIATIONS, FAVOURITES };

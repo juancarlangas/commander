@@ -42,7 +42,7 @@ void Field::hide()/*{{{*/
 
 void Field::get_cursor()/*{{{*/
 {
-	wprintw(wEspacio, "");
+	wprintw(wEspacio, "%s", "" );
 	curs_set( true );
 	wrefresh(wEspacio);
 }/*}}}*/

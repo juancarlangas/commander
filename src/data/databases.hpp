@@ -15,6 +15,8 @@ enum Switch : bool { OFF = 0, ON };
 
 struct Track {
 	enum Switch status;
+	int16_t volume;
+	int16_t modulation;
 	int16_t lower_key;
 	int16_t upper_key;
 	int16_t transposition;

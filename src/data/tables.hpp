@@ -6,7 +6,7 @@
 short int compare(const char stringSystem[], const char stringUser[]);
 
 void llenado_displayTable(	System *displayTable[], System dataBase[], 
-							const int dbRows, const char string[],
+							const int dbRows, const std::string_view _Cadena,
 							int *dRows);
 
 void llenado_favourite(int fav[], System base[], const int baseRows);
