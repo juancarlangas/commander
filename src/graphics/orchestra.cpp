@@ -57,7 +57,7 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 
 	// keyboard_text_box
 	keyboard_scheme.Popup::init(
-			5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 80 / 200 ) );
+			5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 88 / 200 ) );
 	keyboard_scheme.set_font_color( WHITE_DEFAULT );
 	keyboard_scheme.set_font_width( "Bold" );
 	keyboard_scheme.auto_draw();
@@ -80,12 +80,20 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 				native_font[ i ], dimmed_font, cursor_font );
 		instrument_field[i].update();
 
-		transposition_field[i].init( 1, 4, y_starting_point + i, _Xpos + 39,
+		volume_field[i].init( 1, 4, y_starting_point + i, _Xpos + 35,
+				native_font[ i ], dimmed_font, cursor_font );
+		volume_field[i].update();
+
+		modulator_wheel[i].init( 1, 4, y_starting_point + i, _Xpos + 40,
+				native_font[ i ], dimmed_font, cursor_font );
+		modulator_wheel[i].update();
+
+		transposition_field[i].init( 1, 4, y_starting_point + i, _Xpos + 45,
 				native_font[ i ], dimmed_font, cursor_font );
 		transposition_field[i].update();
 		
 		// invocamos su clase base porque no cuadra con su init
-		double_X_slider[i].OrchestraElement::init( 1, 62, y_starting_point + i, _Xpos + 44,
+		double_X_slider[i].OrchestraElement::init( 1, 62, y_starting_point + i, _Xpos + 49,
 				native_font[ i ], dimmed_font, cursor_font );
 		double_X_slider[i].update();
 	}
@@ -141,12 +149,16 @@ void Orchestra::update() noexcept/*{{{*/
 		if ( info->variacion[ variacion ].track[ i ].status == Switch::ON ) {
 			status_field[ i ].on();
 			instrument_field[ i ].on();
+			volume_field[i].on();
+			modulator_wheel[i].on();
 			transposition_field[ i ].on();
 			double_X_slider[ i ].on();
 		}
 		else {
 			status_field[ i ].off();
 			instrument_field[ i ].off();
+			volume_field[i].off();
+			modulator_wheel[i].off();
 			transposition_field[ i ].off();
 			double_X_slider[ i ].off();
 		}
@@ -170,6 +182,8 @@ void Orchestra::show( struct System *&_Row ) noexcept/*{{{*/
 	for ( int32_t i = 0; i < 8; ++i ) {
 		status_field[i].show();
 		instrument_field[i].show();
+		volume_field[i].show();
+		modulator_wheel[i].show();
 		transposition_field[i].show();
 		double_X_slider[i].show();
 	}
@@ -178,8 +192,17 @@ void Orchestra::show( struct System *&_Row ) noexcept/*{{{*/
 }/*}}}*/
 
 void Orchestra::hide() noexcept/*{{{*/
+{	
+	for ( int32_t i = 0; i < 8; ++i ) {
+		status_field[i].hide();
+		instrument_field[i].hide();
+		volume_field[i].hide();
+		modulator_wheel[i].hide();
+		transposition_field[i].hide();
+		double_X_slider[i].hide();
+	}
 
-{	etiqueta_field.hide();
+	etiqueta_field.hide();
 	variacion_text_box.hide();
 	keyboard_scheme.hide();
 	base.hide();

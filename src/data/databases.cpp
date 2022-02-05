@@ -152,6 +152,7 @@ void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 		linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 		for ( int32_t i = 0; i < 8; ++i ) {
+
 			// instrumento
 			if ( linea.starts_with( '\"' ) ) { // Incluye comas
 				linea = linea.substr( 1 ); // Quitamos "
@@ -167,6 +168,16 @@ void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 				// status
 				base[n_linea].variacion[j].track[i].status = static_cast<enum Switch>(
 							std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) ) );
+				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+
+				// volume
+				base[n_linea].variacion[j].track[i].volume =
+					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
+				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+
+				// modulation
+				base[n_linea].variacion[j].track[i].modulation =
+					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 				// lower_key
@@ -361,23 +372,23 @@ void Database::escribir( const std::string &_Path ) noexcept/*{{{*/
 		exit( EXIT_FAILURE );
 	}
 
-	////////////////////////////////// clonar de la antigua ///////////////////////////////////
+	////////////////////////////////// clonando del esquema C ///////////////////////////////////
 	n_canciones = activeRows;
 
 	for ( int32_t i = 0; i < n_canciones; ++i ) {
-		base[i].titulo	= base[i].title;
-		base[i].artista	= base[i].artist;
-		base[i].genero	= base[i].genre;
+		base[i].titulo		= base[i].title;
+		base[i].artista		= base[i].artist;
+		base[i].genero		= base[i].genre;
 		base[i].mood		= base[i].section;
-		base[i].key_words = base[i].keywords;
-		base[i].tipo 	= base[i].type;
+		base[i].key_words	= base[i].keywords;
+		base[i].tipo		= base[i].type;
 	}
 
 	///////////////////////////////////// escritura ///////////////////////////////////////////
 	std::string delimitador;
 
 	for ( int32_t i = 0; i < activeRows; ++i ) {
-		// BASE
+		// Tags
 		delimitador = base[i].titulo.find( ',' ) < base[i].titulo.npos ? "\"" : "";
 		archivo << delimitador << base[i].titulo << delimitador << ',';
 
@@ -397,23 +408,24 @@ void Database::escribir( const std::string &_Path ) noexcept/*{{{*/
 				<< std::setw( 3 ) << std::setfill( '0' ) << base[i].num	<< ","
 				<< base[i].n_variaciones << ',';
 
-		// VARIACIONES Etiquetas
+		// Etiqueta de variación
 		for ( int32_t j = 0; j < base[i].n_variaciones; ++j ) {
 			delimitador = 	base[i].variacion[j].etiqueta.find( ',' ) <
 							base[i].variacion[j].etiqueta.npos	? "\"" : "";
 			archivo << delimitador << base[i].variacion[j].etiqueta << delimitador << ',';
 		}
 		
-		// Variación INICIAL
+		// Variaciónes
 		archivo << base[i].variacion_inicial << ',';
 
-		// INSTRUMENTOS
 		for ( int32_t k = 0; k < 8; ++k ) {
 			delimitador = base[i].instrumento[ k ].find( ',' ) < base[i].instrumento[ k ].npos ?
 				"\"" : "";
 			archivo << delimitador << base[i].instrumento[ k ] << delimitador << ',';
 			for ( int32_t j = 0; j < base[i].n_variaciones; ++j ) {
 				archivo << base[i].variacion[j].track[k].status << ','
+						<< base[i].variacion[j].track[k].volume << ','
+						<< base[i].variacion[j].track[k].modulation << ','
 						<< base[i].variacion[j].track[k].lower_key << ','
 						<< base[i].variacion[j].track[k].upper_key << ','
 						<< base[i].variacion[j].track[k].transposition
