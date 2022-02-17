@@ -46,7 +46,6 @@ class Orchestra {
 				std::array<CheckPopup, 8> status_field;
 				std::array<FieldPopup, 8> instrument_field;
 				std::array<FieldPopup, 8> volume_field;
-				std::array<FieldPopup, 8> modulator_wheel;
 				std::array<FieldPopup, 8> transposition_field;
 				std::array<DoubleXslider, 8> double_X_slider;
 				std::array<int16_t, 2> cursor;
