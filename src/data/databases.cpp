@@ -175,11 +175,6 @@ void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
 				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
-				// modulation
-				base[n_linea].variacion[j].track[i].modulation =
-					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
-				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
-
 				// lower_key
 				base[n_linea].variacion[j].track[i].lower_key =
 					std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
@@ -425,7 +420,6 @@ void Database::escribir( const std::string &_Path ) noexcept/*{{{*/
 			for ( int32_t j = 0; j < base[i].n_variaciones; ++j ) {
 				archivo << base[i].variacion[j].track[k].status << ','
 						<< base[i].variacion[j].track[k].volume << ','
-						<< base[i].variacion[j].track[k].modulation << ','
 						<< base[i].variacion[j].track[k].lower_key << ','
 						<< base[i].variacion[j].track[k].upper_key << ','
 						<< base[i].variacion[j].track[k].transposition
