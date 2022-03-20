@@ -19,7 +19,21 @@ when it comes from a new patch, instead of returning to the same.
 - The posibility of moving cursor not mathematically but graphically (the cursor will move
 down and up to the nearest fader ( not the relative ).
 
-- MIDI error messages managment.
+- Fix error volume not showing while modifyng insrument name
+
+- Fix reseting dislplayTable when saving
+
+- Auxilio, no funciona el movimiento de faders
+
+- Fixing error not sensibuilizing mayúsuycal
+
+- Números a los canales padre
+
+- Implementar límites en los valores
+
+- Cuando se abre la orquestación debe de aparecer en la vigente, no en la 1
+
+- Función Copy from
 
 Commander 1.0
 =============
