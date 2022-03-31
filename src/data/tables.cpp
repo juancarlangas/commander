@@ -26,11 +26,16 @@ void llenado_displayTable(	System *_DisplayTable[], System _DataBase[], /*{{{*/
 			*_DisplayRows = 0; // Reiniciamos
 
 			for ( int32_t i = 0; i < _DBRows; ++i )
-				if (	_DataBase[i].titulo.find( _Cadena ) != std::string::npos or
-						_DataBase[i].artista.find( _Cadena ) != std::string::npos or
-						_DataBase[i].genero.find( _Cadena ) != std::string::npos or
-						_DataBase[i].mood.find( _Cadena ) != std::string::npos or
-						_DataBase[i].key_words.find( _Cadena ) != std::string::npos ) {
+				if (	low_string( _DataBase[i].titulo ).find( low_string( _Cadena ) )
+							!= std::string::npos or
+						low_string( _DataBase[i].artista ).find( low_string( _Cadena ) )
+							!= std::string::npos or
+						low_string( _DataBase[i].genero ).find( low_string( _Cadena  ) )
+							!= std::string::npos or
+						low_string( _DataBase[i].mood ).find( low_string( _Cadena ) )
+							!= std::string::npos or
+						low_string( _DataBase[i].key_words ).find( low_string( _Cadena ) )
+							!= std::string::npos ) {
 
 					_DisplayTable[ *_DisplayRows ] = _DataBase + i;
 					( *_DisplayRows )++;

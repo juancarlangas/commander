@@ -1,6 +1,7 @@
 #include <ctype.h>
+#include "common/string.hpp"
 
-int no_accent(char after[], const char prev[])
+int no_accent(char after[], const char prev[])/*{{{*/
 {
 	int i, j;
 	int c_plus;
@@ -81,22 +82,20 @@ int no_accent(char after[], const char prev[])
 	} while (after[i++] != '\0'); 
 
 	return i - 1;
-}
+}/*}}}*/
 
-/*************************************************************** low_string **************************************************************/
-void low_string(char cadena[])
+void low_string(char cadena[])/*{{{*/
 {
 	short i = 0;
 
 	do {
-		cadena[i] = tolower((int)cadena[i]);
-	} while (cadena[i++] != '\0');
+		cadena[i] = tolower( (int)cadena[i] );
+	} while ( cadena[i++] != '\0' );
 
 	return;
-}
+}/*}}}*/
 
-/*************************************************************** up_string **************************************************************/
-void up_string(char cadena[])
+void up_string(char cadena[])/*{{{*/
 {
 	short i = 0;
 
@@ -105,4 +104,15 @@ void up_string(char cadena[])
 	} while (cadena[i++] != '\0');
 
 	return;
-}
+}/*}}}*/
+
+std::string low_string( std::string_view _Cadena ) noexcept/*{{{*/
+{
+	std::string cadena_temporal;
+
+	for ( int32_t i = 0; i < static_cast<int32_t>( _Cadena.length() ); ++ i )
+			cadena_temporal = cadena_temporal +
+				static_cast<char>( std::tolower( _Cadena.data()[i] ) );
+
+	return cadena_temporal;
+}/*}}}*/

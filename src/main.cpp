@@ -341,24 +341,19 @@ int32_t main()
 
 			case READ_CHAR:/*{{{*/
 
-				//agregate
-				keyword[charIndex++] = caracter;
-				keyword[charIndex] = '\0';
+				// agregamos 1 letra al keyword
+				keyword[ charIndex++ ] = caracter;
+				keyword[ charIndex ] = '\0';
 
-				if (keyword[charIndex - 1] != -61) { // saltamos acentos y tildes
+				if (keyword[charIndex - 1] != -61) {	// si es acento o tilde esperamos
+														// la parte faltante
 					charIndex = no_accent(keyword, keyword); //clean
+
+					// Garantizamos que la última letra válida añadida sea minúscula
+					// keyword[ charIndex - 1 ] = std::tolower( keyword[ charIndex - 1 ] );
 
 					llenado_displayTable(	displayTable, dBase[mode].base,
 											dbRows[mode], keyword, &n_matches	);
-
-					/*
-					 * Esta parte se supone que era un hack para que no imprimiera nada
-					 * pero resultó contraproducente pues el -1 sí habilitaba la impresión.
-					if (n_matches == 0)
-						dTop = dIndex = -1;
-					else
-						dTop = dIndex = 0;
-					*/
 
 					if (winMode == MODE_PLAYLIST) {
 						winMode = MODE_DISPLAY;
