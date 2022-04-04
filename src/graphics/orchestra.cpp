@@ -17,11 +17,11 @@ Orchestra::Orchestra() :/*{{{*/
 	native_font { { { GREEN_DEFAULT, "Bold" },
 					{ BLUE_DEFAULT, "Bold" },
 					{ YELLOW_DEFAULT, "Bold" },
-					{ BLUE_DEFAULT, "Regular" },
-					{ MAGENTA_DEFAULT, "Regular" },
-					{ YELLOW_DEFAULT, "Regular" },
+					{ MAGENTA_DEFAULT, "Bold" },
 					{ CYAN_DEFAULT, "Bold" },
-					{ RED_DEFAULT, "Bold " } } },
+					{ RED_DEFAULT, "Bold" },
+					{ YELLOW_DEFAULT, "Regular" },
+					{ CYAN_DEFAULT, "Regular " } } },
 	cursor_font { WHITE_DEFAULT, "Bold" },
 	MIDI_font { GREEN_DEFAULT, "Bold" },
 	dimmed_font { GRAY_DEFAULT, "Bold" }
@@ -408,7 +408,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			case KEY_RIGHT :/*{{{*/
-				if ( cursor[ Coordinates::X ] < 6 ) {
+				if ( cursor[ Coordinates::X ] < 5 ) {
 					++cursor[ Coordinates::X ];
 					if ( cursor[ Coordinates::Y ] >= 0 )
 						switch ( cursor[ Coordinates::X ] ) {
@@ -661,11 +661,11 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 			case 546 : // CTRL-KEY_LEFT{{{
 				if ( cursor[Y] > -1 ) { // Zona de controles
-					if ( cursor[X] == 3 ) { // left slider
+					if ( cursor[X] == 4 ) { // left slider
 						if ( double_X_slider[ cursor[Y] ].decrease_left_slider() == Moved::YES )
 							--( info->variacion[ variacion ].track[ cursor[Y] ].lower_key );
 					}
-					else if ( cursor[X] == 4 ) { // right slider
+					else if ( cursor[X] == 5 ) { // right slider
 						if ( double_X_slider[ cursor[Y] ].decrease_right_slider() == Moved::YES )
 							--( info->variacion[ variacion ].track[ cursor[Y] ].upper_key );
 					}
@@ -677,11 +677,11 @@ void Orchestra::capture_key() noexcept/*{{{*/
 			// CTRL-KEY_RIGHT{{{
 			case 561 :
 				if ( cursor[Y] > -1 ) {
-					if ( cursor[X] == 3 ) {
+					if ( cursor[X] == 4 ) {
 						if ( double_X_slider[ cursor[Y] ].increase_left_slider() == Moved::YES )
 							++( info->variacion[ variacion ].track[ cursor[Y] ].lower_key );
 					}
-					else if ( cursor[X] == 4 ) {
+					else if ( cursor[X] == 5 ) {
 						if ( double_X_slider[ cursor[Y] ].increase_right_slider() == Moved::YES )
 							++( info->variacion[ variacion ].track[ cursor[Y] ].upper_key );
 					}

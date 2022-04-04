@@ -67,17 +67,23 @@ Reached, Thanks to GOD!
 
 - Thaks to god and above, the track color is preserved during the typewritting. O.K.
 
-- Better track coloring
+- Better track coloring... O.K.
 
-- Fix of no hiding Orchestration when shows Tagging
+- Fix of no hiding Orchestration when shows Tagging O.K.
 
-- WTF with the delete value mechanism??
+- WTF with the delete value mechanism?? O.K.
 
 - Writing compound instrument names
 
 - Fixing of losing index when selects a Favourite by pressing number keys.
 
 - Selecting a Favourite backwards.
+
+- Fixing of showing legends like "Orchestration 1 of 0"
+
+- Fixing of volume value loosing clor
+
+- Autoupdate when editing a tag
 
 Korg 4.7.3
 ==========
