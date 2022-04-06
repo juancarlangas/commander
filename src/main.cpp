@@ -194,6 +194,11 @@ int32_t main()
 				int32_t caracter_a_numero = caracter == 48 ? 9 : ( caracter - 49 );
 				buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
 
+				updateWindow[LCD] 	  = true;
+
+				/* Toda la siguiente parte reinicializa displayTable y coloca el índice
+				 * en el favorito, pero esta es una característica poco conveniente.
+				 *
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
@@ -207,10 +212,10 @@ int32_t main()
 					winMode = MODE_DISPLAY;
 					updateWindow[PLAYLIST] = true;
 				}
-				updateWindow[LCD] 	  = true;
 				updateWindow[SEARCH]  = true;
 				updateWindow[DISPLAY] = true;
 				updateWindow[ZOOM]	  = true;
+				*/
 
 				break;
 			}/*}}}*/
