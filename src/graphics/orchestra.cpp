@@ -50,7 +50,7 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 	base.update();
 
 	// Indicador de variación
-	variacion_text_box.Popup::init( 3, 20, _Ypos + 1, _Xpos + 2 );
+	variacion_text_box.Popup::init( 3, 20, _Ypos + 1, _Xpos + 92 );
 	variacion_text_box.set_font_color( GRAY_DEFAULT );
 	variacion_text_box.set_font_width( "Bold" );
 	variacion_text_box.update();
@@ -62,6 +62,11 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 	keyboard_scheme.set_font_width( "Bold" );
 	keyboard_scheme.auto_draw();
 	keyboard_scheme.update();
+
+	// Variación inicial
+	vi_field.create( "VI", 3, 6, _Ypos + 1, _Xpos + 2, STRING, 16 );
+	vi_field.set_font_width( "Bold" );
+	vi_field.set_font_color( WHITE_DEFAULT );
 
 	// Etiqueta
 	etiqueta_field.create( "Etiqueta", 3, _Xsize * 80 / 200, _Ypos + 1, _Xpos + ( _Xsize / 4 ),
@@ -121,6 +126,7 @@ void Orchestra::update() noexcept/*{{{*/
 {
 	variacion_text_box.set_text( "Variacion " + std::to_string( variacion + 1 ) +
 								" de " + std::to_string( info->n_variaciones ) );
+	vi_field.set_content( std::to_string( info->variacion_inicial ) );
 	etiqueta_field.set_content( info->variacion[ variacion ].etiqueta );
 
 	for ( int32_t i = 0; i < 8; ++i ) {
@@ -173,6 +179,7 @@ void Orchestra::show( struct System *&_Row ) noexcept/*{{{*/
 	base.show();
 	variacion_text_box.show();
 	keyboard_scheme.show();
+	vi_field.show();
 	etiqueta_field.show();
 
 	for ( int32_t i = 0; i < 8; ++i ) {
@@ -196,6 +203,7 @@ void Orchestra::hide() noexcept/*{{{*/
 		double_X_slider[i].hide();
 	}
 
+	vi_field.hide();
 	etiqueta_field.hide();
 	variacion_text_box.hide();
 	keyboard_scheme.hide();

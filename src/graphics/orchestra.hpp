@@ -42,6 +42,7 @@ class Orchestra {
 		BoxedPopup base;
 			TextPopup variacion_text_box;
 			KeyboardScheme keyboard_scheme;
+			Field vi_field;
 			Field etiqueta_field;
 				std::array<CheckPopup, 8> status_field;
 				std::array<FieldPopup, 8> instrument_field;
