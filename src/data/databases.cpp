@@ -140,16 +140,17 @@ void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 		}
 		linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
+		// Variación inicial
+		base[n_linea].variacion_inicial = std::stoi( linea.substr( 0, linea.find( ',' ) ) );
+		linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
+
+
 		// Label
 		for ( int32_t i = 0; i < base[n_linea].n_variaciones; ++i ) {
 			base[n_linea].variacion[i].etiqueta =
 				linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 		}
-
-		// Variación inicial
-		base[n_linea].variacion_inicial = std::stoi( linea.substr( 0, linea.find( ',' ) ) );
-		linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
 
 		for ( int32_t i = 0; i < 8; ++i ) {
 
@@ -401,7 +402,8 @@ void Database::escribir( const std::string &_Path ) noexcept/*{{{*/
 		archivo	<< base[i].tipo	<< ','
 				<< base[i].bnk	<< ','
 				<< std::setw( 3 ) << std::setfill( '0' ) << base[i].num	<< ","
-				<< base[i].n_variaciones << ',';
+				<< base[i].n_variaciones << ','
+				<< base[i].variacion_inicial << ',';
 
 		// Etiqueta de variación
 		for ( int32_t j = 0; j < base[i].n_variaciones; ++j ) {
@@ -409,9 +411,6 @@ void Database::escribir( const std::string &_Path ) noexcept/*{{{*/
 							base[i].variacion[j].etiqueta.npos	? "\"" : "";
 			archivo << delimitador << base[i].variacion[j].etiqueta << delimitador << ',';
 		}
-		
-		// Variaciónes
-		archivo << base[i].variacion_inicial << ',';
 
 		for ( int32_t k = 0; k < 8; ++k ) {
 			delimitador = base[i].instrumento[ k ].find( ',' ) < base[i].instrumento[ k ].npos ?
@@ -441,12 +440,13 @@ void Database::edit_value(int line, System row)/*{{{*/
 	base[line] = row;
 }/*}}}*/
 
-void Database::delete_value(int line)/*{{{*/
+void Database::delete_value( int line )/*{{{*/
 {
-	for (int i = line; i < activeRows - 1; i++)
+	for ( int i = line; i < activeRows - 1; i++ )
 		base[i] = base[i + 1];
 
-	clean_row(activeRows--);
+	clean_row( activeRows-- );
+	--n_canciones;
 }/*}}}*/
 
 void Database::ordenate()/*{{{*/

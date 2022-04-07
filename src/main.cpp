@@ -512,9 +512,9 @@ int32_t main()
 			case DELETE_VALUE:/*{{{*/
 			{
 				// obtenemos el índice real en dBase al cual displayTable[dIndex] apunta
-				int pointer_diff = displayTable[dIndex] - &(dBase[mode].base[0]);
+				int real_index = displayTable[dIndex] - &(dBase[mode].base[0]);
 
-				dBase[mode].delete_value( pointer_diff );
+				dBase[mode].delete_value( real_index );
 
 
 				llenado_displayTable(
