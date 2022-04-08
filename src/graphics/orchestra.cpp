@@ -40,8 +40,6 @@ void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept/*{{{*/
 void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 						const int32_t _Ypos, const int32_t _Xpos ) noexcept
 {
-	variacion = 0;
-
 	// Base
 	base.init( _Ysize, _Xsize, _Ypos, _Xpos, 1 );
 	base.set_box_color( WHITE_DEFAULT );
@@ -124,6 +122,8 @@ void KeyboardScheme::auto_draw() noexcept/*{{{*/
 
 void Orchestra::update() noexcept/*{{{*/
 {
+	variacion = info->variacion_inicial;
+
 	variacion_text_box.set_text( "Variacion " + std::to_string( variacion + 1 ) +
 								" de " + std::to_string( info->n_variaciones ) );
 	vi_field.set_content( std::to_string( info->variacion_inicial ) );
@@ -225,10 +225,10 @@ void Orchestra::capture_key() noexcept/*{{{*/
 	cursor[ Y ] = -1;
 
 	curs_set( true );
-	etiqueta_field.set_cursor(); // Por defalt el cursor estará sobre la etiqueta
+	vi_field.set_cursor(); // Por defalt el cursor estará sobre el campo variacion_inicial
 
 	/* Cadena para almacenar la palabra la palabra que está siendo editada. */
-	temp_word = info->variacion[ variacion ].etiqueta;
+	temp_word = std::to_string( info->variacion_inicial );
 	int32_t tecla;
 	char tecla_c_string[3];
 	bool again = true;
@@ -241,7 +241,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				print_MIDI_state( MIDI_state_window, keyboard->get_MIDI_state() );
 
 				if ( cursor[Y] == -1 ) // si está hasta arriba
-					etiqueta_field.set_cursor();
+					cursor[X] <= 1 ? vi_field.set_cursor() : etiqueta_field.set_cursor();
 				else
 					switch ( cursor[X] ) {
 						case 0:
@@ -275,7 +275,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					if ( cursor[Y] == -1 ) { // si está hasta arriba
 						info->variacion[ variacion + 1 ].etiqueta = temp_word; // guardamos
 						temp_word = info->variacion[ variacion ].etiqueta; // copiamos nuevo
-						etiqueta_field.set_cursor();
+					cursor[X] <= 1 ? vi_field.set_cursor() : etiqueta_field.set_cursor();
 					}
 					else
 						switch ( cursor[X] ) {
@@ -328,7 +328,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					if ( cursor[ Coordinates::Y ] == -1 ) {
 						info->variacion[ variacion - 1 ].etiqueta = temp_word; // guardamos
 						temp_word = info->variacion[ variacion ].etiqueta;
-						etiqueta_field.set_cursor();
+						cursor[X] <= 1 ? vi_field.set_cursor() : etiqueta_field.set_cursor();
 					}
 					else
 						switch ( cursor[ Coordinates::X ] ) {
@@ -376,7 +376,16 @@ void Orchestra::capture_key() noexcept/*{{{*/
 			case KEY_LEFT :/*{{{*/
 				if ( cursor[X] > 0 ) {
 					--cursor[X];
-					if ( cursor[Y] >= 0 ) // Zona de objetos
+					if ( cursor[Y] == -1 ) {// Zona de arriba
+						if ( cursor[X] > 1 )
+							cursor[X] = 1;
+						if ( cursor[X] == 1 ) {
+							info->variacion[ variacion ].etiqueta = temp_word;
+							temp_word = std::to_string( info->variacion_inicial );
+							vi_field.set_cursor();
+						}
+					}
+					else // Zona de objetos
 						switch ( cursor[X] ) {
 							case 0 : // Status <- Instrumento
 								comb_ptr->set_instrument_name(
@@ -418,7 +427,16 @@ void Orchestra::capture_key() noexcept/*{{{*/
 			case KEY_RIGHT :/*{{{*/
 				if ( cursor[ Coordinates::X ] < 5 ) {
 					++cursor[ Coordinates::X ];
-					if ( cursor[ Coordinates::Y ] >= 0 )
+					if ( cursor[Y] == -1 ) {// Zona de arriba
+						if ( cursor[X] == 1 )
+							cursor[X] = 2;
+						if ( cursor[X] == 2 ) {
+							info->variacion_inicial = std::stoi( temp_word );
+							temp_word = info->variacion[ variacion ].etiqueta;
+							etiqueta_field.set_cursor();
+						}
+					}
+					else // Zona de objetos
 						switch ( cursor[ Coordinates::X ] ) {
 							case 1 : // check -> Instrument
 								status_field[ cursor[ Coordinates::Y ] ].leave_cursor();
@@ -462,15 +480,15 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					++cursor[ Coordinates::Y ];
 					switch ( cursor[ Coordinates::X ] ) {
 						case 0: // Check
-							if ( cursor[ Coordinates::Y ] == 0 ) // hasta arriba
-								info->variacion[ variacion ].etiqueta = temp_word;
+							if ( cursor[ Coordinates::Y ] == 0 ) // viene de arriba
+								info->variacion_inicial = std::stoi( temp_word );
 							else
 								status_field[ cursor[ Coordinates::Y ] - 1 ].leave_cursor();
 							status_field[ cursor[ Coordinates::Y ] ].set_cursor();
 							break;
 						case 1: // Instrument
 							if ( cursor[ Coordinates::Y ] == 0 )
-								info->variacion[ variacion ].etiqueta = temp_word;
+								info->variacion_inicial = std::stoi( temp_word );
 							else
 								comb_ptr->set_instrument_name(
 										info->bnk, info->num, cursor[Y] - 1, temp_word );
@@ -530,8 +548,8 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						case 0: // check: nada que salvar
 							status_field[ cursor[ Coordinates::Y ] + 1 ].leave_cursor();
 							if ( cursor[ Coordinates::Y ] == -1 ) {
-								temp_word = info->variacion[ variacion ].etiqueta;
-								etiqueta_field.set_cursor();
+								temp_word = std::to_string( info->variacion_inicial );
+								vi_field.set_cursor();
 							}
 							else
 								status_field[ cursor[ Coordinates::Y ] ].set_cursor();
@@ -541,8 +559,8 @@ void Orchestra::capture_key() noexcept/*{{{*/
 							comb_ptr->set_instrument_name(
 									info->bnk, info->num, cursor[Y] + 1, temp_word );
 							if ( cursor[ Coordinates::Y ] == -1 ) {
-								temp_word = info->variacion[ variacion ].etiqueta;
-								etiqueta_field.set_cursor();
+								temp_word = std::to_string( info->variacion_inicial );
+								vi_field.set_cursor();
 							}
 							else {
 								temp_word = comb_ptr->get_instrument_name(
@@ -604,7 +622,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			case ' ' :/*{{{*/
-				if ( cursor[ Coordinates::Y ] == -1 ) {
+				if ( cursor[Y] == -1 and cursor[X] > 1 ) {
 					temp_word.append( " " );
 					etiqueta_field.set_content( temp_word );
 				}
@@ -646,7 +664,8 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				// Etiqeta
 				if ( cursor[ Coordinates::Y ] == -1 ) {
 					temp_word = temp_word.substr( 0, temp_word.length() - 1 );
-					etiqueta_field.set_content( temp_word );
+					cursor[X] <= 1 ?	vi_field.set_content( temp_word ) :
+										etiqueta_field.set_content( temp_word );
 				}
 				// Instrmento
 				else if ( cursor[X] == 1 ) {
@@ -699,7 +718,10 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 			case '\n' :/*{{{*/
 				if ( cursor[Y] == -1 )
-					info->variacion[ variacion ].etiqueta = temp_word;
+					if ( cursor[X] <= 1 )
+						info->variacion_inicial = std::stoi( temp_word );
+					else
+						info->variacion[ variacion ].etiqueta = temp_word;
 				else switch ( cursor[X] ) {
 					case 1 :
 						comb_ptr->set_instrument_name( info->bnk, info->num, cursor[Y], temp_word );
