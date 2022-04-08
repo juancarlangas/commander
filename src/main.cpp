@@ -30,7 +30,7 @@ int32_t main()
 	// Tables{{{
 	System **displayTable = new System *[ dbRows[COMBINATIONS] ](); // arreglo de apuntadores
 	System *playlistTable = new System [ dbRows[COMBINATIONS] ](); // arreglo de copias
-	System *buffer; // apuntador simple
+	System *buffer, *orch_clipboard_ptr; // apuntadores simple
 
 	int32_t n_matches;
 	int32_t dIndex { 0 }; // Absolute selected index of the whole displayTable
@@ -45,7 +45,7 @@ int32_t main()
 	int32_t	caracter;
 	int16_t charIndex { 0 };
 
-	int32_t i;
+	int32_t i, j;
 	int16_t k;/*}}}*/
 
 	// System{{{
@@ -583,6 +583,33 @@ int32_t main()
 				}
 
 				break;/*}}}*/
+
+			case COPY_ORCHESTRATION :/*{{{*/
+				orch_clipboard_ptr = displayTable[ dIndex ];
+				break;/*}}}*/
+
+			case PASTE_ORCHESTRATION :/*{{{*/
+				displayTable[ dIndex ]->n_variaciones = orch_clipboard_ptr->n_variaciones;
+				displayTable[ dIndex]->variacion_inicial = orch_clipboard_ptr->variacion_inicial;
+				for ( i = 0; i < orch_clipboard_ptr->n_variaciones; ++i ) {
+					displayTable[ dIndex ]->variacion[ i ].etiqueta =
+						orch_clipboard_ptr->variacion[ i ].etiqueta;
+					for ( j = 0; j < NUMBER_OF_PARTS; ++j ) {
+						displayTable[ dIndex ]->variacion[ i ].track[ j ].status =
+							orch_clipboard_ptr->variacion[ i ].track[ j ].status;
+						displayTable[ dIndex ]->variacion[ i ].track[ j ].volume =
+							orch_clipboard_ptr->variacion[ i ].track[ j ].volume;
+						displayTable[ dIndex ]->variacion[ i ].track[ j ].lower_key =
+							orch_clipboard_ptr->variacion[ i ].track[ j ].lower_key;
+						displayTable[ dIndex ]->variacion[ i ].track[ j ].upper_key =
+							orch_clipboard_ptr->variacion[ i ].track[ j ].upper_key;
+						displayTable[ dIndex ]->variacion[ i ].track[ j ].transposition =
+							orch_clipboard_ptr->variacion[ i ].track[ j ].transposition;
+					}
+				}
+				break;/*}}}*/
+
+
 
 			case TOGGLE_MIDI_STATE:/*{{{*/
 				x50.toggle_MIDI_state();

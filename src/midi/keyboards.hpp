@@ -8,6 +8,8 @@
 enum Section { COMBI, GLOBAL, MULTI };
 enum Page { PLAY = 0, TIMBRE };
 
+#define NUMBER_OF_PARTS 8
+
 class Keyboard {
 public:
 	Keyboard();

@@ -40,6 +40,8 @@ void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept/*{{{*/
 void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 						const int32_t _Ypos, const int32_t _Xpos ) noexcept
 {
+	variacion = 0;
+
 	// Base
 	base.init( _Ysize, _Xsize, _Ypos, _Xpos, 1 );
 	base.set_box_color( WHITE_DEFAULT );
@@ -122,8 +124,6 @@ void KeyboardScheme::auto_draw() noexcept/*{{{*/
 
 void Orchestra::update() noexcept/*{{{*/
 {
-	variacion = info->variacion_inicial;
-
 	variacion_text_box.set_text( "Variacion " + std::to_string( variacion + 1 ) +
 								" de " + std::to_string( info->n_variaciones ) );
 	vi_field.set_content( std::to_string( info->variacion_inicial ) );
@@ -273,9 +273,16 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					update();
 
 					if ( cursor[Y] == -1 ) { // si está hasta arriba
-						info->variacion[ variacion + 1 ].etiqueta = temp_word; // guardamos
-						temp_word = info->variacion[ variacion ].etiqueta; // copiamos nuevo
-					cursor[X] <= 1 ? vi_field.set_cursor() : etiqueta_field.set_cursor();
+						if ( cursor[X] <= 1 ) {
+							vi_field.set_content( std::to_string( info->variacion_inicial ) );
+							info->variacion_inicial = std::stoi( temp_word );
+							vi_field.set_cursor();
+						}
+						else {
+							info->variacion[ variacion + 1 ].etiqueta = temp_word; // guardamos
+							temp_word = info->variacion[ variacion ].etiqueta; // copiamos nuevo
+							etiqueta_field.set_cursor();
+						}
 					}
 					else
 						switch ( cursor[X] ) {
@@ -325,10 +332,17 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				if ( variacion < info->n_variaciones - 1 ) {
 					++variacion;
 					update();
-					if ( cursor[ Coordinates::Y ] == -1 ) {
-						info->variacion[ variacion - 1 ].etiqueta = temp_word; // guardamos
-						temp_word = info->variacion[ variacion ].etiqueta;
-						cursor[X] <= 1 ? vi_field.set_cursor() : etiqueta_field.set_cursor();
+					if ( cursor[Y] == -1 ) { // si está hasta arriba
+						if ( cursor[X] <= 1 ) {
+							info->variacion_inicial = std::stoi( temp_word );
+							vi_field.set_content( std::to_string( info->variacion_inicial ) );
+							vi_field.set_cursor();
+						}
+						else {
+							info->variacion[ variacion - 1 ].etiqueta = temp_word; // guardamos
+							temp_word = info->variacion[ variacion ].etiqueta; // copiamos nuevo
+							etiqueta_field.set_cursor();
+						}
 					}
 					else
 						switch ( cursor[ Coordinates::X ] ) {
@@ -945,7 +959,8 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					if ( cursor[Y] == -1 ) {
 						sprintf( tecla_c_string, "%c", tecla );
 						temp_word = temp_word + tecla_c_string;
-						etiqueta_field.set_content( temp_word );
+						cursor[X] <= 1 ?	vi_field.set_content( temp_word ) :
+											etiqueta_field.set_content( temp_word );
 					}
 					else switch ( cursor[X] ) {
 						case 1:

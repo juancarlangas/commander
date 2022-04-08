@@ -48,7 +48,7 @@ void Database::clean_row(int line)/*{{{*/
 void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 {
 	activeRows = n_canciones = Files::contar_lineas( _Path );
-	base = new struct System[ activeRows ]();
+	base = new struct System[ 1000 ]();
 
 	std::ifstream archivo{ _Path };
 	if ( archivo.fail() ) {

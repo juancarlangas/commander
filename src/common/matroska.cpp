@@ -53,7 +53,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 15: if ( windowMode == MODE_DISPLAY ) comando = EDIT_ORCHESTRATION; break; //<C-O>
 		case 520: if (windowMode == MODE_DISPLAY) comando = DELETE_VALUE; break; //<C-Supr>
 		case 3: if ( windowMode == MODE_DISPLAY ) comando = COPY_ORCHESTRATION; break; // <C-C>
-		case 16: if ( windowMode == MODE_DISPLAY ) comando = PASTE_ORCHESTRATION; break; // <C-P>
+		case 22: if ( windowMode == MODE_DISPLAY ) comando = PASTE_ORCHESTRATION; break; // <C-P>
 		case '+': if (windowMode == MODE_DISPLAY && dIndex >= 0) comando = ADD; break;
 		case 27: comando = ESCAPE; break;
 		case '\t': comando = CHANGE_WINDOW; break;
