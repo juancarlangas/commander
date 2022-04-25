@@ -21,7 +21,7 @@ Orchestra::Orchestra() :/*{{{*/
 					{ CYAN_DEFAULT, "Bold" },
 					{ RED_DEFAULT, "Bold" },
 					{ YELLOW_DEFAULT, "Regular" },
-					{ CYAN_DEFAULT, "Regular " } } },
+					{ CYAN_DEFAULT, "Regular" } } },
 	cursor_font { WHITE_DEFAULT, "Bold" },
 	MIDI_font { GREEN_DEFAULT, "Bold" },
 	dimmed_font { GRAY_DEFAULT, "Bold" }
