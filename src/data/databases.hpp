@@ -2,6 +2,7 @@
 #define DATABASES_HPP
 
 #include "../common/common.hpp"
+#include "../data/combinations.hpp"
 
 #include <string>
 #include <string_view>
@@ -57,9 +58,11 @@ struct System {
 class Database {
 	public:
 		Database();
+		Database( const std::string & ) noexcept;
+		Database( const std::string &, Combinations *_CombinationPtr ) noexcept;
 		~Database();
-		int get_activeRows(const char *,const char *);
 		void cargar( const std::string & ) noexcept;
+		int32_t get_activeRows() noexcept;
 		void cargar_especifico( const std::string &, int32_t ) noexcept;
 		void clonar_to_old( Database & ) noexcept;
 		void add_value(System);
@@ -79,6 +82,7 @@ class Database {
 		const char *homedir;
 		struct System *favorito[ N_FAVORITOS ];
 		void fill_favourites() noexcept;
+		Combinations *combinationsPtr;
 	};
 
 #endif

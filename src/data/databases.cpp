@@ -19,13 +19,32 @@
 #include "common/string.hpp"
 #include "utilities/src/files.hpp"
 
-Database::Database() : activeRows( 0 )/*{{{*/
+Database::Database() :/*{{{*/
+		activeRows( 0 ),
+		n_canciones( 0 )
 {
-	n_canciones = activeRows;
-
 	// homedir
 	if ((homedir = getenv("HOME")) == NULL)
 		homedir = getpwuid(getuid())->pw_dir;
+}/*}}}*/
+
+Database::Database( const std::string &_Path ) noexcept/*{{{*/
+{
+	// homedir
+	if ((homedir = getenv("HOME")) == NULL)
+		homedir = getpwuid(getuid())->pw_dir;
+
+	cargar( _Path );
+}/*}}}*/
+
+Database::Database( const std::string &_Path, Combinations *_CombinationsPtr ) noexcept :/*{{{*/
+	combinationsPtr( _CombinationsPtr )
+{
+	// homedir
+	if ((homedir = getenv("HOME")) == NULL)
+		homedir = getpwuid(getuid())->pw_dir;
+
+	cargar( _Path );
 }/*}}}*/
 
 Database::~Database()/*{{{*/
@@ -359,6 +378,11 @@ void Database::cargar_especifico( const std::string &_Path, int32_t _Indice ) no
 	}
 }/*}}}*/
 
+int32_t Database::get_activeRows() noexcept/*{{{*/
+{
+	return n_canciones;
+}/*}}}*/
+
 void Database::escribir( const std::string &_Path ) noexcept/*{{{*/
 {
 	std::ofstream archivo{ _Path };
@@ -430,9 +454,35 @@ void Database::escribir( const std::string &_Path ) noexcept/*{{{*/
 	archivo.close();
 }/*}}}*/
 
-void Database::add_value(System row)/*{{{*/
+void Database::add_value( System row )/*{{{*/
 {
-	base[activeRows++] = row;
+	base[activeRows] = row;
+
+	// C++ values
+	base[activeRows].titulo = base[activeRows].title;
+	base[activeRows].artista = base[activeRows].artist;
+	base[activeRows].genero = base[activeRows].genre;
+	base[activeRows].mood = base[activeRows].section;
+	base[activeRows].key_words = base[activeRows].keywords;
+	base[activeRows].tipo = base[activeRows].type;
+
+	// extras
+	base[activeRows].n_variaciones = 1;
+	base[activeRows].variacion_inicial = 0;
+
+	base[activeRows].variacion[0].etiqueta = "Label";
+
+	for ( int32_t i = 0; i < 8; ++i ) {
+		base[activeRows].instrumento[i] =
+			combinationsPtr->get_instrument_name( row.bnk, row.num, i );
+		base[activeRows].variacion[0].track[i].status = Switch::OFF;
+		base[activeRows].variacion[0].track[i].volume = 100;
+		base[activeRows].variacion[0].track[i].transposition = 0;
+		base[activeRows].variacion[0].track[i].lower_key = 36;
+		base[activeRows].variacion[0].track[i].upper_key = 96;
+	}
+
+	n_canciones = ++activeRows;
 }/*}}}*/
 
 void Database::edit_value(int line, System row)/*{{{*/
@@ -446,7 +496,7 @@ void Database::delete_value( int line )/*{{{*/
 		base[i] = base[i + 1];
 
 	clean_row( activeRows-- );
-	--n_canciones;
+	n_canciones = activeRows;
 }/*}}}*/
 
 void Database::ordenate()/*{{{*/

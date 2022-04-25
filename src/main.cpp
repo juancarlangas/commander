@@ -22,10 +22,11 @@ int32_t main()
 
 	Combinations combinaciones { config_directory + "/combinaciones.csv" };
 
-	Database dBase[1];	// C++ Object
+	Database dBase[1]{ { config_directory + "/catalogo.csv", &combinaciones } };
+
 	int dbRows[1];
-	dbRows[COMBINATIONS] = Files::contar_lineas( config_directory + "/catalogo.csv" );
-    dBase[COMBINATIONS].cargar( config_directory + "/catalogo.csv" );/*}}}*/
+	dbRows[COMBINATIONS] = dBase[COMBINATIONS].get_activeRows();
+/*}}}*/
 
 	// Tables{{{
 	System **displayTable = new System *[ dbRows[COMBINATIONS] ](); // arreglo de apuntadores
@@ -497,6 +498,10 @@ int32_t main()
 					dBase[mode].ordenate();
 				}
 
+				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
+				llenado_displayTable(
+						displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches );
+
 				draw_windows();
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;
@@ -505,6 +510,7 @@ int32_t main()
 				updateWindow[COMPUTER] 	= true;
 				updateWindow[DIGITS]	= true;
 				updateWindow[ZOOM]		= true;	
+
 
 				break;
 			}/*}}}*/
@@ -526,6 +532,8 @@ int32_t main()
 				updateWindow[COMPUTER] 	= true;
 				updateWindow[DIGITS]	= true;
 				updateWindow[ZOOM]		= true;	
+
+				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
 
 				break;
 			}/*}}}*/
@@ -608,8 +616,6 @@ int32_t main()
 					}
 				}
 				break;/*}}}*/
-
-
 
 			case TOGGLE_MIDI_STATE:/*{{{*/
 				x50.toggle_MIDI_state();

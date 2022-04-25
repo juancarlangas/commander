@@ -10,7 +10,8 @@ class Combinations {
 		Combinations( const std::string & );
 		~Combinations();
 		void escribir( const std::string & ) noexcept;
-		std::string get_instrument_name( const char &, const int16_t &, const int16_t & ) noexcept;
+		std::string get_instrument_name(
+				const char &_Banco, const int16_t &_Num, const int16_t &_Track ) noexcept;
 		void set_instrument_name( const char &, const int16_t &, const int16_t &,
 				const std::string_view )
 			noexcept;
