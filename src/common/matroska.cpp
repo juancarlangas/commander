@@ -28,7 +28,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 					comando = ESCAPE;
 			}
 
-			else if (strstr(":wpl", cadena) != NULL && strstr(cadena, ":wpl") != NULL)
+			else if (strstr(":save", cadena) != NULL && strstr(cadena, ":wpl") != NULL)
 				comando = SAVE_PLAYLIST;
 
 			else if (strstr(":load", cadena) != NULL && strstr(cadena, ":load") != NULL)
