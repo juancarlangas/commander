@@ -43,6 +43,9 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 			else if ( strcmp( ":q", cadena ) == 0 )
 				comando = EXIT;
 
+			else if ( strcmp( ":wq", cadena ) == 0 )
+				comando = EXPORTATE_AND_QUIT;
+
 			else
 				comando = INTRO;
 

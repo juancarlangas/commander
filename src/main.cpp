@@ -640,6 +640,16 @@ int32_t main()
 				updateWindow[ZOOM]		= true;
 				updateWindow[PLAYLIST]	= true;
 
+				break;/*}}}*/
+
+			case EXPORTATE_AND_QUIT :/*{{{*/
+				// Esta madrola hace lo básico del EXPORTATE y diréctamente modifica
+				// el command para que el while saque a la chingada el programa
+				dBase[COMBINATIONS].escribir( config_directory + "/catalogo.csv" );
+				combinaciones.escribir( config_directory + "/combinaciones.csv" );
+
+				command = EXIT;
+
 				break;
 
 			default:
@@ -684,9 +694,10 @@ int32_t main()
 			if ( command == FAVOURITE and x50.is_connected() )
 				x50.set_program( *buffer );/*}}}*/
 
-		command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
+		if ( command != EXIT ) // Que no eche a perder el :wq
+			command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
 
-	} while (command != EXIT);/*}}}*/
+	} while ( command != EXIT );/*}}}*/
 
 	// Ending{{{
 	if ( x50.get_MIDI_state() == Switch::ON )

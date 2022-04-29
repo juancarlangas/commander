@@ -37,7 +37,8 @@ enum matroska/*{{{*/
 		EXPORTATE,
 		SELECT_PART,
 		TOGGLE_MIDI_STATE,
-		EXIT				};/*}}}*/
+		EXIT,
+		EXPORTATE_AND_QUIT };/*}}}*/
 
 enum matroska get_command(	const int digit,
 							const short mode, short windowMode,
