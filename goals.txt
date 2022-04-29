@@ -1,0 +1,39 @@
+- Numbers in sounds on Orchestration
+
+- New combinations databases. The old combinations.csv will be called repertorio.csv
+
+- Save with CTRL-E at the fly with no need to loose the query.
+
+- Coloring keyboard while changing the faders.
+
+- Modulator Wheel Check Box or Value Box per instrument and per variation
+
+- The Orchestration editor now return to the DEFAULT variation (as is specified in the database)
+when it comes from a new patch, instead of returning to the same.
+
+- std::vector based Database
+
+- The posibility of moving cursor not mathematically but graphically (the cursor will move
+down and up to the nearest fader ( not the relative ).
+
+- Fix error volume not showing while modifyng insrument name
+
+- Fix reseting dislplayTable when saving
+
+- Auxilio, no funciona el movimiento de faders
+
+- Fixing error not sensibuilizing mayúsuycal
+
+- Números a los canales padre
+
+- Implementar límites en los valores
+
+- Cuando se abre la orquestación debe de aparecer en la vigente, no en la 1
+
+- Función Copy from
+
+- Fixing of showing legends like "Orchestration 1 of 0"
+
+- Fixing of volume value loosing clor
+
+- Autoupdate when editing a tag

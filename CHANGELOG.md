@@ -75,17 +75,15 @@ Reached, Thanks to GOD!
 
 - Writing compound instrument names O.K.
 
-- Fixing of losing index when selects a Favourite by pressing number keys. EXCELENT!!!! GAD!!!
+- Fixing of losing index when selects a Favourite by pressing number keys.
+
+- Selecting a Favourite backwards.
 
 - Fixing of showing legends like "Orchestration 1 of 0"
-
-- Copy and paste all Orchestra Data from one song to another from DisplayWindow
 
 - Fixing of volume value loosing clor
 
 - Autoupdate when editing a tag
-
-- Nasty playlist error!
 
 Korg 4.7.3
 ==========
