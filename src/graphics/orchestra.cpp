@@ -78,7 +78,7 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 
 	for ( int32_t i = 0; i < 8; ++i ) {
 		status_field[i].init( y_starting_point + i, _Xpos + 2,
-				native_font[ i ], dimmed_font, cursor_font );
+				native_font[ i ], dimmed_font, cursor_font, i + 49 /*ASCII*/ );
 		status_field[i].update();
 
 		instrument_field[i].init( 1, 32, y_starting_point + i, _Xpos + 5,
