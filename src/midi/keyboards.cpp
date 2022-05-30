@@ -7,11 +7,10 @@
 #include "midi/keyboards.hpp"
 #include <ncurses.h>
 
-enum Switch MIDI = Switch::OFF;
-
 Keyboard::Keyboard() :/*{{{*/
 	device( NULL ),
-	port( "hw:1,0,0" )
+	port( "hw:1,0,0" ),
+	MIDI( Switch::OFF )
 {
 	*name = '\0';
 	activeMode = false;
