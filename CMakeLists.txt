@@ -30,6 +30,7 @@ ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/databases.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/files.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/tables.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/playlist.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/math.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/string.cpp"
 	"/home/juancarlangas/Programming/lib/utilities/src/files.cpp" )

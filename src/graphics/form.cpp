@@ -16,6 +16,8 @@ Form::Form()/*{{{*/
 	box(window, 0, 0);
 	mvwprintw(window, 0, 20, " Editar song ");
 
+	field = new Field[ 10 ]();
+
 	field[TITLE].create(	"Title", 3, x * 110 / 200, y * 40 / 200, x * 45 / 200, 
 								STRING, LONG_STRING);
 	field[ARTIST].create(	"Artist", 3, x * 110 / 200, y * 65 / 200, x * 45 / 200,
@@ -194,3 +196,8 @@ void Form::hide()/*{{{*/
 	::update_panels();
 	::doupdate();
 }/*}}}*/
+
+Form::~Form()
+{
+	delete [] field;
+}

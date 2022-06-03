@@ -28,12 +28,13 @@ enum Action {
 class Form {
 public:
 	Form();
+	~Form();
 	bool capture_value();
 	bool capture_value(System);
 	System get_value();
 private:
 	System row;
-	Field field[10];
+	Field *field;
 	short activeField;
 	short cursor;
 	Action action;

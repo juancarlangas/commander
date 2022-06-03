@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 
-int load_playlist(System plArray[], const char* file_name)
+int load_playlist(System plArray[], const char* file_name)/*{{{*/
 {
 	FILE *cfPointer;
 
@@ -34,9 +34,9 @@ int load_playlist(System plArray[], const char* file_name)
 	fclose(cfPointer);
 
 	return rows;
-}
+}/*}}}*/
 
-void save_playlist(System plArray[], const int plRows, const char* file_name)
+void save_playlist(System plArray[], const int plRows, const char* file_name)/*{{{*/
 {
 	FILE *cfPointer;
 
@@ -55,10 +55,10 @@ void save_playlist(System plArray[], const int plRows, const char* file_name)
 	fclose(cfPointer);
 
 	sprintf(path, "%s/.commander/Playlists/%s.cpl", homedir, file_name);
-	cfPointer = fopen(path, "w");
-		for (i = 0; i <= plRows - 1; i++)
-			fwrite(&(plArray[i]), sizeof(System), 1, cfPointer);
+	cfPointer = fopen( path, "w" );
+		for ( i = 0; i <= plRows - 1; ++i )
+			fwrite( &(plArray[i]) , sizeof(System), 1, cfPointer);
 	fclose(cfPointer);
 
 	return;
-}
+}/*}}}*/
