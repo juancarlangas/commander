@@ -22,6 +22,7 @@
 #include "data/tables.hpp"
 #include "data/combinations.hpp"
 #include "data/databases.hpp"
+#include "data/playlist.hpp"
 #include "data/files.hpp"
 #include "utilities/src/files.hpp"
 #include "graphics/colors.hpp"

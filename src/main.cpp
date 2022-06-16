@@ -33,6 +33,8 @@ int32_t main()
 	System *playlistTable = new System [ dbRows[COMBINATIONS] ](); // arreglo de copias
 	System *buffer, *orch_clipboard_ptr; // apuntadores simple
 
+	Playlist *playlist = new Playlist( "/home/juancarlangas/.commander/Playlists/default.cpl" );
+
 	int32_t n_matches;
 	int32_t dIndex { 0 }; // Absolute selected index of the whole displayTable
 	int32_t dTop { 0 }; // Absolute on-window-top index of the whole displayTable
@@ -704,6 +706,8 @@ int32_t main()
 		x50.disconnect();
 
 	endwin();
+
+	delete playlist;
 
 	delete [] displayTable;
 	buffer = NULL;
