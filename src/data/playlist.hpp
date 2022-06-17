@@ -15,6 +15,7 @@ struct Pista {
 class Playlist {
 	public:
 		Playlist( const std::string &_Path );
+		void cargar( const std::string &_Path ) noexcept;
 		~Playlist();
 	private:
 		std::array<struct Pista, MAXIMO_DE_CANCIONES> pista;

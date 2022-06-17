@@ -4,6 +4,11 @@
 
 Playlist::Playlist( const std::string &_Path )/*{{{*/
 {
+	cargar( _Path );
+}/*}}}*/
+
+void Playlist::cargar( const std::string &_Path ) noexcept/*{{{*/
+{
 	n_pistas = Files::contar_lineas( _Path );
 
 	std::ifstream archivo { _Path };
