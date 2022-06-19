@@ -1,5 +1,6 @@
 #include "playlist.hpp"
 #include "databases.hpp"
+#include <cstdint>
 #include <fstream>
 
 Playlist::Playlist( const std::string &_Path )/*{{{*/
@@ -39,6 +40,30 @@ void Playlist::cargar( const std::string &_Path ) noexcept/*{{{*/
 		}
 	}
 	archivo.close();
+}/*}}}*/
+
+void Playlist::agregar( struct System * const &_Cancion ) noexcept/*{{{*/
+{
+	pista[ n_pistas ].titulo = _Cancion->titulo;
+	pista[ n_pistas ].artista = _Cancion->artista;
+	pista[ n_pistas ].row_ptr = _Cancion;
+
+	++n_pistas;
+}/*}}}*/
+
+int32_t Playlist::get_n_pistas() noexcept/*{{{*/
+{
+	return n_pistas;
+}/*}}}*/
+
+const std::string &Playlist::get_titulo( const int32_t &_Index ) noexcept/*{{{*/
+{
+	return pista[ _Index ].titulo;
+}/*}}}*/
+
+const std::string &Playlist::get_artista( const int32_t &_Index ) noexcept/*{{{*/
+{
+	return pista[ _Index ].titulo;
 }/*}}}*/
 
 Playlist::~Playlist() {}

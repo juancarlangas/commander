@@ -4,6 +4,7 @@
 #include "../common/common.hpp"
 #include "colors.hpp"
 #include "../data/databases.hpp"
+#include "data/playlist.hpp"
 
 extern const char *get_digit(char, short int);
 
@@ -88,6 +89,40 @@ void print_playlist(	WINDOW *window,/*{{{*/
 	}
 
 	wrefresh(window);
+	
+	return;
+}/*}}}*/
+
+void print_playlist( WINDOW *_WindowPtr, const int32_t &_Top, const int &_IndexA,/*{{{*/
+					const int &_IndexB,
+					Playlist &_PlaylistRef, const short int &_WinMode ) noexcept
+{
+	int32_t i;
+	short int row = 1;
+
+	wclear( _WindowPtr );
+	
+	for ( i = _Top;
+		( i <= _Top + playlistShowResults - 1 ) && ( i < _PlaylistRef.get_n_pistas() );
+		++i) {
+		if ( ( ( i <= _IndexB && i >= _IndexA ) || ( i >= _IndexB && i <= _IndexA ) ) &&
+				_WinMode == 2) { /*resaltado*/
+			wattron( _WindowPtr, COLOR_PAIR(WHITE_DEFAULT) );
+			wattron( _WindowPtr, A_REVERSE);
+			mvwprintw( _WindowPtr, row, 1, "%2d. ", i + 1);
+			mvwprintw( _WindowPtr, row++, 5, "%-30s", _PlaylistRef.get_titulo( i ).c_str() );
+			wattroff( _WindowPtr, A_REVERSE);
+		}
+		else {
+			wattron( _WindowPtr, COLOR_PAIR(GRAY_DEFAULT));
+			wattron( _WindowPtr, A_BOLD);
+			mvwprintw( _WindowPtr, row, 1, "%2d. ", i + 1);
+			wattron( _WindowPtr, COLOR_PAIR(WHITE_DEFAULT ) );
+			mvwprintw( _WindowPtr, row++, 5, "%-30s", _PlaylistRef.get_titulo( i ).c_str() );
+		}
+	}
+
+	wrefresh( _WindowPtr );
 	
 	return;
 }/*}}}*/

@@ -4,6 +4,7 @@
 #include "../common/common.hpp"
 #include "../data/combinations.hpp"
 
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <array>

@@ -1,6 +1,7 @@
 #include "main.hpp"
 #include "common/common.hpp"
 #include "common/matroska.hpp"
+#include "graphics/printing.hpp"
 
 int32_t main()
 {
@@ -275,11 +276,17 @@ int32_t main()
 				break;/*}}}*/
 
 			case ADD:/*{{{*/
-				playlistTable[(plRows)++] = *displayTable[dIndex];
-				if (plRows > plTop + playlistShowResults)
-					(plTop)++;
+				/*
+				// Old method
+					playlistTable[(plRows)++] = *displayTable[dIndex];
+					if (plRows > plTop + playlistShowResults)
+						(plTop)++;
 
-				save_playlist(playlistTable, plRows, "default");
+					save_playlist(playlistTable, plRows, "default");
+				*/
+
+				// New method
+					playlist->agregar( displayTable[ dIndex ] );
 
 
 				updateWindow[PLAYLIST] = true;
@@ -663,9 +670,11 @@ int32_t main()
 			print_displayTable(	displayWindow, 	displayTable,
 								dTop, 	n_matches, 	dIndex, winMode);
 
-		if (updateWindow[PLAYLIST] == true)
-			print_playlist(	playlistWindow, playlistTable,
-							plTop, 	plRows, plIndexA, plIndexB, winMode);
+		if (updateWindow[PLAYLIST] == true) {
+			//print_playlist(	playlistWindow, playlistTable,
+			//				plTop, 	plRows, plIndexA, plIndexB, winMode);
+			print_playlist(	playlistWindow, plTop, plIndexA, plIndexB, *playlist, winMode);
+		}
 
 		if (updateWindow[SEARCH] == true)
 			print_search(searchWindow, keyword);
