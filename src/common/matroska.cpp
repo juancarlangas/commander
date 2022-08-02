@@ -58,7 +58,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 520: if (windowMode == MODE_DISPLAY) comando = DELETE_VALUE; break; //<C-Supr>
 		case 3: if ( windowMode == MODE_DISPLAY ) comando = COPY_ORCHESTRATION; break; // <C-C>
 		case 22: if ( windowMode == MODE_DISPLAY ) comando = PASTE_ORCHESTRATION; break; // <C-P>
-		case '+': if (windowMode == MODE_DISPLAY && dIndex >= 0) comando = ADD; break;
+		case '+': if (windowMode == MODE_DISPLAY && dIndex >= 0) comando = ADD_TO_PLAYLIST; break;
 		case 27: comando = ESCAPE; break;
 		case '\t': comando = CHANGE_WINDOW; break;
 		case KEY_UP: case KEY_DOWN: comando = MOVE_INDEX; break;
@@ -67,7 +67,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 566: comando = DRAG_UP; break;
 		case 525: comando = DRAG_DOWN; break;
 		case KEY_DC: if (windowMode == MODE_PLAYLIST) comando = SUPR; break;
-		case KEY_BACKSPACE: if (ci > 0) comando = DEL; break; // BACKSPACE
+		case KEY_BACKSPACE: case 8: if (ci > 0) comando = DEL; break; // BACKSPACE
 		case 17: comando = EXIT; break;
 
 		default:

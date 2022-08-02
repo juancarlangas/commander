@@ -674,7 +674,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 				break;/*}}}*/
 
-			case KEY_BACKSPACE :/*{{{*/
+			case KEY_BACKSPACE : case 8:/*{{{*/
 				// Etiqeta
 				if ( cursor[ Coordinates::Y ] == -1 ) {
 					temp_word = temp_word.substr( 0, temp_word.length() - 1 );

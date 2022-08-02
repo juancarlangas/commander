@@ -51,6 +51,14 @@ void Playlist::agregar( struct System * const &_Cancion ) noexcept/*{{{*/
 	++n_pistas;
 }/*}}}*/
 
+void Playlist::eliminar( const int32_t &_Index ) noexcept/*{{{*/
+{
+	for ( int32_t i = _Index; i < n_pistas - 1; ++i ) // succión
+		pista[ i ] = pista[ i + 1 ];
+
+	--n_pistas;
+}/*}}}*/
+
 int32_t Playlist::get_n_pistas() noexcept/*{{{*/
 {
 	return n_pistas;

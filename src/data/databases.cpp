@@ -227,6 +227,8 @@ void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 		strcpy( base[i].type,		base[i].tipo.c_str() );
 	}
 
+	delete_duplicated();
+
 	// Favoritos{{{
 	int32_t i { 0 };
 	int16_t favoritos_leidos { 0 };
@@ -610,6 +612,17 @@ void Database::ordenate()/*{{{*/
 				}
 			}
 		}
+}/*}}}*/
+
+void Database::delete_duplicated() noexcept/*{{{*/
+{
+	int32_t i, j;
+	for ( i = 0; i < n_canciones - 1; ++i )
+		for ( j = i + 1; j < n_canciones; ++j )
+			if ( ( base[i].titulo == base[j].titulo ) and ( base[i].artista == base[j].artista ) ) {
+				delete_value( i );
+				--n_canciones;
+			}
 }/*}}}*/
 
 struct System Database::get_cancion( const int _Index ) noexcept/*{{{*/

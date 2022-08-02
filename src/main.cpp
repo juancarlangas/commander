@@ -226,7 +226,7 @@ int32_t main()
 
 			case CHANGE_WINDOW:/*{{{*/
 
-				if (winMode == MODE_DISPLAY && plRows > 0) {
+				if (winMode == MODE_DISPLAY && playlist->get_n_pistas() > 0) {
 					winMode = MODE_PLAYLIST;
 					if (plIndexA < plTop && plIndexB < plTop) {// <-- Que no se quede volando
 						plIndexA = plTop;
@@ -264,7 +264,7 @@ int32_t main()
 							updateWindow[DISPLAY] = true;
 							break;
 						case MODE_PLAYLIST:
-							increase_index(&plTop, plRows, &plIndexB, winMode);
+							increase_index(&plTop, playlist->get_n_pistas(), &plIndexB, winMode);
 							plIndexA = plIndexB;
 							updateWindow[PLAYLIST] = true;
 							break;
@@ -275,36 +275,26 @@ int32_t main()
 
 				break;/*}}}*/
 
-			case ADD:/*{{{*/
-				/*
-				// Old method
-					playlistTable[(plRows)++] = *displayTable[dIndex];
-					if (plRows > plTop + playlistShowResults)
-						(plTop)++;
+			case ADD_TO_PLAYLIST:/*{{{*/
+				playlist->agregar( displayTable[ dIndex ] );
 
-					save_playlist(playlistTable, plRows, "default");
-				*/
-
-				// New method
-					playlist->agregar( displayTable[ dIndex ] );
-
+				if ( playlist->get_n_pistas() > plTop + playlistShowResults )
+					--plTop;
 
 				updateWindow[PLAYLIST] = true;
 
 				break;/*}}}*/
 
 			case SUPR:/*{{{*/
-				for (i = plIndexA; i <= plRows - 1; i++)  //succión
-					playlistTable[i] = playlistTable[i + 1];
+				playlist->eliminar( plIndexA );
+
 				if (plIndexA == plRows - 1) { //fin de lista
 					decrease_index(&plTop, &plIndexA );
 					(plIndexB = plIndexA);
 				}
-				(plRows)--;
+				--plRows;
 
-				save_playlist(playlistTable, plRows, "default");
-
-				if (plRows == 0) { //cambio
+				if ( plRows == 0 ) { //cambio
 					winMode = MODE_DISPLAY;
 					updateWindow[DISPLAY] = true;
 				}

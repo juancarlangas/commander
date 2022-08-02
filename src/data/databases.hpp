@@ -70,7 +70,7 @@ class Database {
 		void edit_value(int, System);
 		void delete_value(int);
 		void ordenate();
-		void exportate(const char *);
+		void delete_duplicated() noexcept;
 		void clonar_from_old( Database & ) noexcept;
 		void escribir( const std::string & ) noexcept;
 		struct System get_cancion( const int ) noexcept;
