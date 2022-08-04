@@ -16,7 +16,7 @@ struct Pista {
 
 class Playlist {
 	public:
-		Playlist( const std::string &_Path );
+		Playlist( const std::string &_Path, Database *_Database_ptr );
 		void cargar( const std::string &_Path ) noexcept;
 		void agregar( struct System * const &_Cancion ) noexcept;
 		void eliminar( const int32_t &_Index ) noexcept;
@@ -27,6 +27,8 @@ class Playlist {
 	private:
 		std::array<struct Pista, MAXIMO_DE_CANCIONES> pista;
 		int32_t n_pistas;
+		Database *database_ptr;
+		void check_integrity() noexcept;
 };
 
 #endif

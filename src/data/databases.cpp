@@ -620,7 +620,7 @@ void Database::delete_duplicated() noexcept/*{{{*/
 	for ( i = 0; i < n_canciones - 1; ++i )
 		for ( j = i + 1; j < n_canciones; ++j )
 			if ( ( base[i].titulo == base[j].titulo ) and ( base[i].artista == base[j].artista ) ) {
-				delete_value( i );
+				delete_value( j );
 				--n_canciones;
 			}
 }/*}}}*/

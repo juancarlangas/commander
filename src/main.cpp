@@ -34,7 +34,8 @@ int32_t main()
 	System *playlistTable = new System [ dbRows[COMBINATIONS] ](); // arreglo de copias
 	System *buffer, *orch_clipboard_ptr; // apuntadores simple
 
-	Playlist *playlist = new Playlist( "/home/juancarlangas/.commander/Playlists/default.cpl" );
+	Playlist *playlist = new Playlist( "/home/juancarlangas/.commander/Playlists/default.cpl",
+										dBase );
 
 	int32_t n_matches;
 	int32_t dIndex { 0 }; // Absolute selected index of the whole displayTable
