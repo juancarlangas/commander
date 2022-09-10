@@ -2,7 +2,9 @@
 #include "databases.hpp"
 #include <cstdint>
 #include <fstream>
+#include <iostream>
 
+// Inicializa el puntero a la Base de datos e invoca cargar()
 Playlist::Playlist( const std::string &_Path, Database *_Database_ptr )/*{{{*/
 {
 	database_ptr = _Database_ptr;
@@ -11,56 +13,53 @@ Playlist::Playlist( const std::string &_Path, Database *_Database_ptr )/*{{{*/
 
 void Playlist::cargar( const std::string &_Path ) noexcept/*{{{*/
 {
-	n_pistas = Files::contar_lineas( _Path );
+	/* Lee línea por línea del archivo almacenando en un pequeño struct temporal
+	 * y luego revisa que esa combinación se encuentre en la base de datos;
+	 * si no se encuentra descarta dicha línea, de lo contrario la agrega al playlist */
 
 	std::ifstream archivo { _Path };
+	if ( archivo.fail() ) {
+		std::cerr << "No se pudo abrir " << _Path << " en contar_lineas()" << std::endl;
+		exit( EXIT_FAILURE );
+	}
+
 	std::string linea;
 	struct {
 		std::string titulo;
 		std::string artista;
 	} pista_temp;
 
-	int32_t i;
+	n_pistas = 0;
 
-	for ( int32_t n_linea = 0; n_linea < n_pistas; ++n_linea ) {
+	while( std::getline( archivo, linea ) ) {
+
 		// Titulo
-		std::getline( archivo, linea );
-		if ( linea.starts_with( '\"' ) ) { // Incluye comas
-			linea = linea.substr( 1 ); // Quitamos "
-			pista_temp.titulo = linea.substr( 0, linea.find_first_of( '\"' ) );
-			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
+		if ( linea.starts_with( '\"' ) ) { // si incluye comillas
+			linea = linea.substr( 1 ); // avanzamos 1
+			pista[n_pistas].titulo = linea.substr( 0, linea.find_first_of( '\"' ) );
+			linea = linea.substr( linea.find_first_of( '\"' ) + 2 ); // lo dejamos hasta el sig
 		}
 		else {
-			pista[n_linea].titulo = linea.substr( 0, linea.find_first_of( ',' ) );
-			pista_temp.titulo = linea.substr( linea.find_first_of( ',' ) + 1 );
+			pista[n_pistas].titulo = linea.substr( 0, linea.find_first_of( ',' ) );
+			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
 
 		// Artista
 		if ( linea.starts_with( '\"' ) ) { // Incluye comas
 			linea = linea.substr( 1 ); // Quitamos "
-			pista_temp.artista = linea.substr( 0, linea.find_first_of( '\"' ) );
+			pista[n_pistas].artista = linea.substr( 0, linea.find_first_of( '\"' ) );
 			linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
 		}
 		else {
-			pista_temp.artista = linea.substr( 0, linea.find_first_of( ',' ) );
+			pista[n_pistas].artista = linea.substr( 0, linea.find_first_of( ',' ) );
 			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
 		}
 
-		// Validación
-		i = 0;
-		while ( i < database_ptr->get_activeRows() and
-				pista_temp.titulo != database_ptr->get_cancion( i ).titulo and
-				pista_temp.artista != database_ptr->get_cancion( i ).artista )
-			++i;
-		if ( i < database_ptr->get_activeRows() ) { // found
-			pista[n_linea].titulo = pista_temp.titulo;
-			pista[n_linea].artista = pista_temp.artista;
-		}
-		else // not found
-			--n_pistas;
+		++n_pistas;
 	}
 
 	archivo.close();
+	sincronizar();
 }/*}}}*/
 
 void Playlist::agregar( struct System * const &_Cancion ) noexcept/*{{{*/
@@ -78,6 +77,47 @@ void Playlist::eliminar( const int32_t &_Index ) noexcept/*{{{*/
 		pista[ i ] = pista[ i + 1 ];
 
 	--n_pistas;
+}/*}}}*/
+
+void Playlist::guardar( const std::string &_Path) noexcept/*{{{*/
+{
+	std::ofstream archivo{ _Path };
+
+	if ( archivo.fail() ) {
+		std::cerr << "No s pudo abrir " + _Path + "en BaseDeDatos::cargar()" << std::endl;
+		exit( EXIT_FAILURE );
+	}
+
+	///////////////////////////////////// escritura ///////////////////////////////////////////
+	std::string delimitador;
+
+	for ( int32_t i = 0; i < n_pistas; ++i ) {
+		// Tags
+		delimitador = pista[i].titulo.find( ',' ) < pista[i].titulo.npos ? "\"" : "";
+		archivo << delimitador << pista[i].titulo << delimitador << ',';
+
+		delimitador = pista[i].artista.find( ',' ) < pista[i].artista.npos ? "\"" : "";
+		archivo << delimitador << pista[i].artista << delimitador << ',';
+	}
+
+	archivo.close();
+}/*}}}*/
+
+void Playlist::sincronizar() noexcept/*{{{*/
+{
+	int32_t i, j;
+
+	for ( i = 0; i < n_pistas; ++i ) {
+		j = 0;
+		while ( j < database_ptr->get_activeRows() and
+				pista[i].titulo != database_ptr->get_cancion(j).titulo and
+				pista[i].artista != database_ptr->get_cancion(j).artista )
+			++j;
+		if ( j < database_ptr->get_activeRows() ) // lo encontró -> anéxale el (nuevo) apuntador
+			pista[i].row_ptr = database_ptr->get_cancion_ptr(j);
+		else // elmimínala del playlist
+			eliminar( i );
+	}
 }/*}}}*/
 
 int32_t Playlist::get_n_pistas() noexcept/*{{{*/

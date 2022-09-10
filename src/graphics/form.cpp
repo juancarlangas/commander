@@ -1,3 +1,4 @@
+#include <curses.h>
 #include <stdlib.h>
 
 #include "form.hpp"
@@ -126,7 +127,7 @@ bool Form::capture()/*{{{*/
 				break;
 
 			default:
-				if ((key == 32) || (key >= 44 && key <= 122) || (key == 8)) // WRITE
+				if ((key == 32) || (key >= 44 && key <= 122) || (key == KEY_BACKSPACE)) // WRITE
 					if (field[activeField].process_key(key) == true) {
 						field[activeField].get_string(word);
 						switch (activeField) {

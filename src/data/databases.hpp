@@ -15,20 +15,20 @@
 
 enum Switch : bool { OFF = 0, ON };
 
-struct Track {
+struct Track {/*{{{*/
 	enum Switch status;
 	int16_t volume;
 	int16_t lower_key;
 	int16_t upper_key;
 	int16_t transposition;
-};
+};/*}}}*/
 
-struct Variacion {
+struct Variacion {/*{{{*/
 	std::string etiqueta;
 	struct Track track[ 8 ];
-};
+};/*}}}*/
 
-struct System {
+struct System {/*{{{*/
 	// C
 	char title[LONG_STRING];
 	char artist[LONG_STRING];
@@ -54,9 +54,9 @@ struct System {
 	int16_t variacion_inicial;
 	std::string instrumento[ 8 ];
 	struct Variacion variacion[ 16 ];
-};
+};/*}}}*/
 
-class Database {
+class Database {/*{{{*/
 	public:
 		Database();
 		Database( const std::string & ) noexcept;
@@ -74,6 +74,7 @@ class Database {
 		void clonar_from_old( Database & ) noexcept;
 		void escribir( const std::string & ) noexcept;
 		struct System get_cancion( const int ) noexcept;
+		struct System *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		struct System *get_favourite_row( const int32_t & ) noexcept;
 		System *base;
 	private:
@@ -84,6 +85,6 @@ class Database {
 		struct System *favorito[ N_FAVORITOS ];
 		void fill_favourites() noexcept;
 		Combinations *combinationsPtr;
-	};
+	};/*}}}*/
 
 #endif

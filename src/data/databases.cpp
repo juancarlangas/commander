@@ -630,6 +630,11 @@ struct System Database::get_cancion( const int _Index ) noexcept/*{{{*/
 	return base[ _Index ];
 }/*}}}*/
 
+struct System *Database::get_cancion_ptr( const int32_t &_Index ) noexcept/*{{{*/
+{
+	return base + _Index;
+}/*}}}*/
+
 struct System *Database::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
 {
 	return favorito[ _FavNumber ];

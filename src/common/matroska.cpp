@@ -29,13 +29,13 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 					comando = ESCAPE;
 			}
 
-			else if (strstr(":save", cadena) != NULL && strstr(cadena, ":wpl") != NULL)
+			else if ( !strcmp( cadena, ":wpl" ) )
 				comando = SAVE_PLAYLIST;
 
-			else if (strstr(":load", cadena) != NULL && strstr(cadena, ":load") != NULL)
+			else if ( !strcmp( cadena, ":lpl" ) )
 				comando = LOAD_PLAYLIST;
 
-			else if (strstr(":clear", cadena) != NULL && strstr(cadena, ":clear") != NULL)
+			else if ( !strcmp( cadena, ":cpl" ) )
 				comando = CLEAR_PLAYLIST;
 
 			else if (strstr(":w", cadena) != NULL && strstr(cadena, ":w") != NULL)
@@ -66,7 +66,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case KEY_RIGHT:	comando = NEXT_VARIATION; break;
 		case 566: comando = DRAG_UP; break;
 		case 525: comando = DRAG_DOWN; break;
-		case KEY_DC: if (windowMode == MODE_PLAYLIST) comando = SUPR; break;
+		case KEY_DC: if (windowMode == MODE_PLAYLIST) comando = DEL_FROM_PLAYLIST; break;
 		case KEY_BACKSPACE: case 8: if (ci > 0) comando = DEL; break; // BACKSPACE
 		case 17: comando = EXIT; break;
 

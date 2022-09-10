@@ -43,7 +43,7 @@ int32_t main()
 
 	int32_t plRows { 0 };
 	int32_t plTop = { 0 };
-	int32_t plIndexA = { 0 };
+	int32_t pl_index = { 0 };
 	int32_t plIndexB = { 0 };
 
 	char 	keyword[LONG_STRING] { "\0" };
@@ -146,6 +146,57 @@ int32_t main()
 
 				break;/*}}}*/
 
+			case READ_CHAR:/*{{{*/
+
+				// agregamos 1 letra al keyword
+				keyword[ charIndex++ ] = caracter;
+				keyword[ charIndex ] = '\0';
+
+				if (keyword[charIndex - 1] != -61) {	// si es acento o tilde esperamos
+														// la parte faltante
+					charIndex = no_accent(keyword, keyword); //clean
+
+					// Garantizamos que la última letra válida añadida sea minúscula
+					// keyword[ charIndex - 1 ] = std::tolower( keyword[ charIndex - 1 ] );
+
+					llenado_displayTable(	displayTable, dBase[mode].base,
+											dbRows[mode], keyword, &n_matches	);
+
+					if (winMode == MODE_PLAYLIST) {
+						winMode = MODE_DISPLAY;
+						updateWindow[PLAYLIST] = true;
+					}
+
+					if (keyword[0] != ':' || charIndex == 1)
+						updateWindow[ZOOM] = true;
+
+					updateWindow[LCD] 	  = true;
+					updateWindow[SEARCH]  = true;
+					updateWindow[DISPLAY] = true;
+
+				}
+				break;/*}}}*/
+
+			case DEL:/*{{{*/
+
+				charIndex--;
+				keyword[charIndex] = '\0';
+
+				llenado_displayTable(displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches);
+				
+				dTop = 0;
+				dIndex = 0;
+
+				updateWindow[0] = 1;
+				updateWindow[1] = 1;
+				updateWindow[2] = 1;
+				updateWindow[ZOOM] = true;
+
+				if (winMode == MODE_PLAYLIST)
+					winMode = MODE_DISPLAY;
+
+				break;/*}}}*/
+
 			case SET_VARIATION: {/*{{{*/
 				// la conversión de 1 a 9 es -48, pero por indice de arreglo restamos uno más
 				int32_t funcion_a_variacion = caracter - KEY_F0;
@@ -173,11 +224,11 @@ int32_t main()
 						buffer = displayTable[ dIndex ];
 						break;
 					case MODE_PLAYLIST:
-						buffer = &playlistTable[ plIndexA ];
+						buffer = &playlistTable[ pl_index ];
 						//avance carro
 						if ( plIndexB < plRows - 1 ) {
 							plIndexB++;
-							plIndexA = plIndexB;
+							pl_index = plIndexB;
 						}
 						updateWindow[PLAYLIST] = true;
 						updateWindow[ZOOM] = true;
@@ -229,8 +280,8 @@ int32_t main()
 
 				if (winMode == MODE_DISPLAY && playlist->get_n_pistas() > 0) {
 					winMode = MODE_PLAYLIST;
-					if (plIndexA < plTop && plIndexB < plTop) {// <-- Que no se quede volando
-						plIndexA = plTop;
+					if (pl_index < plTop && plIndexB < plTop) {// <-- Que no se quede volando
+						pl_index = plTop;
 						plIndexB = plTop;
 					}
 				}
@@ -253,7 +304,7 @@ int32_t main()
 							break;
 						case MODE_PLAYLIST:
 							decrease_index(&plTop, &plIndexB );
-							plIndexA = plIndexB;
+							pl_index = plIndexB;
 							updateWindow[PLAYLIST] = true;
 							break;
 					}
@@ -266,7 +317,7 @@ int32_t main()
 							break;
 						case MODE_PLAYLIST:
 							increase_index(&plTop, playlist->get_n_pistas(), &plIndexB, winMode);
-							plIndexA = plIndexB;
+							pl_index = plIndexB;
 							updateWindow[PLAYLIST] = true;
 							break;
 					}
@@ -275,6 +326,32 @@ int32_t main()
 				updateWindow[ZOOM]	= true;
 
 				break;/*}}}*/
+
+			case ADD_VALUE:/*{{{*/
+			{
+				Form forma;
+
+				if (forma.capture_value() == true) {
+					dBase[mode].add_value(forma.get_value());
+					dBase[mode].ordenate();
+				}
+
+				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
+				llenado_displayTable(
+						displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches );
+
+				draw_windows();
+				updateWindow[LCD]		= true;
+				updateWindow[SEARCH] 	= true;
+				updateWindow[DISPLAY]	= true;
+				updateWindow[PLAYLIST] 	= true;
+				updateWindow[COMPUTER] 	= true;
+				updateWindow[DIGITS]	= true;
+				updateWindow[ZOOM]		= true;	
+
+
+				break;
+			}/*}}}*/
 
 			case ADD_TO_PLAYLIST:/*{{{*/
 				playlist->agregar( displayTable[ dIndex ] );
@@ -286,16 +363,15 @@ int32_t main()
 
 				break;/*}}}*/
 
-			case SUPR:/*{{{*/
-				playlist->eliminar( plIndexA );
+			case DEL_FROM_PLAYLIST:/*{{{*/
+				playlist->eliminar( pl_index );
 
-				if (plIndexA == plRows - 1) { //fin de lista
-					decrease_index(&plTop, &plIndexA );
-					(plIndexB = plIndexA);
+				if ( pl_index == playlist->get_n_pistas() - 1 ) { //fin de lista
+					decrease_index( &plTop, &pl_index );
+					plRows = playlist->get_n_pistas();
 				}
-				--plRows;
 
-				if ( plRows == 0 ) { //cambio
+				if ( playlist->get_n_pistas() == 0 ) { //cambio
 					winMode = MODE_DISPLAY;
 					updateWindow[DISPLAY] = true;
 				}
@@ -305,32 +381,12 @@ int32_t main()
 
 				break;/*}}}*/
 
-			case DEL:/*{{{*/
-
-				charIndex--;
-				keyword[charIndex] = '\0';
-
-				llenado_displayTable(displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches);
-				
-				dTop = 0;
-				dIndex = 0;
-
-				updateWindow[0] = 1;
-				updateWindow[1] = 1;
-				updateWindow[2] = 1;
-				updateWindow[ZOOM] = true;
-
-				if (winMode == MODE_PLAYLIST)
-					winMode = MODE_DISPLAY;
-
-				break;/*}}}*/
-
 			case DRAG_UP: case DRAG_DOWN:/*{{{*/
 
-				if (winMode == MODE_PLAYLIST && caracter == 566 && plIndexB > 0) {
+				if ( winMode == MODE_PLAYLIST and caracter == 566 and plIndexB > 0) {
 					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
 					decrease_index(&plTop, &plIndexB );
-					plIndexA = plIndexB;
+					pl_index = plIndexB;
 					save_playlist(playlistTable, plRows, "default");
 					updateWindow[PLAYLIST] = true;
 				}
@@ -338,42 +394,11 @@ int32_t main()
 				else if (winMode == MODE_PLAYLIST && caracter == 525 && plIndexB < plRows - 1) {
 					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
 					increase_index(&plTop, plRows, &plIndexB, winMode);
-					plIndexA = plIndexB;
+					pl_index = plIndexB;
 					save_playlist(playlistTable, plRows, "default");
 					updateWindow[PLAYLIST] = true;
 				}
 				
-				break;/*}}}*/
-
-			case READ_CHAR:/*{{{*/
-
-				// agregamos 1 letra al keyword
-				keyword[ charIndex++ ] = caracter;
-				keyword[ charIndex ] = '\0';
-
-				if (keyword[charIndex - 1] != -61) {	// si es acento o tilde esperamos
-														// la parte faltante
-					charIndex = no_accent(keyword, keyword); //clean
-
-					// Garantizamos que la última letra válida añadida sea minúscula
-					// keyword[ charIndex - 1 ] = std::tolower( keyword[ charIndex - 1 ] );
-
-					llenado_displayTable(	displayTable, dBase[mode].base,
-											dbRows[mode], keyword, &n_matches	);
-
-					if (winMode == MODE_PLAYLIST) {
-						winMode = MODE_DISPLAY;
-						updateWindow[PLAYLIST] = true;
-					}
-
-					if (keyword[0] != ':' || charIndex == 1)
-						updateWindow[ZOOM] = true;
-
-					updateWindow[LCD] 	  = true;
-					updateWindow[SEARCH]  = true;
-					updateWindow[DISPLAY] = true;
-
-				}
 				break;/*}}}*/
 
 			case SAVE_PLAYLIST:/*{{{*/
@@ -488,32 +513,6 @@ int32_t main()
 				updateWindow[PLAYLIST]	= true;
 
 				break;/*}}}*/
-
-			case ADD_VALUE:/*{{{*/
-			{
-				Form forma;
-
-				if (forma.capture_value() == true) {
-					dBase[mode].add_value(forma.get_value());
-					dBase[mode].ordenate();
-				}
-
-				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
-				llenado_displayTable(
-						displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches );
-
-				draw_windows();
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;	
-
-
-				break;
-			}/*}}}*/
 
 			case DELETE_VALUE:/*{{{*/
 			{
@@ -663,8 +662,8 @@ int32_t main()
 
 		if (updateWindow[PLAYLIST] == true) {
 			//print_playlist(	playlistWindow, playlistTable,
-			//				plTop, 	plRows, plIndexA, plIndexB, winMode);
-			print_playlist(	playlistWindow, plTop, plIndexA, plIndexB, *playlist, winMode);
+			//				plTop, 	plRows, pl_index, plIndexB, winMode);
+			print_playlist(	playlistWindow, plTop, pl_index, plIndexB, *playlist, winMode);
 		}
 
 		if (updateWindow[SEARCH] == true)

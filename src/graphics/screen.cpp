@@ -14,13 +14,12 @@ void decrease_index( int *top, int *index )/*{{{*/
 	}
 }/*}}}*/
 
-void increase_index(	int *top, const int resultRows, int *index, 
+void increase_index(	int *top, const int resultRows, int *index, /*{{{*/
 						const short int winMode	)
 {
-	
 	short int showResults;
 
-	if (winMode == 1)
+	if ( winMode == 1 )
 		showResults = displayShowResults;
 	else
 		showResults = playlistShowResults;
@@ -32,7 +31,7 @@ void increase_index(	int *top, const int resultRows, int *index,
 	}
 
 	return;
-}
+}/*}}}*/
 
 void korg_drag(	System table[],
 				const int rows, const int indexUP, const int indexDOWN,
