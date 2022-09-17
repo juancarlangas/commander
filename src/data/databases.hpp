@@ -76,8 +76,6 @@ class Database {/*{{{*/
 		struct System get_cancion( const int ) noexcept;
 		struct System *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		struct System *get_favourite_row( const int32_t & ) noexcept;
-		const std::string &get_title_by_pointer( struct System *&_Pointer ) noexcept;
-		const std::string &get_artist_by_pointer( struct System *&_Pointer ) noexcept;
 		System *base;
 	private:
 		int32_t activeRows;
@@ -87,6 +85,8 @@ class Database {/*{{{*/
 		struct System *favorito[ N_FAVORITOS ];
 		void fill_favourites() noexcept;
 		Combinations *combinationsPtr;
+
+		friend class Playlist;
 	};/*}}}*/
 
 #endif

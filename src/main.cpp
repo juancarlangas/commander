@@ -534,9 +534,7 @@ int32_t main()
 				break;/*}}}*/
 
 			case ADD_TO_PLAYLIST:/*{{{*/
-				playlist->agregar(	dBase[0].get_title_by_pointer( displayTable[ dIndex ] ),
-									dBase[0].get_artist_by_pointer( displayTable[ dIndex ] ),
-									displayTable[ dIndex ] );
+				playlist->agregar( displayTable[ dIndex ] );
 
 				if ( playlist->get_n_pistas() > plTop + playlistShowResults )
 					--plTop;
