@@ -639,3 +639,13 @@ struct System *Database::get_favourite_row( const int32_t &_FavNumber ) noexcept
 {
 	return favorito[ _FavNumber ];
 }/*}}}*/
+		
+const std::string &Database::get_title_by_pointer( struct System *&_Pointer ) noexcept/*{{{*/
+{
+	return _Pointer->titulo;
+}/*}}}*/
+
+const std::string &Database::get_artist_by_pointer( struct System *&_Pointer ) noexcept/*{{{*/
+{
+	return _Pointer->artista;
+}/*}}}*/

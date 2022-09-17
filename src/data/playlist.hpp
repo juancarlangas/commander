@@ -21,7 +21,8 @@ class Playlist {
 		void cargar( const std::string &_Path ) noexcept;
 		void guardar( const std::string &_Path) noexcept;
 
-		void agregar( struct System * const &_Cancion ) noexcept;
+		void agregar(	const std::string &_Titulo, const std::string &_Artista,
+						struct System *&_Row_ptr ) noexcept;
 		void eliminar( const int32_t &_Index ) noexcept;
 		void sincronizar() noexcept;
 

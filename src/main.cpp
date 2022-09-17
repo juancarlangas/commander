@@ -353,167 +353,6 @@ int32_t main()
 				break;
 			}/*}}}*/
 
-			case ADD_TO_PLAYLIST:/*{{{*/
-				playlist->agregar( displayTable[ dIndex ] );
-
-				if ( playlist->get_n_pistas() > plTop + playlistShowResults )
-					--plTop;
-
-				updateWindow[PLAYLIST] = true;
-
-				break;/*}}}*/
-
-			case DEL_FROM_PLAYLIST:/*{{{*/
-				playlist->eliminar( pl_index );
-
-				if ( pl_index == playlist->get_n_pistas() - 1 ) { //fin de lista
-					decrease_index( &plTop, &pl_index );
-					plRows = playlist->get_n_pistas();
-				}
-
-				if ( playlist->get_n_pistas() == 0 ) { //cambio
-					winMode = MODE_DISPLAY;
-					updateWindow[DISPLAY] = true;
-				}
-				updateWindow[LCD] 	   = true;
-				updateWindow[PLAYLIST] = true;
-				updateWindow[ZOOM]	= true;
-
-				break;/*}}}*/
-
-			case DRAG_UP: case DRAG_DOWN:/*{{{*/
-
-				if ( winMode == MODE_PLAYLIST and caracter == 566 and plIndexB > 0) {
-					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
-					decrease_index(&plTop, &plIndexB );
-					pl_index = plIndexB;
-					save_playlist(playlistTable, plRows, "default");
-					updateWindow[PLAYLIST] = true;
-				}
-
-				else if (winMode == MODE_PLAYLIST && caracter == 525 && plIndexB < plRows - 1) {
-					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
-					increase_index(&plTop, plRows, &plIndexB, winMode);
-					pl_index = plIndexB;
-					save_playlist(playlistTable, plRows, "default");
-					updateWindow[PLAYLIST] = true;
-				}
-				
-				break;/*}}}*/
-
-			case SAVE_PLAYLIST:/*{{{*/
-
-				show_panel(panel[DIALOG_WINDOW]);
-				show_panel(panel[INPUT_BOX]);
-				update_panels();
-				doupdate();
-
-				echo();
-				wmove(ventana[INPUT_BOX], 0, 0);
-				curs_set(true);
-				noraw();
-
-					char file_name[40];
-					wscanw(ventana[INPUT_BOX], "%s", file_name);
-					save_playlist(playlistTable, plRows, file_name);
-
-				noecho();
-				wclear(ventana[INPUT_BOX]);
-				curs_set(false);
-				raw();
-
-				hide_panel(panel[DIALOG_WINDOW]);
-				hide_panel(panel[INPUT_BOX]);
-				update_panels();
-				doupdate();
-
-				for (k = 0; k <= LONG_STRING - 1; k++)
-					keyword[k] = '\0';
-
-				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
-
-				charIndex = 0;
-				dTop   = 0;
-				dIndex = 0;
-				winMode = MODE_DISPLAY;
-
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
-
-				break;/*}}}*/
-
-			case LOAD_PLAYLIST:/*{{{*/
-
-				show_panel(panel[DIALOG_WINDOW]);
-				show_panel(panel[INPUT_BOX]);
-				update_panels();
-				doupdate();
-
-				echo();
-				wmove(ventana[INPUT_BOX], 0, 0);
-				curs_set(true);
-				noraw();
-				{
-					char file_name[40];
-					wscanw(ventana[INPUT_BOX], "%s", file_name);
-					plRows = load_playlist(playlistTable, file_name);
-				}
-				noecho();
-				wclear(ventana[INPUT_BOX]);
-				curs_set(false);
-				raw();
-
-				hide_panel(panel[DIALOG_WINDOW]);
-				hide_panel(panel[INPUT_BOX]);
-				update_panels();
-				doupdate();
-
-				save_playlist(playlistTable, plRows, "default");
-
-				for (k = 0; k <= LONG_STRING - 1; k++)
-					keyword[k] = '\0';
-
-				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
-
-				charIndex = 0;
-				dTop   = 0;
-				dIndex = 0;
-				winMode = MODE_DISPLAY;
-
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
-
-				break;/*}}}*/
-
-			case CLEAR_PLAYLIST:/*{{{*/
-
-				plRows = 0;
-				save_playlist(playlistTable, plRows, "default");
-
-				for (k = 0; k <= LONG_STRING - 1; k++)
-					keyword[k] = '\0';
-
-				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
-
-				if (winMode == MODE_PLAYLIST)
-					winMode = MODE_DISPLAY;
-
-				charIndex = 0;
-				dTop   = 0;
-				dIndex = 0;
-				winMode = MODE_DISPLAY;
-
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
-
-				break;/*}}}*/
-
 			case DELETE_VALUE:/*{{{*/
 			{
 				// obtenemos el índice real en dBase al cual displayTable[dIndex] apunta
@@ -616,11 +455,6 @@ int32_t main()
 				}
 				break;/*}}}*/
 
-			case TOGGLE_MIDI_STATE:/*{{{*/
-				x50.toggle_MIDI_state();
-				updateWindow[ MIDI_STATE ] = true;
-				break;/*}}}*/
-
 			case EXPORTATE:/*{{{*/
 				dBase[COMBINATIONS].escribir( config_directory + "/catalogo.csv" );
 				combinaciones.escribir( config_directory + "/combinaciones.csv" );
@@ -652,6 +486,174 @@ int32_t main()
 				break;
 
 			default:
+				break;/*}}}*/
+
+			case LOAD_PLAYLIST:/*{{{*/
+
+				show_panel(panel[DIALOG_WINDOW]);
+				show_panel(panel[INPUT_BOX]);
+				update_panels();
+				doupdate();
+
+				echo();
+				wmove(ventana[INPUT_BOX], 0, 0);
+				curs_set(true);
+				noraw();
+				{
+					char file_name[40];
+					wscanw(ventana[INPUT_BOX], "%s", file_name);
+					plRows = load_playlist(playlistTable, file_name);
+				}
+				noecho();
+				wclear(ventana[INPUT_BOX]);
+				curs_set(false);
+				raw();
+
+				hide_panel(panel[DIALOG_WINDOW]);
+				hide_panel(panel[INPUT_BOX]);
+				update_panels();
+				doupdate();
+
+				save_playlist(playlistTable, plRows, "default");
+
+				for (k = 0; k <= LONG_STRING - 1; k++)
+					keyword[k] = '\0';
+
+				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
+
+				charIndex = 0;
+				dTop   = 0;
+				dIndex = 0;
+				winMode = MODE_DISPLAY;
+
+				updateWindow[SEARCH] 	= true;
+				updateWindow[DISPLAY]	= true;
+				updateWindow[ZOOM]		= true;
+				updateWindow[PLAYLIST]	= true;
+
+				break;/*}}}*/
+
+			case ADD_TO_PLAYLIST:/*{{{*/
+				playlist->agregar(	dBase[0].get_title_by_pointer( displayTable[ dIndex ] ),
+									dBase[0].get_artist_by_pointer( displayTable[ dIndex ] ),
+									displayTable[ dIndex ] );
+
+				if ( playlist->get_n_pistas() > plTop + playlistShowResults )
+					--plTop;
+
+				updateWindow[PLAYLIST] = true;
+
+				break;/*}}}*/
+
+			case DEL_FROM_PLAYLIST:/*{{{*/
+				playlist->eliminar( pl_index );
+
+				if ( pl_index == playlist->get_n_pistas() - 1 ) { //fin de lista
+					decrease_index( &plTop, &pl_index );
+					plRows = playlist->get_n_pistas();
+				}
+
+				if ( playlist->get_n_pistas() == 0 ) { //cambio
+					winMode = MODE_DISPLAY;
+					updateWindow[DISPLAY] = true;
+				}
+				updateWindow[LCD] 	   = true;
+				updateWindow[PLAYLIST] = true;
+				updateWindow[ZOOM]	= true;
+
+				break;/*}}}*/
+
+			case CLEAR_PLAYLIST:/*{{{*/
+
+				plRows = 0;
+				save_playlist(playlistTable, plRows, "default");
+
+				for (k = 0; k <= LONG_STRING - 1; k++)
+					keyword[k] = '\0';
+
+				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
+
+				if (winMode == MODE_PLAYLIST)
+					winMode = MODE_DISPLAY;
+
+				charIndex = 0;
+				dTop   = 0;
+				dIndex = 0;
+				winMode = MODE_DISPLAY;
+
+				updateWindow[SEARCH] 	= true;
+				updateWindow[DISPLAY]	= true;
+				updateWindow[ZOOM]		= true;
+				updateWindow[PLAYLIST]	= true;
+
+				break;/*}}}*/
+
+			case DRAG_UP: case DRAG_DOWN:/*{{{*/
+
+				if ( winMode == MODE_PLAYLIST and caracter == 566 and plIndexB > 0) {
+					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
+					decrease_index(&plTop, &plIndexB );
+					pl_index = plIndexB;
+					save_playlist(playlistTable, plRows, "default");
+					updateWindow[PLAYLIST] = true;
+				}
+
+				else if (winMode == MODE_PLAYLIST && caracter == 525 && plIndexB < plRows - 1) {
+					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
+					increase_index(&plTop, plRows, &plIndexB, winMode);
+					pl_index = plIndexB;
+					save_playlist(playlistTable, plRows, "default");
+					updateWindow[PLAYLIST] = true;
+				}
+				
+				break;/*}}}*/
+
+			case SAVE_PLAYLIST:/*{{{*/
+
+				show_panel(panel[DIALOG_WINDOW]);
+				show_panel(panel[INPUT_BOX]);
+				update_panels();
+				doupdate();
+
+				echo();
+				wmove(ventana[INPUT_BOX], 0, 0);
+				curs_set(true);
+				noraw();
+
+					char file_name[40];
+					wscanw(ventana[INPUT_BOX], "%s", file_name);
+					save_playlist(playlistTable, plRows, file_name);
+
+				noecho();
+				wclear(ventana[INPUT_BOX]);
+				curs_set(false);
+				raw();
+
+				hide_panel(panel[DIALOG_WINDOW]);
+				hide_panel(panel[INPUT_BOX]);
+				update_panels();
+				doupdate();
+
+				for (k = 0; k <= LONG_STRING - 1; k++)
+					keyword[k] = '\0';
+
+				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
+
+				charIndex = 0;
+				dTop   = 0;
+				dIndex = 0;
+				winMode = MODE_DISPLAY;
+
+				updateWindow[SEARCH] 	= true;
+				updateWindow[DISPLAY]	= true;
+				updateWindow[ZOOM]		= true;
+				updateWindow[PLAYLIST]	= true;
+
+				break;/*}}}*/
+
+			case TOGGLE_MIDI_STATE:/*{{{*/
+				x50.toggle_MIDI_state();
+				updateWindow[ MIDI_STATE ] = true;
 				break;/*}}}*/
 		}
 

@@ -62,11 +62,12 @@ void Playlist::cargar( const std::string &_Path ) noexcept/*{{{*/
 	sincronizar();
 }/*}}}*/
 
-void Playlist::agregar( struct System * const &_Cancion ) noexcept/*{{{*/
+void Playlist::agregar( const std::string &_Titulo, const std::string &_Artista,
+		struct System *&_Row_ptr ) noexcept/*{{{*/
 {
-	pista[ n_pistas ].titulo = _Cancion->titulo;
-	pista[ n_pistas ].artista = _Cancion->artista;
-	pista[ n_pistas ].row_ptr = _Cancion;
+	pista[ n_pistas ].titulo = _Titulo;
+	pista[ n_pistas ].artista = _Artista;
+	pista[ n_pistas ].row_ptr = _Row_ptr;
 
 	++n_pistas;
 }/*}}}*/
