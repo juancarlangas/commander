@@ -537,7 +537,7 @@ int32_t main()
 				playlist->agregar( displayTable[ dIndex ] );
 
 				if ( playlist->get_n_pistas() > plTop + playlistShowResults )
-					--plTop;
+					++plTop;
 
 				updateWindow[PLAYLIST] = true;
 
@@ -546,10 +546,8 @@ int32_t main()
 			case DEL_FROM_PLAYLIST:/*{{{*/
 				playlist->eliminar( pl_index );
 
-				if ( pl_index == playlist->get_n_pistas() - 1 ) { //fin de lista
+				if ( pl_index == playlist->get_n_pistas() ) //fin de lista
 					decrease_index( &plTop, &pl_index );
-					plRows = playlist->get_n_pistas();
-				}
 
 				if ( playlist->get_n_pistas() == 0 ) { //cambio
 					winMode = MODE_DISPLAY;

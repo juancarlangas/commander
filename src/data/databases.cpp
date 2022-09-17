@@ -80,6 +80,7 @@ void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 
 	std::string linea;
 
+	// Leemos
 	for ( int32_t n_linea = 0; n_linea < n_canciones; ++n_linea ) {
 		// Titulo
 		std::getline( archivo, linea );

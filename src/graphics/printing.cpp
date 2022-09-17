@@ -60,50 +60,16 @@ void print_displayTable(	WINDOW *window,/*{{{*/
 	return;
 }/*}}}*/
 
-void print_playlist(	WINDOW *window,/*{{{*/
-						System playlistTable[], const int32_t top, const short resultRows, 
-						const int indexA, const int indexB, short int winMode )
-{
-	int32_t i;
-	short int row = 1;
-
-	wclear(window);
-	
-	for (i = top; (i <= top + playlistShowResults - 1) && (i <= resultRows - 1); i++) {
-		if (((i <= indexB && i >= indexA) || (i >= indexB && i <= indexA)) && winMode == 2) { /*resaltado*/
-			wattron(window, 
-					playlistTable[i].type[0] == 'p' ? COLOR_PAIR(WHITE_DEFAULT) : COLOR_PAIR(YELLOW_DEFAULT));
-			wattron(window, A_REVERSE);
-			mvwprintw(window, row, 1, "%2d. ", i + 1);
-			mvwprintw(window, row++, 5, "%-30s", playlistTable[i].title);
-			wattroff(window, A_REVERSE);
-		}
-		else {
-			wattron(window, COLOR_PAIR(GRAY_DEFAULT));
-			wattron(window, A_BOLD);
-			mvwprintw(window, row, 1, "%2d. ", i + 1);
-			wattron(window, 
-					playlistTable[i].type[0] == 'p' ? COLOR_PAIR(WHITE_DEFAULT) : COLOR_PAIR(YELLOW_DEFAULT));
-			mvwprintw(window, row++, 5, "%-30s", playlistTable[i].title);
-		}
-	}
-
-	wrefresh(window);
-	
-	return;
-}/*}}}*/
-
 void print_playlist( WINDOW *_WindowPtr, const int32_t &_Top, const int &_IndexA,/*{{{*/
 					const int &_IndexB,
 					Playlist &_PlaylistRef, const short int &_WinMode ) noexcept
 {
-	int32_t i;
 	short int row = 1;
 
 	wclear( _WindowPtr );
 	
-	for ( i = _Top;
-		( i <= _Top + playlistShowResults - 1 ) && ( i < _PlaylistRef.get_n_pistas() );
+	for ( int32_t i = _Top;
+		( i < _Top + playlistShowResults ) && ( i < _PlaylistRef.get_n_pistas() );
 		++i) {
 		if ( ( ( i <= _IndexB && i >= _IndexA ) || ( i >= _IndexB && i <= _IndexA ) ) &&
 				_WinMode == 2) { /*resaltado*/

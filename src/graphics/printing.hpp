@@ -13,7 +13,7 @@ void print_displayTable(	WINDOW *window,
 							const int index,
 							short int winMode);
 
-void print_playlist(	WINDOW *window, System playlistTable[], const int32_t top,
+void print_playlist(	WINDOW *window, const int32_t top,
 		const short resultRows, const int indexA, const int indexB, short int winMode );
 
 void print_playlist( WINDOW *_WindowPtr, const int32_t &_Top, const int &_IndexA,
