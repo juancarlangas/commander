@@ -60,8 +60,7 @@ void print_displayTable(	WINDOW *window,/*{{{*/
 	return;
 }/*}}}*/
 
-void print_playlist( WINDOW *_WindowPtr, const int32_t &_Top, const int &_IndexA,/*{{{*/
-					const int &_IndexB,
+void print_playlist( WINDOW *_WindowPtr, const int32_t &_Top, const int &_Index,/*{{{*/
 					Playlist &_PlaylistRef, const short int &_WinMode ) noexcept
 {
 	short int row = 1;
@@ -71,8 +70,7 @@ void print_playlist( WINDOW *_WindowPtr, const int32_t &_Top, const int &_IndexA
 	for ( int32_t i = _Top;
 		( i < _Top + playlistShowResults ) && ( i < _PlaylistRef.get_n_pistas() );
 		++i) {
-		if ( ( ( i <= _IndexB && i >= _IndexA ) || ( i >= _IndexB && i <= _IndexA ) ) &&
-				_WinMode == 2) { /*resaltado*/
+		if ( i == _Index and _WinMode == 2 ) { /*resaltado*/
 			wattron( _WindowPtr, COLOR_PAIR(WHITE_DEFAULT) );
 			wattron( _WindowPtr, A_REVERSE);
 			mvwprintw( _WindowPtr, row, 1, "%2d. ", i + 1);

@@ -546,8 +546,10 @@ int32_t main()
 			case DEL_FROM_PLAYLIST:/*{{{*/
 				playlist->eliminar( pl_index );
 
-				if ( pl_index == playlist->get_n_pistas() ) //fin de lista
+				if ( pl_index == playlist->get_n_pistas() ) {//fin de lista
 					decrease_index( &plTop, &pl_index );
+					plIndexB = pl_index; // Guardamos compatibilidad
+				}
 
 				if ( playlist->get_n_pistas() == 0 ) { //cambio
 					winMode = MODE_DISPLAY;
@@ -661,7 +663,7 @@ int32_t main()
 		if (updateWindow[PLAYLIST] == true) {
 			//print_playlist(	playlistWindow, playlistTable,
 			//				plTop, 	plRows, pl_index, plIndexB, winMode);
-			print_playlist(	playlistWindow, plTop, pl_index, plIndexB, *playlist, winMode);
+			print_playlist(	playlistWindow, plTop, pl_index, *playlist, winMode);
 		}
 
 		if (updateWindow[SEARCH] == true)
