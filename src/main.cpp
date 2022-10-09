@@ -16,7 +16,8 @@ int32_t main()
 		homedir = getpwuid(getuid())->pw_dir;
 
    	char directory[50];
-   	sprintf(directory, "%s/.commander", homedir);/*}}}*/
+   	sprintf(directory, "%s/.commander", homedir);
+	std::string path;/*}}}*/
 
 	// Databases{{{
     const std::string config_directory{ directory };
@@ -34,7 +35,7 @@ int32_t main()
 	System *playlistTable = new System [ dbRows[COMBINATIONS] ](); // arreglo de copias
 	System *buffer, *orch_clipboard_ptr; // apuntadores simple
 
-	Playlist *playlist = new Playlist( "/home/juancarlangas/.commander/Playlists/default.cpl",
+	Playlist *playlist = new Playlist( "/home/juancarlangas/.commander/Playlists/default.csv",
 										dBase );
 
 	int32_t n_matches;
@@ -74,7 +75,7 @@ int32_t main()
 			case BEGIN:/*{{{*/
 				llenado_displayTable( displayTable, dBase[COMBINATIONS].base, dbRows[COMBINATOR],
 						keyword, &n_matches );
-				plRows = load_playlist( playlistTable, "default" );
+				plRows = playlist->get_n_pistas();
 
 				if (dbRows[COMBINATOR] > 0) // permitimos 0 lineas
 					buffer = dBase[COMBINATIONS].base;
@@ -217,7 +218,7 @@ int32_t main()
 				if ( x50.is_connected() )
 					x50.dump_variation();
 				break;/*}}}*/
-				
+
 			case INTRO:/*{{{*/
 				switch ( winMode ) {
 					case MODE_DISPLAY:
@@ -502,7 +503,10 @@ int32_t main()
 				{
 					char file_name[40];
 					wscanw(ventana[INPUT_BOX], "%s", file_name);
-					plRows = load_playlist(playlistTable, file_name);
+					std::string cpp_file_name{ file_name };
+					playlist->cargar(
+							"/home/juancarlangas/.commander/Playlists/" + cpp_file_name + ".csv" );
+					plRows = playlist->get_n_pistas();
 				}
 				noecho();
 				wclear(ventana[INPUT_BOX]);
@@ -514,7 +518,8 @@ int32_t main()
 				update_panels();
 				doupdate();
 
-				save_playlist(playlistTable, plRows, "default");
+				// save_playlist(playlistTable, plRows, "default");
+				playlist->guardar( "/home/juancarlangas/.commander/Playlists/default.csv" );
 
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
@@ -618,9 +623,13 @@ int32_t main()
 				curs_set(true);
 				noraw();
 
-					char file_name[40];
-					wscanw(ventana[INPUT_BOX], "%s", file_name);
-					save_playlist(playlistTable, plRows, file_name);
+				{
+				char file_name[40];
+				wscanw(ventana[INPUT_BOX], "%s", file_name);
+				std::string cpp_file_name{ file_name };
+				playlist->guardar(
+						"/home/juancarlangas/.commander/Playlists/" + cpp_file_name + ".csv" );
+				}
 
 				noecho();
 				wclear(ventana[INPUT_BOX]);

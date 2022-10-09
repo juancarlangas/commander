@@ -1,8 +1,10 @@
 #include "playlist.hpp"
 #include "databases.hpp"
 #include <cstdint>
+#include <curses.h>
 #include <fstream>
 #include <iostream>
+#include <ostream>
 
 // Inicializa el puntero a la Base de datos e invoca cargar()
 Playlist::Playlist( const std::string &_Path, Database *_Database_ptr )/*{{{*/
@@ -19,7 +21,8 @@ void Playlist::cargar( const std::string &_Path ) noexcept/*{{{*/
 
 	std::ifstream archivo { _Path };
 	if ( archivo.fail() ) {
-		std::cerr << "No se pudo abrir " << _Path << " en contar_lineas()" << std::endl;
+		endwin();
+		std::cerr << "No se pudo abrir " << _Path << " en cargar()" << std::endl;
 		exit( EXIT_FAILURE );
 	}
 
@@ -89,7 +92,7 @@ void Playlist::guardar( const std::string &_Path) noexcept/*{{{*/
 	}
 
 	///////////////////////////////////// escritura ///////////////////////////////////////////
-	std::string delimitador;
+	std::string delimitador; // Either " or nothing
 
 	for ( int32_t i = 0; i < n_pistas; ++i ) {
 		// Tags
@@ -97,7 +100,7 @@ void Playlist::guardar( const std::string &_Path) noexcept/*{{{*/
 		archivo << delimitador << pista[i].titulo << delimitador << ',';
 
 		delimitador = pista[i].artista.find( ',' ) < pista[i].artista.npos ? "\"" : "";
-		archivo << delimitador << pista[i].artista << delimitador << ',';
+		archivo << delimitador << pista[i].artista << delimitador << std::endl;
 	}
 
 	archivo.close();
