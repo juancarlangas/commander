@@ -42,7 +42,6 @@ int32_t main()
 	int32_t dIndex { 0 }; // Absolute selected index of the whole displayTable
 	int32_t dTop { 0 }; // Absolute on-window-top index of the whole displayTable
 
-	int32_t plRows { 0 };
 	int32_t plTop = { 0 };
 	int32_t pl_index = { 0 };
 	int32_t plIndexB = { 0 };
@@ -75,7 +74,6 @@ int32_t main()
 			case BEGIN:/*{{{*/
 				llenado_displayTable( displayTable, dBase[COMBINATIONS].base, dbRows[COMBINATOR],
 						keyword, &n_matches );
-				plRows = playlist->get_n_pistas();
 
 				if (dbRows[COMBINATOR] > 0) // permitimos 0 lineas
 					buffer = dBase[COMBINATIONS].base;
@@ -227,7 +225,7 @@ int32_t main()
 					case MODE_PLAYLIST:
 						buffer = &playlistTable[ pl_index ];
 						//avance carro
-						if ( plIndexB < plRows - 1 ) {
+						if ( plIndexB < playlist->get_n_pistas() - 1 ) {
 							plIndexB++;
 							pl_index = plIndexB;
 						}
@@ -506,7 +504,6 @@ int32_t main()
 					std::string cpp_file_name{ file_name };
 					playlist->cargar(
 							"/home/juancarlangas/.commander/Playlists/" + cpp_file_name + ".csv" );
-					plRows = playlist->get_n_pistas();
 				}
 				noecho();
 				wclear(ventana[INPUT_BOX]);
@@ -568,8 +565,7 @@ int32_t main()
 
 			case CLEAR_PLAYLIST:/*{{{*/
 
-				plRows = 0;
-				save_playlist(playlistTable, plRows, "default");
+				// save_playlist(playlistTable, plRows, "default");
 
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
@@ -594,18 +590,20 @@ int32_t main()
 			case DRAG_UP: case DRAG_DOWN:/*{{{*/
 
 				if ( winMode == MODE_PLAYLIST and caracter == 566 and plIndexB > 0) {
-					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
+					korg_drag( playlistTable, playlist->get_n_pistas(),
+							plIndexB, plIndexB, caracter);
 					decrease_index(&plTop, &plIndexB );
 					pl_index = plIndexB;
-					save_playlist(playlistTable, plRows, "default");
+					save_playlist(playlistTable, playlist->get_n_pistas(), "default");
 					updateWindow[PLAYLIST] = true;
 				}
 
-				else if (winMode == MODE_PLAYLIST && caracter == 525 && plIndexB < plRows - 1) {
-					korg_drag(playlistTable, plRows, plIndexB, plIndexB, caracter);
-					increase_index(&plTop, plRows, &plIndexB, winMode);
+				else if (winMode == MODE_PLAYLIST && caracter == 525 and
+						plIndexB < playlist->get_n_pistas() - 1) {
+					korg_drag(playlistTable, playlist->get_n_pistas(), plIndexB, plIndexB, caracter);
+					increase_index(&plTop, playlist->get_n_pistas(), &plIndexB, winMode);
 					pl_index = plIndexB;
-					save_playlist(playlistTable, plRows, "default");
+					save_playlist(playlistTable, playlist->get_n_pistas(), "default");
 					updateWindow[PLAYLIST] = true;
 				}
 				
