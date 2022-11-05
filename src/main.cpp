@@ -35,8 +35,7 @@ int32_t main()
 	System *playlistTable = new System [ dbRows[COMBINATIONS] ](); // arreglo de copias
 	System *buffer, *orch_clipboard_ptr; // apuntadores simple
 
-	Playlist *playlist = new Playlist( "/home/juancarlangas/.commander/Playlists/default.csv",
-										dBase );
+	Playlist *playlist = new Playlist( &dBase[COMBINATIONS] );
 
 	int32_t n_matches;
 	int32_t dIndex { 0 }; // Absolute selected index of the whole displayTable
@@ -79,6 +78,8 @@ int32_t main()
 					buffer = dBase[COMBINATIONS].base;
 
 				x50.set_buffer( *buffer );
+
+				playlist->cargar( "/home/juancarlangas/.commander/Playlists/default.csv" );
 
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;

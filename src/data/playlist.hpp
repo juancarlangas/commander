@@ -16,6 +16,7 @@ struct Pista {
 
 class Playlist {
 	public:
+		Playlist( Database *_Database_ptr ); // solo inicializa
 		Playlist( const std::string &_Path, Database *_Database_ptr );
 
 		void cargar( const std::string &_Path ) noexcept;

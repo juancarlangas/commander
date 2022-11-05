@@ -6,6 +6,12 @@
 #include <iostream>
 #include <ostream>
 
+// Solo Inicializa
+Playlist::Playlist( Database *_Database_ptr )
+{
+	database_ptr = _Database_ptr;
+}
+
 // Inicializa el puntero a la Base de datos e invoca cargar()
 Playlist::Playlist( const std::string &_Path, Database *_Database_ptr )/*{{{*/
 {
