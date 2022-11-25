@@ -144,4 +144,9 @@ const std::string &Playlist::get_artista( const int32_t &_Index ) noexcept/*{{{*
 	return pista[ _Index ].titulo;
 }/*}}}*/
 		
+struct System *Playlist::get_pointer( const int32_t &_Index) noexcept
+{
+	return pista[ _Index ].row_ptr;
+}
+
 Playlist::~Playlist() {}

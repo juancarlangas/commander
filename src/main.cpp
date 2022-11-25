@@ -225,7 +225,7 @@ int32_t main()
 						buffer = displayTable[ dIndex ];
 						break;
 					case MODE_PLAYLIST:
-						buffer = &playlistTable[ pl_index ];
+						buffer = playlist->get_pointer( pl_index );
 						//avance carro
 						if ( plIndexB < playlist->get_n_pistas() - 1 ) {
 							plIndexB++;

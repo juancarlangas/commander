@@ -27,8 +27,13 @@ class Playlist {
 		void sincronizar() noexcept;
 
 		int32_t get_n_pistas() noexcept;
+
 		const std::string &get_titulo( const int32_t &_Index ) noexcept;
 		const std::string &get_artista( const int32_t &_Index ) noexcept;
+
+		/* Esta función es la efectiva para mandar la información al teclado.
+		 * Mandará el APUNTADOR correcto hacia el renglón en la base de datos */
+		struct System *get_pointer( const int32_t &_Index) noexcept;
 
 		~Playlist();
 
