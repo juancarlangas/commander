@@ -551,6 +551,7 @@ int32_t main()
 
 			case DEL_FROM_PLAYLIST:/*{{{*/
 				playlist->eliminar( pl_index );
+				playlist->guardar( homedir_string + "/.commander/Playlists/default.csv" );
 
 				if ( pl_index == playlist->get_n_pistas() ) {//fin de lista
 					decrease_index( &plTop, &pl_index );
