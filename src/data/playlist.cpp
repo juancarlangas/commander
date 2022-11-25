@@ -21,9 +21,9 @@ Playlist::Playlist( const std::string &_Path, Database *_Database_ptr )/*{{{*/
 
 void Playlist::cargar( const std::string &_Path ) noexcept/*{{{*/
 {
-	/* Lee línea por línea del archivo almacenando en un pequeño struct temporal
-	 * y luego revisa que esa combinación se encuentre en la base de datos;
-	 * si no se encuentra descarta dicha línea, de lo contrario la agrega al playlist */
+	/* Lee del archivo cada línea y la almacena diréctamente en el playlist.
+	 * Después sincroniza, eliminando los inexistentes en la base de datos
+	 * y añadiendo el apuntador hacia dicha base de datos */
 
 	std::ifstream archivo { _Path };
 	if ( archivo.fail() ) {

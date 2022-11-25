@@ -11,9 +11,10 @@ int32_t main()
 	short int updateWindow[8] = {0};/*}}}*/
 
 	// File System{{{
-	const char *homedir;
+	const char *homedir; // versión C
 	if ((homedir = getenv("HOME")) == NULL)
 		homedir = getpwuid(getuid())->pw_dir;
+	std::string homedir_string{ homedir }; // Versión C++
 
    	char directory[50];
    	sprintf(directory, "%s/.commander", homedir);
@@ -541,6 +542,8 @@ int32_t main()
 
 				if ( playlist->get_n_pistas() > plTop + playlistShowResults )
 					++plTop;
+
+				playlist->guardar( homedir_string + "/.commander/Playlists/default.csv" );
 
 				updateWindow[PLAYLIST] = true;
 
