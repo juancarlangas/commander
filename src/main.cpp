@@ -11,18 +11,17 @@ int32_t main()
 	short int updateWindow[8] = {0};/*}}}*/
 
 	// File System{{{
-	const char *homedir; // versión C
-	if ((homedir = getenv("HOME")) == NULL)
-		homedir = getpwuid(getuid())->pw_dir;
-	std::string homedir_string{ homedir }; // Versión C++
+	const char *home_directory_c;
+	if ( ( home_directory_c = getenv("HOME") ) == NULL )
+		home_directory_c = getpwuid( getuid() )->pw_dir;
+	const std::string home_directory { home_directory_c };
 
-   	char directory[50];
-   	sprintf(directory, "%s/.commander", homedir);
-	std::string path;/*}}}*/
+   	char config_directory_c[50];
+   	sprintf( config_directory_c, "%s/.commander", home_directory_c );
+	std::string generic_path;
+    const std::string config_directory{ config_directory_c };/*}}}*/
 
 	// Databases{{{
-    const std::string config_directory{ directory };
-
 	Combinations combinaciones { config_directory + "/combinaciones.csv" };
 
 	Database dBase[1]{ { config_directory + "/catalogo.csv", &combinaciones } };
@@ -153,9 +152,9 @@ int32_t main()
 				keyword[ charIndex++ ] = caracter;
 				keyword[ charIndex ] = '\0';
 
-				if (keyword[charIndex - 1] != -61) {	// si es acento o tilde esperamos
-														// la parte faltante
-					charIndex = no_accent(keyword, keyword); //clean
+				// si es acento o tilde, quedamos a la espera del siguiente
+				if (keyword[charIndex - 1] != -61) {
+					charIndex = no_accent( keyword, keyword ); //clean
 
 					// Garantizamos que la última letra válida añadida sea minúscula
 					// keyword[ charIndex - 1 ] = std::tolower( keyword[ charIndex - 1 ] );
@@ -170,6 +169,7 @@ int32_t main()
 
 					if (keyword[0] != ':' || charIndex == 1)
 						updateWindow[ZOOM] = true;
+
 
 					updateWindow[LCD] 	  = true;
 					updateWindow[SEARCH]  = true;
@@ -543,7 +543,7 @@ int32_t main()
 				if ( playlist->get_n_pistas() > plTop + playlistShowResults )
 					++plTop;
 
-				playlist->guardar( homedir_string + "/.commander/Playlists/default.csv" );
+				playlist->guardar( home_directory + "/.commander/Playlists/default.csv" );
 
 				updateWindow[PLAYLIST] = true;
 
@@ -551,7 +551,7 @@ int32_t main()
 
 			case DEL_FROM_PLAYLIST:/*{{{*/
 				playlist->eliminar( pl_index );
-				playlist->guardar( homedir_string + "/.commander/Playlists/default.csv" );
+				playlist->guardar( home_directory + "/.commander/Playlists/default.csv" );
 
 				if ( pl_index == playlist->get_n_pistas() ) {//fin de lista
 					decrease_index( &plTop, &pl_index );
@@ -689,7 +689,7 @@ int32_t main()
 
 		if (updateWindow[ZOOM] == true) {
 			if (winMode == MODE_PLAYLIST)
-				print_zoom(zoomWindow, &playlistTable[plIndexB]);
+				print_zoom(zoomWindow, playlist->get_pointer( pl_index ) );
 			else if ( keyword[0] != '/' and dIndex >= 0 )
 				print_zoom(zoomWindow, displayTable[dIndex]);
 			else {

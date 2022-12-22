@@ -213,7 +213,7 @@ void print_computer(WINDOW *window, const short int oxygen, const short int mode
 }/*}}}*/
 
 void print_zoom(WINDOW *window, System *linea)
-{/*{{{*/
+{
 	//static char message[50];
 
 	wclear(window);
@@ -250,7 +250,7 @@ void print_zoom(WINDOW *window, System *linea)
 		wrefresh(window);
 	
 	return;
-}/*}}}*/
+}
 
 void print_MIDI_state( WINDOW *&_Ventana, const enum Switch &_State ) noexcept
 {/*{{{*/
