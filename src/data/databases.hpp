@@ -61,7 +61,6 @@ class Database {/*{{{*/
 		Database();
 		Database( const std::string & ) noexcept;
 		Database( const std::string &, Combinations *_CombinationPtr ) noexcept;
-		~Database();
 		void cargar( const std::string & ) noexcept;
 		int32_t get_activeRows() noexcept;
 		void cargar_especifico( const std::string &, int32_t ) noexcept;
@@ -76,7 +75,7 @@ class Database {/*{{{*/
 		struct System get_cancion( const int ) noexcept;
 		struct System *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		struct System *get_favourite_row( const int32_t & ) noexcept;
-		System *base;
+		struct System base[1000];
 	private:
 		int32_t activeRows;
 		int32_t n_canciones;

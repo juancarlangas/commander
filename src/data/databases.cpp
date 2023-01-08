@@ -47,11 +47,6 @@ Database::Database( const std::string &_Path, Combinations *_CombinationsPtr ) n
 	cargar( _Path );
 }/*}}}*/
 
-Database::~Database()/*{{{*/
-{
-	delete [] base;
-}/*}}}*/
-
 void Database::clean_row(int line)/*{{{*/
 {
 	*base[line].title = '\0';
@@ -67,7 +62,6 @@ void Database::clean_row(int line)/*{{{*/
 void Database::cargar( const std::string &_Path ) noexcept/*{{{*/
 {
 	activeRows = n_canciones = Files::contar_lineas( _Path );
-	base = new struct System[ 1000 ]();
 
 	std::ifstream archivo{ _Path };
 	if ( archivo.fail() ) {

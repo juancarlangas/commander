@@ -24,15 +24,12 @@ int32_t main()
 	// Databases{{{
 	Combinations combinaciones { config_directory + "/combinaciones.csv" };
 
-	Database dBase[1]{ { config_directory + "/catalogo.csv", &combinaciones } };
-
-	int dbRows[1];
-	dbRows[COMBINATIONS] = dBase[COMBINATIONS].get_activeRows();
+	Database *dBase = new Database []{ { config_directory + "/catalogo.csv", &combinaciones } };
+	int dbRows[1] { dBase[COMBINATIONS].get_activeRows() };
 /*}}}*/
 
 	// Tables{{{
 	System **displayTable = new System *[ dbRows[COMBINATIONS] ](); // arreglo de apuntadores
-	System *playlistTable = new System [ dbRows[COMBINATIONS] ](); // arreglo de copias
 	System *buffer, *orch_clipboard_ptr; // apuntadores simple
 
 	Playlist *playlist = new Playlist( &dBase[COMBINATIONS] );
@@ -593,25 +590,6 @@ int32_t main()
 				break;/*}}}*/
 
 			case DRAG_UP: case DRAG_DOWN:/*{{{*/
-
-				if ( winMode == MODE_PLAYLIST and caracter == 566 and plIndexB > 0) {
-					korg_drag( playlistTable, playlist->get_n_pistas(),
-							plIndexB, plIndexB, caracter);
-					decrease_index(&plTop, &plIndexB );
-					pl_index = plIndexB;
-					save_playlist(playlistTable, playlist->get_n_pistas(), "default");
-					updateWindow[PLAYLIST] = true;
-				}
-
-				else if (winMode == MODE_PLAYLIST && caracter == 525 and
-						plIndexB < playlist->get_n_pistas() - 1) {
-					korg_drag(playlistTable, playlist->get_n_pistas(), plIndexB, plIndexB, caracter);
-					increase_index(&plTop, playlist->get_n_pistas(), &plIndexB, winMode);
-					pl_index = plIndexB;
-					save_playlist(playlistTable, playlist->get_n_pistas(), "default");
-					updateWindow[PLAYLIST] = true;
-				}
-				
 				break;/*}}}*/
 
 			case SAVE_PLAYLIST:/*{{{*/
@@ -722,6 +700,8 @@ int32_t main()
 
 	delete [] displayTable;
 	buffer = NULL;
+
+	delete [] dBase;
 
 	return EXIT_SUCCESS;/*}}}*/
 }
