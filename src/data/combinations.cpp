@@ -44,8 +44,14 @@ Combinations::Combinations( const std::string &_Path ) :/*{{{*/
 
 		// INSTRUMENTOS
 		for ( int32_t j = 0; j < 8; ++j ) {
-			data[i].instrumento[j] = linea.substr( 0, linea.find_first_of( ',' ) );
-			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+			if ( linea.starts_with( '\"' ) ) {
+				data[i].instrumento[j] = linea.substr( 1, linea.find_first_of( '\"' ) );
+				linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
+			}
+			else {
+				data[i].instrumento[j] = linea.substr( 0, linea.find_first_of( ',' ) );
+				linea = linea.substr( linea.find_first_of( ',' ) + 1 );
+			}
 		}
 	}
 
