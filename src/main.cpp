@@ -17,7 +17,7 @@ int32_t main()
 	const std::string home_directory { home_directory_c };
 
    	char config_directory_c[50];
-   	sprintf( config_directory_c, "%s/.commander", home_directory_c );
+   	sprintf( config_directory_c, "%s/.config/commander", home_directory_c );
 	std::string generic_path;
     const std::string config_directory{ config_directory_c };/*}}}*/
 
@@ -76,7 +76,7 @@ int32_t main()
 
 				x50.set_buffer( *buffer );
 
-				playlist->cargar( "/home/juancarlangas/.commander/Playlists/default.csv" );
+				playlist->cargar( "/home/juancarlangas/.config/commander/Playlists/default.csv" );
 
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;

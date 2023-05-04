@@ -61,7 +61,11 @@ class Database {/*{{{*/
 		Database();
 		Database( const std::string & ) noexcept;
 		Database( const std::string &, Combinations *_CombinationPtr ) noexcept;
-		void cargar( const std::string & ) noexcept;
+		void load_csv( const std::string &_Path ) noexcept;
+		void cargar( const std::string &_Path ) noexcept
+		{
+			load_csv( _Path );
+		}
 		int32_t get_activeRows() noexcept;
 		void cargar_especifico( const std::string &, int32_t ) noexcept;
 		void clonar_to_old( Database & ) noexcept;
@@ -71,7 +75,11 @@ class Database {/*{{{*/
 		void ordenate();
 		void delete_duplicated() noexcept;
 		void clonar_from_old( Database & ) noexcept;
-		void escribir( const std::string & ) noexcept;
+		void write_csv( const std::string &_Path ) noexcept;
+		void escribir( const std::string &_Path ) noexcept
+		{
+			write_csv( _Path );
+		}
 		struct System get_cancion( const int ) noexcept;
 		struct System *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		struct System *get_favourite_row( const int32_t & ) noexcept;

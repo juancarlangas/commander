@@ -9,6 +9,7 @@ class Combinations {
 	public:
 		Combinations( const std::string & );
 		~Combinations();
+		void load_from_csv( const std::string & ) noexcept;
 		void escribir( const std::string & ) noexcept;
 		std::string get_instrument_name(
 				const char &_Banco, const int16_t &_Num, const int16_t &_Track ) noexcept;

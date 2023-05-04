@@ -9,10 +9,16 @@
 
 int32_t value;
 
-Combinations::Combinations( const std::string &_Path ) :/*{{{*/
-	n_bancos { static_cast<int16_t>( ( value = Files::contar_lineas( _Path ) ) / 128 ) },
-	data { new struct Row [ n_bancos * 128 ]() }
+Combinations::Combinations( const std::string &_Path )/*{{{*/
 {
+	load_from_csv( _Path );
+}
+
+void Combinations::load_from_csv( const std::string &_Path ) noexcept
+{
+	n_bancos = static_cast<int16_t>( ( value = Files::contar_lineas( _Path ) ) / 128 );
+	data = new struct Row [ n_bancos * 128 ]();
+
 	std::ifstream archivo { _Path };
 	if ( archivo.fail() ) {
 		std::cerr << "No se pudo abrir " + _Path + "en BaseDeDatos::cargar()" << std::endl;

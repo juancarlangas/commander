@@ -57,7 +57,7 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 
 	// keyboard_text_box
 	keyboard_scheme.Popup::init(
-			5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 88 / 200 ) );
+			5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 90 / 200 ) );
 	keyboard_scheme.set_font_color( WHITE_DEFAULT );
 	keyboard_scheme.set_font_width( "Bold" );
 	keyboard_scheme.auto_draw();

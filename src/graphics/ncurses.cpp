@@ -22,17 +22,31 @@ PANEL 	*panel[2];
 
 Orchestra orquestacion;
 
-short int init_ncurses(void)
-{/*{{{*/
+void init_screen() noexcept/*{{{*/
+{
 	initscr();
 	raw();
 	noecho();
 	keypad(stdscr, TRUE);
 	curs_set(FALSE);
 	set_escdelay(3);
-	
-	getmaxyx(stdscr, y, x);
+}/*}}}*/
 
+void end_screen() noexcept/*{{{*/
+{
+	set_escdelay( 0 );
+	curs_set( TRUE );
+	keypad( stdscr, FALSE );
+	echo();
+	noraw();
+	endwin();
+}/*}}}*/
+
+short int init_ncurses(void)
+{/*{{{*/
+	init_screen();
+
+	getmaxyx(stdscr, y, x);
 	displayShowResults  = y * 56 / 100 - 4;
 	playlistShowResults = y * 70 / 100 - 4;
 
@@ -56,8 +70,8 @@ short int init_ncurses(void)
 	
 	refresh();
 
-	searchBox 		= newwin(5, 				x * 140 / 200,     	y * 86 / 100,     	x * 0 / 200	 	);
-	searchWindow 	= newwin(3, 				x * 140 / 200 - 2, 	y * 86 / 100 + 1, 	x * 0 / 200 + 1	);
+	searchBox 		= newwin(5, 				x * 140 / 200,     	y * 88 / 100,     	x * 0 / 200	 	);
+	searchWindow 	= newwin(3, 				x * 140 / 200 - 2, 	y * 88 / 100 + 1, 	x * 0 / 200 + 1	);
 
 	// lcdBox		= newwin(y * 38 / 200,	 	x * 98 / 200,     	y * 36 / 200,		x * 102 / 200	);
 	lcdWindow 		= newwin(y * 38 / 200 - 2, 	x * 98 / 200 - 2, 	y * 36 / 200 + 1,	x * 102 / 200 + 1);
@@ -65,11 +79,11 @@ short int init_ncurses(void)
 	playlistBox		= newwin(y * 70 / 100, 		x * 60 / 200, 		y * 32 / 100,	   	x * 141 / 200  	);
 	playlistWindow 	= newwin(y * 70 / 100 - 3, 	x * 60 / 200 - 2, 	y * 32 / 100 + 2, 	x * 141 / 200 + 1);
 	
-	displayBox 		= newwin(y * 56 / 100,		x * 143 / 200,     	y * 32 / 100,     	x * 0 / 100	 	);
-	displayWindow 	= newwin(y * 56 / 100 - 3,	x * 143 / 200 - 2, 	y * 32 / 100 + 2, 	x * 0 / 100 + 1	);
+	displayBox 		= newwin(y * 56 / 100,		x * 142 / 200,     	y * 32 / 100,     	x * 0 / 100	 	);
+	displayWindow 	= newwin(y * 56 / 100 - 3,	x * 142 / 200 - 2, 	y * 32 / 100 + 2, 	x * 0 / 100 + 1	);
 
-	zoomBox 		= newwin(y * 40 / 200, 		x * 98 / 200, 		y * 36 / 200, 		x * 0 / 200	);		
-	zoomWindow 		= newwin(y * 40 / 200 - 2, 	x * 98 / 200 - 2, 	y * 36 / 200 + 1, 	x * 0 / 200 + 1	);
+	zoomBox 		= newwin(y * 40 / 200, 		x * 98 / 200, 		y * 32 / 200, 		x * 0 / 200	);		
+	zoomWindow 		= newwin(y * 40 / 200 - 2, 	x * 98 / 200 - 2, 	y * 32 / 200 + 1, 	x * 0 / 200 + 1	);
 	
 	MIDI_state_window = newwin( 1, 4, y * 10 / 200, x * 180 / 200 );
 
