@@ -7,9 +7,14 @@
 #include <string_view>
 #include <vector>
 
+#include "data/nlohmann/json.hpp"
+//#include "data/nlohmann/adl_serializer.hpp"
+//#include "data/nlohmann/detail/abi_macros.hpp"
+//#include "data/nlohmann/detail/value_t.hpp"
+
 struct Combi {
 	std::string name;
-	std::array<std::string, 8> instrument_list;
+	std::array<std::string, 8> instruments_list;
 };
 
 struct Row {
@@ -34,8 +39,10 @@ class Combinations {
 	private:
 		int16_t n_bancos;
 		struct Row *data;
-		std::vector<std::array<struct Combi, 128>> combination_list;
+		std::vector<std::array<struct Combi, 128>> combinations_list;
 		int16_t bnk_num_to_int( const char &, const int16_t & ) noexcept;
 };
+		
+void from_json( const nlohmann::json &_JSONobject, struct Combi &_Combination );
 
 #endif

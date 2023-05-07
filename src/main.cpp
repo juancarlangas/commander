@@ -22,7 +22,7 @@ int32_t main()
     const std::string config_directory{ config_directory_c };/*}}}*/
 
 	// Databases{{{
-	Combinations combinaciones { config_directory + "/combinaciones.csv" };
+	Combinations combinaciones { config_directory + "/combinations.json" };
 
 	Database *dBase = new Database []{ { config_directory + "/catalogo.csv", &combinaciones } };
 	int dbRows[1] { dBase[COMBINATIONS].get_activeRows() };

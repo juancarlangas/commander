@@ -5,7 +5,7 @@ PROJECT( Commander
 	DESCRIPTION "Programa para manipular combinaciones y performances en sintetizadores musicales"
 	LANGUAGES C CXX )
 
-#set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"

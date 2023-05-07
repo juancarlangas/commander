@@ -1,19 +1,20 @@
 #include "combinations.hpp"
+
 #include <bits/stdint-intn.h>
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
-#include "data/nlohmann/json.hpp"
 #include "utilities/src/files.hpp"
 
 int32_t value;
 
 Combinations::Combinations( const std::string &_Path )/*{{{*/
 {
-	load_from_csv( _Path );
+	load_from_json( _Path );
 }/*}}}*/
 
 void Combinations::load_from_csv( const std::string &_Path ) noexcept/*{{{*/
@@ -70,13 +71,24 @@ void Combinations::load_from_json( const std::string &_Path ) noexcept/*{{{*/
 {
 	std::ifstream json_file{ _Path };
 	if ( json_file.fail() ) {
+
 		std::cerr << "Failed to open " + _Path + " in Combinations::load_from_json()\n";
 		exit(EXIT_FAILURE);
 	}
 	nlohmann::json json_object;
 	json_file >> json_object;
 
-	json_object.get_to( combination_list );
+	// Extract the array from the object
+	auto json_vector =
+		json_object.at( "combinations_list" ).get<std::vector<std::array<nlohmann::json, 127>>>();
+
+    // Deserialize the JSON array into the combination_list vector
+    for ( const auto &json_bank : json_vector ) {
+        std::array<struct Combi, 128> temp_bank;
+        std::transform(json_bank.begin(), json_bank.end(), temp_bank.begin(),
+                       []( const nlohmann::json& j ) { return j.get<struct Combi>(); });
+        combinations_list.push_back( temp_bank );
+    }
 
 	json_file.close();
 
@@ -125,3 +137,9 @@ int16_t Combinations::bnk_num_to_int( const char &_Banco, const int16_t &_Numero
 {
 	return ( _Banco - 65 ) * 127 + _Numero;
 }/*}}}*/
+
+void from_json( const nlohmann::json &_JSONobject, struct Combi &_Combination ) {/*{{{*/
+    _JSONobject.at( "name").get_to( _Combination.name );
+    _JSONobject.at( "instruments_list").get_to( _Combination.instruments_list );
+}/*}}}*/
+
