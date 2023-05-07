@@ -6,9 +6,7 @@
 #include <iostream>
 #include <string>
 
-#include "data/rapidjson/document.h"
-#include "data/rapidjson/istreamwrapper.h"
-#include "rapidjson/rapidjson.h"
+#include "data/nlohmann/json.hpp"
 #include "utilities/src/files.hpp"
 
 int32_t value;
@@ -75,46 +73,10 @@ void Combinations::load_from_json( const std::string &_Path ) noexcept/*{{{*/
 		std::cerr << "Failed to open " + _Path + " in Combinations::load_from_json()\n";
 		exit(EXIT_FAILURE);
 	}
+	nlohmann::json json_object;
+	json_file >> json_object;
 
-	rapidjson::IStreamWrapper{ json_file }; // Creamos un Stream Wrapper para leerlo mejor
-
-	rapidjson::Document json_doc; // Aquí lo vamos a almacenar
-	json_doc.ParseStream( json_file ); // Lo parseamos al documento
-	if ( json_doc.HasParseError() ) {
-		std::cerr << "Failed to parse JSON file on Combinations::load_from_json()\n";
-		exit( EXIT_FAILURE );
-	}
-
-	// Vector total
-	const rapidjson::Value &json_vector{ json_doc["combination_list"] };
-
-	// We cycle trough BANKS
-	for ( rapidjson::SizeType i_bank{ 0 }; i_bank < json_vector.Size(); ++i_bank ) {
-		const rapidjson::Value &json_bank{ json_vector[ i_bank ] };
-
-		// Cycle trough COMBINATIONS
-		for ( rapidjson::SizeType i_combi{ 0 }; i_combi < json_bank.Size(); ++i_combi ) {
-			const rapidjson::Value &json_combi{ json_bank[ i_combi ] };
-
-			struct Combi temp_combi;
-
-			if ( json_combi.HasMember( "name" ) )
-				temp_combi.name = json_combi[ "name" ].GetString();
-
-			if ( json_combi.HasMember( "instrument_list" ) ) {
-				const rapidjson::Value &json_instrument_list{ json_combi[ "instrument_list" ] };
-
-				for ( rapidjson::SizeType i_inst{ 0 }; i_inst < json_instrument_list.Size(); ++i_inst )
-					temp_combi.instrument_list[ i_inst ] = json_instrument_list[ i_inst ].GetString();
-
-
-
-
-
-
-
-
-
+	json_object.get_to( combination_list );
 
 	json_file.close();
 
