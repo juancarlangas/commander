@@ -92,6 +92,8 @@ void Combinations::load_from_json( const std::string &_Path ) noexcept/*{{{*/
 	for ( rapidjson::SizeType i_bank{ 0 }; i_bank < json_vector.Size(); ++i_bank ) {
 		const rapidjson::Value &json_bank{ json_vector[ i_bank ] };
 
+		std::array<struct Combi, 128> temp_bank;
+
 		// Cycle trough COMBINATIONS
 		for ( rapidjson::SizeType i_combi{ 0 }; i_combi < json_bank.Size(); ++i_combi ) {
 			const rapidjson::Value &json_combi{ json_bank[ i_combi ] };
@@ -106,15 +108,13 @@ void Combinations::load_from_json( const std::string &_Path ) noexcept/*{{{*/
 
 				for ( rapidjson::SizeType i_inst{ 0 }; i_inst < json_instrument_list.Size(); ++i_inst )
 					temp_combi.instrument_list[ i_inst ] = json_instrument_list[ i_inst ].GetString();
+			}
 
+			temp_bank[ i_combi ] = temp_combi;
+		}
 
-
-
-
-
-
-
-
+		combination_list.push_back( temp_bank );
+	}
 
 	json_file.close();
 
