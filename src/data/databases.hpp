@@ -16,20 +16,48 @@
 
 enum Switch : bool { OFF = 0, ON };
 
-struct Track {/*{{{*/
+// NEW TYPE{{{
+struct Settings {
+	enum Switch state;
+	std::int16_t volume;
+	std::int16_t lower_key;
+	std::int16_t upper_key;
+	std::int16_t transposition;
+};
+
+struct Scene {
+	std::string label;
+	std::array <Settings, 8> track;
+};
+
+struct Performance {
+	std::string title;
+	std::string artist;
+	std::string genre;
+	std::string mood;
+	std::string key_words;
+	std::string type;
+	std::int16_t n_variations;
+	std::int16_t initial_variation;
+	std::array<std::string, 8> instrument_list;
+	std::vector<Scene> scene;
+};/*}}}*/
+		
+// OLD TYPE{{{
+struct Track {
 	enum Switch status;
 	int16_t volume;
 	int16_t lower_key;
 	int16_t upper_key;
 	int16_t transposition;
-};/*}}}*/
+};
 
-struct Variacion {/*{{{*/
+struct Variacion {
 	std::string etiqueta;
 	struct Track track[ 8 ];
-};/*}}}*/
+};
 
-struct System {/*{{{*/
+struct System {
 	// C
 	char title[LONG_STRING];
 	char artist[LONG_STRING];
@@ -85,9 +113,9 @@ class Database {/*{{{*/
 		struct System get_cancion( const int ) noexcept;
 		struct System *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		struct System *get_favourite_row( const int32_t & ) noexcept;
-		//std::vector<Struct System> performance
 		struct System base[1000];
 	private:
+		std::vector<Performance> performance_list;
 		int32_t activeRows;
 		int32_t n_canciones;
 		void clean_row(int);

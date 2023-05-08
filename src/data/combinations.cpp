@@ -118,6 +118,7 @@ void Combinations::from_new_to_old() noexcept/*{{{*/
 		}
 }/*}}}*/
 
+
 Combinations::~Combinations()/*{{{*/
 {
 	// delete [] data;
