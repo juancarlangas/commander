@@ -77,18 +77,7 @@ void Combinations::load_from_json( const std::string &_Path ) noexcept/*{{{*/
 	}
 	nlohmann::json json_object;
 	json_file >> json_object;
-
-	// Extract the array from the object
-	auto json_vector =
-		json_object.at( "combinations_list" ).get<std::vector<std::array<nlohmann::json, 127>>>();
-
-    // Deserialize the JSON array into the combination_list vector
-    for ( const auto &json_bank : json_vector ) {
-        std::array<struct Combi, 128> temp_bank;
-        std::transform(json_bank.begin(), json_bank.end(), temp_bank.begin(),
-                       []( const nlohmann::json& j ) { return j.get<struct Combi>(); });
-        combinations_list.push_back( temp_bank );
-    }
+	json_object.get_to(combinations_list);
 
 	json_file.close();
 
@@ -97,7 +86,7 @@ void Combinations::load_from_json( const std::string &_Path ) noexcept/*{{{*/
 
 Combinations::~Combinations()/*{{{*/
 {
-	delete [] data;
+	// delete [] data;
 }/*}}}*/
 
 void Combinations::escribir( const std::string &_Path ) noexcept/*{{{*/
