@@ -1,21 +1,20 @@
 #include "combinations.hpp"
+
 #include <bits/stdint-intn.h>
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
-#include "data/rapidjson/document.h"
-#include "data/rapidjson/istreamwrapper.h"
-#include "rapidjson/rapidjson.h"
 #include "utilities/src/files.hpp"
 
 int32_t value;
 
 Combinations::Combinations( const std::string &_Path )/*{{{*/
 {
-	load_from_csv( _Path );
+	load_from_json( _Path );
 }/*}}}*/
 
 void Combinations::load_from_csv( const std::string &_Path ) noexcept/*{{{*/
@@ -72,58 +71,21 @@ void Combinations::load_from_json( const std::string &_Path ) noexcept/*{{{*/
 {
 	std::ifstream json_file{ _Path };
 	if ( json_file.fail() ) {
+
 		std::cerr << "Failed to open " + _Path + " in Combinations::load_from_json()\n";
 		exit(EXIT_FAILURE);
 	}
-
-	rapidjson::IStreamWrapper{ json_file }; // Creamos un Stream Wrapper para leerlo mejor
-
-	rapidjson::Document json_doc; // Aquí lo vamos a almacenar
-	json_doc.ParseStream( json_file ); // Lo parseamos al documento
-	if ( json_doc.HasParseError() ) {
-		std::cerr << "Failed to parse JSON file on Combinations::load_from_json()\n";
-		exit( EXIT_FAILURE );
-	}
-
-	// Vector total
-	const rapidjson::Value &json_vector{ json_doc["combination_list"] };
-
-	// We cycle trough BANKS
-	for ( rapidjson::SizeType i_bank{ 0 }; i_bank < json_vector.Size(); ++i_bank ) {
-		const rapidjson::Value &json_bank{ json_vector[ i_bank ] };
-
-		std::array<struct Combi, 128> temp_bank;
-
-		// Cycle trough COMBINATIONS
-		for ( rapidjson::SizeType i_combi{ 0 }; i_combi < json_bank.Size(); ++i_combi ) {
-			const rapidjson::Value &json_combi{ json_bank[ i_combi ] };
-
-			struct Combi temp_combi;
-
-			if ( json_combi.HasMember( "name" ) )
-				temp_combi.name = json_combi[ "name" ].GetString();
-
-			if ( json_combi.HasMember( "instrument_list" ) ) {
-				const rapidjson::Value &json_instrument_list{ json_combi[ "instrument_list" ] };
-
-				for ( rapidjson::SizeType i_inst{ 0 }; i_inst < json_instrument_list.Size(); ++i_inst )
-					temp_combi.instrument_list[ i_inst ] = json_instrument_list[ i_inst ].GetString();
-			}
-
-			temp_bank[ i_combi ] = temp_combi;
-		}
-
-		combination_list.push_back( temp_bank );
-	}
+	nlohmann::json json_object;
+	json_file >> json_object;
+	json_object.get_to(combinations_list);
 
 	json_file.close();
 
-}
-/*}}}*/
+}/*}}}*/
 
 Combinations::~Combinations()/*{{{*/
 {
-	delete [] data;
+	// delete [] data;
 }/*}}}*/
 
 void Combinations::escribir( const std::string &_Path ) noexcept/*{{{*/
@@ -163,3 +125,9 @@ int16_t Combinations::bnk_num_to_int( const char &_Banco, const int16_t &_Numero
 {
 	return ( _Banco - 65 ) * 127 + _Numero;
 }/*}}}*/
+
+void from_json( const nlohmann::json &_JSONobject, struct Combi &_Combination ) {/*{{{*/
+    _JSONobject.at( "name").get_to( _Combination.name );
+    _JSONobject.at( "instruments_list").get_to( _Combination.instruments_list );
+}/*}}}*/
+
