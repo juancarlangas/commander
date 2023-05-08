@@ -3,18 +3,18 @@
 
 #include <array>
 #include <bits/stdint-intn.h>
+#include <cstddef>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "data/nlohmann/json.hpp"
-//#include "data/nlohmann/adl_serializer.hpp"
-//#include "data/nlohmann/detail/abi_macros.hpp"
-//#include "data/nlohmann/detail/value_t.hpp"
+
+static const size_t &PATCHES_PER_BANK{ 128 };
 
 struct Combi {
 	std::string name;
-	std::array<std::string, 8> instruments_list;
+	std::vector<std::string> instruments_list;
 };
 
 struct Row {
@@ -29,17 +29,18 @@ class Combinations {
 		Combinations( const std::string & );
 		~Combinations();
 		void load_from_csv( const std::string & ) noexcept;
-		void load_from_json( const std::string & ) noexcept;
+		void load_from_json( const std::string & );
+		void from_new_to_old() noexcept;
 		void escribir( const std::string & ) noexcept;
 		std::string get_instrument_name(
 				const char &_Banco, const int16_t &_Num, const int16_t &_Track ) noexcept;
 		void set_instrument_name( const char &, const int16_t &, const int16_t &,
-				const std::string_view )
-			noexcept;
+				const std::string_view ) noexcept;
+		size_t channels_per_combi;
 	private:
-		int16_t n_bancos;
+		size_t n_bancos;
 		struct Row *data;
-		std::vector<std::array<struct Combi, 128>> combinations_list;
+		std::vector<std::array<struct Combi, PATCHES_PER_BANK>> combinations_list;
 		int16_t bnk_num_to_int( const char &, const int16_t & ) noexcept;
 };
 		

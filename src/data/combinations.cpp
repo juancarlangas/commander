@@ -1,10 +1,13 @@
 #include "combinations.hpp"
 
 #include <bits/stdint-intn.h>
+#include <cstddef>
 #include <cstdlib>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <math.h>
+#include <stdexcept>
 #include <string>
 #include <algorithm>
 
@@ -30,7 +33,7 @@ void Combinations::load_from_csv( const std::string &_Path ) noexcept/*{{{*/
 
 	std::string linea;
 
-	for ( int32_t i = 0; i < n_bancos * 128; ++i ) {
+	for ( size_t i = 0; i < n_bancos * 128; ++i ) {
 		std::getline( archivo, linea );
 
 		// BNK
@@ -67,8 +70,9 @@ void Combinations::load_from_csv( const std::string &_Path ) noexcept/*{{{*/
 	archivo.close();
 }/*}}}*/
 
-void Combinations::load_from_json( const std::string &_Path ) noexcept/*{{{*/
+void Combinations::load_from_json( const std::string &_Path )/*{{{*/
 {
+	// LOAD DATA
 	std::ifstream json_file{ _Path };
 	if ( json_file.fail() ) {
 
@@ -81,7 +85,39 @@ void Combinations::load_from_json( const std::string &_Path ) noexcept/*{{{*/
 
 	json_file.close();
 
+	// CALCULATE SIZES
+	n_bancos = combinations_list.size();
+
+	if ( !combinations_list.empty() ) {
+		channels_per_combi = combinations_list[0][0].instruments_list.size();
+
+		for ( const auto &bank : combinations_list )
+			for ( const auto &combination : bank )
+				if ( combination.instruments_list.size() != channels_per_combi ) {
+					std::cerr << "instruments_list vector size mismatch\n";
+					exit( EXIT_FAILURE );
+				}
+	}
+	else
+		throw std::runtime_error( "combinations_list is empty" );
+
 }/*}}}*/
+
+void Combinations::from_new_to_old() noexcept/*{{{*/
+{
+	data = new struct Row [ n_bancos * PATCHES_PER_BANK ]();
+
+	for ( size_t i_bank{ 0 }; i_bank < n_bancos; ++i_bank )
+		for ( size_t i_patch{ 0 }; i_patch < PATCHES_PER_BANK; ++i_patch ) {
+			data[ i_bank * PATCHES_PER_BANK + i_patch ].bnk = std::to_string( i_bank ).c_str()[0];
+			data[ i_bank * PATCHES_PER_BANK + i_patch ].num = i_patch;
+			data[ i_bank * PATCHES_PER_BANK + i_patch ].nombre = combinations_list[i_bank][i_patch].name;
+			for ( size_t i_inst{ 0 }; i_inst < channels_per_combi; ++i_inst )
+				data[ i_bank * PATCHES_PER_BANK + i_patch ].instrumento[i_inst] =
+					combinations_list[i_bank][i_patch].instruments_list[i_inst];
+		}
+}/*}}}*/
+
 
 Combinations::~Combinations()/*{{{*/
 {
@@ -96,7 +132,7 @@ void Combinations::escribir( const std::string &_Path ) noexcept/*{{{*/
 		exit( EXIT_FAILURE );
 	}
 
-	for ( int32_t i = 0; i < n_bancos * 128; ++i ) {
+	for ( size_t i = 0; i < n_bancos * 128; ++i ) {
 		archivo << data[i].bnk << ',' << std::setw( 3 ) << std::setfill( '0' ) << data[i].num << ','
 			<< data[i].nombre;
 		for ( int16_t j = 0; j < 8; ++j )
