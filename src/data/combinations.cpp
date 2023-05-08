@@ -81,25 +81,25 @@ void Combinations::load_from_json( const std::string &_Path )/*{{{*/
 	}
 	nlohmann::json json_object;
 	json_file >> json_object;
-	json_object.get_to(combinations_list);
+	json_object.get_to(combination_list);
 
 	json_file.close();
 
 	// CALCULATE SIZES
-	n_bancos = combinations_list.size();
+	n_bancos = combination_list.size();
 
-	if ( !combinations_list.empty() ) {
-		channels_per_combi = combinations_list[0][0].instruments_list.size();
+	if ( !combination_list.empty() ) {
+		channels_per_combi = combination_list[0][0].instrument_list.size();
 
-		for ( const auto &bank : combinations_list )
+		for ( const auto &bank : combination_list )
 			for ( const auto &combination : bank )
-				if ( combination.instruments_list.size() != channels_per_combi ) {
-					std::cerr << "instruments_list vector size mismatch\n";
+				if ( combination.instrument_list.size() != channels_per_combi ) {
+					std::cerr << "instrument_list vector size mismatch\n";
 					exit( EXIT_FAILURE );
 				}
 	}
 	else
-		throw std::runtime_error( "combinations_list is empty" );
+		throw std::runtime_error( "combination_list is empty" );
 
 }/*}}}*/
 
@@ -111,13 +111,12 @@ void Combinations::from_new_to_old() noexcept/*{{{*/
 		for ( size_t i_patch{ 0 }; i_patch < PATCHES_PER_BANK; ++i_patch ) {
 			data[ i_bank * PATCHES_PER_BANK + i_patch ].bnk = std::to_string( i_bank ).c_str()[0];
 			data[ i_bank * PATCHES_PER_BANK + i_patch ].num = i_patch;
-			data[ i_bank * PATCHES_PER_BANK + i_patch ].nombre = combinations_list[i_bank][i_patch].name;
+			data[ i_bank * PATCHES_PER_BANK + i_patch ].nombre = combination_list[i_bank][i_patch].name;
 			for ( size_t i_inst{ 0 }; i_inst < channels_per_combi; ++i_inst )
 				data[ i_bank * PATCHES_PER_BANK + i_patch ].instrumento[i_inst] =
-					combinations_list[i_bank][i_patch].instruments_list[i_inst];
+					combination_list[i_bank][i_patch].instrument_list[i_inst];
 		}
 }/*}}}*/
-
 
 Combinations::~Combinations()/*{{{*/
 {
@@ -164,6 +163,6 @@ int16_t Combinations::bnk_num_to_int( const char &_Banco, const int16_t &_Numero
 
 void from_json( const nlohmann::json &_JSONobject, struct Combi &_Combination ) {/*{{{*/
     _JSONobject.at( "name").get_to( _Combination.name );
-    _JSONobject.at( "instruments_list").get_to( _Combination.instruments_list );
+    _JSONobject.at( "instrument_list").get_to( _Combination.instrument_list );
 }/*}}}*/
 

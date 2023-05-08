@@ -8,6 +8,7 @@
 #include <string>
 #include <string_view>
 #include <array>
+#include <vector>
 
 #define ROWS 1000
 #define MAXIMO_DE_CANCIONES 1000
@@ -76,6 +77,7 @@ class Database {/*{{{*/
 		void delete_duplicated() noexcept;
 		void clonar_from_old( Database & ) noexcept;
 		void write_csv( const std::string &_Path ) noexcept;
+		void write_json( const std::string &_Path ) noexcept;
 		void escribir( const std::string &_Path ) noexcept
 		{
 			write_csv( _Path );
@@ -83,6 +85,7 @@ class Database {/*{{{*/
 		struct System get_cancion( const int ) noexcept;
 		struct System *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		struct System *get_favourite_row( const int32_t & ) noexcept;
+		//std::vector<Struct System> performance
 		struct System base[1000];
 	private:
 		int32_t activeRows;

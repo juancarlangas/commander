@@ -14,7 +14,7 @@ static const size_t &PATCHES_PER_BANK{ 128 };
 
 struct Combi {
 	std::string name;
-	std::vector<std::string> instruments_list;
+	std::vector<std::string> instrument_list;
 };
 
 struct Row {
@@ -40,7 +40,7 @@ class Combinations {
 	private:
 		size_t n_bancos;
 		struct Row *data;
-		std::vector<std::array<struct Combi, PATCHES_PER_BANK>> combinations_list;
+		std::vector<std::array<struct Combi, PATCHES_PER_BANK>> combination_list;
 		int16_t bnk_num_to_int( const char &, const int16_t & ) noexcept;
 };
 		
