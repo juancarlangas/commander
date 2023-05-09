@@ -43,15 +43,15 @@ struct Settings {
 
 struct Scene {
 	std::string label;
-	std::array<Settings, TRACKS_PER_PERFORMANCE> track_list;
+	std::array<Settings, TRACKS_PER_PERFORMANCE> tracks;
 };
 
 struct Performance {
 	Metadata metadata;
 	Patch patch;
 	std::string type;
-	std::array<std::string, 8> instrument_list;
-	std::vector<Scene> scene_list;
+	std::array<std::string, 8> instruments;
+	std::vector<Scene> scenes;
 	std::int16_t initial_scene;
 };/*}}}*/
 
@@ -130,7 +130,7 @@ class Database {/*{{{*/
 		struct System *get_favourite_row( const int32_t & ) noexcept;
 		struct System base[1000];
 	private:
-		std::vector<Performance> performance_list;
+		std::vector<Performance> performances;
 		std::int32_t activeRows;
 		std::int32_t n_canciones;
 		void clean_row(int);

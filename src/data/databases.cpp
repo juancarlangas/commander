@@ -70,26 +70,53 @@ void Database::load_from_json( const std::string &_Path)/*{{{*/
 	}
 	nlohmann::json json_object;
 	json_file >> json_object;
-	json_object.get_to(performance_list);
+	json_object.get_to(performances);
 
 	json_file.close();
 
-	// CALCULATE SIZES
-	activeRows = n_canciones = performance_list.size();
+	activeRows = n_canciones = performances.size();
+	from_new_to_old();
 }/*}}}*/
 
 void Database::from_new_to_old() noexcept/*{{{*/
 {
-	for ( size_t i = 0; i < performance_list.size(); ++i ) {
-		base[i].titulo = performance_list[i].metadata.title;
-		base[i].artista = performance_list[i].metadata.artist;
-		base[i].genero = performance_list[i].metadata.genre;
-		base[i].mood = performance_list[i].metadata.mood;
-		base[i].key_words = performance_list[i].metadata.keyword;
-		base[i].num = performance_list[i].patch.num;
-		base[i].bnk = std::to_string( performance_list[i].patch.bnk ).c_str()[0];
+	for ( size_t i = 0; i < performances.size(); ++i ) {
+		// C
+		strcpy( base[i].title, performances[i].metadata.title.c_str() );
+		strcpy( base[i].artist, performances[i].metadata.artist.c_str() );
+		strcpy( base[i].genre, performances[i].metadata.genre.c_str() );
+		strcpy( base[i].section, performances[i].metadata.mood.c_str() );
+		strcpy( base[i].keywords, performances[i].metadata.keyword.c_str() );
+		strcpy( base[i].type, performances[i].type.c_str() );
+
+		// C++
+		base[i].titulo = performances[i].metadata.title;
+		base[i].artista = performances[i].metadata.artist;
+		base[i].genero = performances[i].metadata.genre;
+		base[i].mood = performances[i].metadata.mood;
+		base[i].tipo = performances[i].type;
+		base[i].key_words = performances[i].metadata.keyword;
+
+		// Global
+		base[i].bnk = std::to_string( performances[i].patch.bnk ).c_str()[0];
+		base[i].num = performances[i].patch.num;
+
+		// New
+		base[i].n_variaciones = performances[i].scenes.size();
+		base[i].variacion_inicial = performances[i].initial_scene;
 		for (size_t j = 0; j < 8; ++j )
-			base[i].instrumento[j] = performance_list[i].instrument_list[j];
+			base[i].instrumento[j] = performances[i].instruments[j];
+		for ( size_t j = 0; j < performances[i].scenes.size(); ++j ) {
+			base[i].variacion[j].etiqueta = performances[i].scenes[j].label;
+			for ( size_t k = 0; k < TRACKS_PER_PERFORMANCE; ++k ) {
+				base[i].variacion[j].track[k].status = performances[i].scenes[j].tracks[k].state;
+				base[i].variacion[j].track[k].volume = performances[i].scenes[j].tracks[k].volume;
+				base[i].variacion[j].track[k].lower_key = performances[i].scenes[j].tracks[k].lower_key;
+				base[i].variacion[j].track[k].upper_key = performances[i].scenes[j].tracks[k].upper_key;
+				base[i].variacion[j].track[k].transposition =
+					performances[i].scenes[j].tracks[k].transposition;
+			}
+		}
 	}
 }/*}}}*/
 
@@ -710,9 +737,9 @@ void from_json(const nlohmann::json& j, Settings& s) {
 // Overload for Scene struct{{{
 void from_json(const nlohmann::json& j, Scene& sc) {
 	sc.label = j.at("label").get<std::string>();
-	auto& tracks = j.at("track_list");
+	auto& tracks = j.at("tracks");
 	for (std::size_t i = 0; i < tracks.size(); ++i) {
-		from_json(tracks[i], sc.track_list[i]);
+		from_json(tracks[i], sc.tracks[i]);
 	}
 }/*}}}*/
 
@@ -721,12 +748,12 @@ void from_json(const nlohmann::json& j, Performance& p) {
 	from_json(j.at("metadata"), p.metadata);
 	from_json(j.at("patch"), p.patch);
 	p.type = j.at("type").get<std::string>();
-	p.instrument_list = j.at("instrument_list").get<std::array<std::string, 8>>();
-	auto& scenes = j.at("scene_list");
+	p.instruments = j.at("instruments").get<std::array<std::string, 8>>();
+	auto& scenes = j.at("scenes");
 	for (std::size_t i = 0; i < scenes.size(); ++i) {
 		Scene sc;
 		from_json(scenes[i], sc);
-		p.scene_list.push_back(sc);
+		p.scenes.push_back(sc);
 	}
 	p.initial_scene = j.at("initial_scene").get<std::int16_t>();
 }/*}}}*/
