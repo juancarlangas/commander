@@ -60,6 +60,39 @@ void Database::clean_row(int line)/*{{{*/
 	base[line].num = 0;
 }/*}}}*/
 
+void Database::load_from_json( const std::string &_Path)/*{{{*/
+{
+	// LOAD DATA
+	std::ifstream json_file{ _Path };
+	if ( json_file.fail() ) {
+		std::cerr << "Failed to open " + _Path + " in Database::load_from_json()\n";
+		exit(EXIT_FAILURE);
+	}
+	nlohmann::json json_object;
+	json_file >> json_object;
+	json_object.get_to(performance_list);
+
+	json_file.close();
+
+	// CALCULATE SIZES
+	activeRows = n_canciones = performance_list.size();
+}/*}}}*/
+
+void Database::from_new_to_old() noexcept/*{{{*/
+{
+	for ( size_t i = 0; i < performance_list.size(); ++i ) {
+		base[i].titulo = performance_list[i].metadata.title;
+		base[i].artista = performance_list[i].metadata.artist;
+		base[i].genero = performance_list[i].metadata.genre;
+		base[i].mood = performance_list[i].metadata.mood;
+		base[i].key_words = performance_list[i].metadata.keyword;
+		base[i].num = performance_list[i].patch.num;
+		base[i].bnk = std::to_string( performance_list[i].patch.bnk ).c_str()[0];
+		for (size_t j = 0; j < 8; ++j )
+			base[i].instrumento[j] = performance_list[i].instrument_list[j];
+	}
+}/*}}}*/
+
 void Database::load_csv( const std::string &_Path ) noexcept/*{{{*/
 {
  	std::int32_t value{ Files::contar_lineas( _Path ) };
@@ -635,4 +668,65 @@ struct System *Database::get_cancion_ptr( const int32_t &_Index ) noexcept/*{{{*
 struct System *Database::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
 {
 	return favorito[ _FavNumber ];
+}/*}}}*/
+
+// Overload for Metadata struct{{{
+void from_json(const nlohmann::json& j, Metadata& m) {
+	m.title = j.at("title").get<std::string>();
+	m.artist = j.at("artist").get<std::string>();
+	m.genre = j.at("genre").get<std::string>();
+	m.mood = j.at("mood").get<std::string>();
+	m.keyword = j.at("key_word").get<std::string>();
+}/*}}}*/
+
+// Overload for Patch struct{{{
+void from_json(const nlohmann::json& j, Patch& p) {
+	p.bnk = j.at("bnk").get<std::int32_t>();
+	p.num = j.at("num").get<std::int32_t>();
+}/*}}}*/
+
+// Overload for Switch enum{{{
+void from_json(const nlohmann::json& j, Switch& s) {
+	static const std::unordered_map<std::string, Switch> switch_map = {
+		{"OFF", OFF},
+		{"ON", ON}
+	};
+	auto it = switch_map.find(j.get<std::string>());
+	if (it == switch_map.end()) {
+		throw std::invalid_argument("Invalid Switch value");
+	}
+	s = it->second;
+}/*}}}*/
+
+// Overload for Settings struct{{{
+void from_json(const nlohmann::json& j, Settings& s) {
+	//s.state = j.at("state").get<Switch>();
+	s.volume = j.at("volume").get<std::int16_t>();
+	s.lower_key = j.at("lower_key").get<std::int16_t>();
+	s.upper_key = j.at("upper_key").get<std::int16_t>();
+	s.transposition = j.at("transposition").get<std::int16_t>();
+}/*}}}*/
+
+// Overload for Scene struct{{{
+void from_json(const nlohmann::json& j, Scene& sc) {
+	sc.label = j.at("label").get<std::string>();
+	auto& tracks = j.at("track_list");
+	for (std::size_t i = 0; i < tracks.size(); ++i) {
+		from_json(tracks[i], sc.track_list[i]);
+	}
+}/*}}}*/
+
+// Overload for Performance struct{{{
+void from_json(const nlohmann::json& j, Performance& p) {
+	from_json(j.at("metadata"), p.metadata);
+	from_json(j.at("patch"), p.patch);
+	p.type = j.at("type").get<std::string>();
+	p.instrument_list = j.at("instrument_list").get<std::array<std::string, 8>>();
+	auto& scenes = j.at("scene_list");
+	for (std::size_t i = 0; i < scenes.size(); ++i) {
+		Scene sc;
+		from_json(scenes[i], sc);
+		p.scene_list.push_back(sc);
+	}
+	p.initial_scene = j.at("initial_scene").get<std::int16_t>();
 }/*}}}*/

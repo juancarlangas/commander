@@ -10,6 +10,8 @@
 #include <array>
 #include <vector>
 
+#include "nlohmann/json.hpp"
+
 #define ROWS 1000
 #define MAXIMO_DE_CANCIONES 1000
 #define N_FAVORITOS 10
@@ -23,7 +25,7 @@ struct Metadata {
 	std::string artist;
 	std::string genre;
 	std::string mood;
-	std::string key_word;
+	std::string keyword;
 };
 
 struct Patch {
@@ -50,10 +52,9 @@ struct Performance {
 	std::string type;
 	std::array<std::string, 8> instrument_list;
 	std::vector<Scene> scene_list;
-	std::int16_t n_variations;
-	std::int16_t initial_variation;
+	std::int16_t initial_scene;
 };/*}}}*/
-		
+
 // OLD STRUCT TYPE{{{
 struct Track {
 	enum Switch status;
@@ -101,11 +102,14 @@ class Database {/*{{{*/
 		Database();
 		Database( const std::string & ) noexcept;
 		Database( const std::string &, Combinations *_CombinationPtr ) noexcept;
+		void load_from_json( const std::string &_Path);
+		void from_new_to_old() noexcept;
 		void load_csv( const std::string &_Path ) noexcept;
 		void cargar( const std::string &_Path ) noexcept
 		{
 			load_csv( _Path );
 		}
+
 		int32_t get_activeRows() noexcept;
 		void cargar_especifico( const std::string &, int32_t ) noexcept;
 		void clonar_to_old( Database & ) noexcept;
@@ -127,8 +131,8 @@ class Database {/*{{{*/
 		struct System base[1000];
 	private:
 		std::vector<Performance> performance_list;
-		int32_t activeRows;
-		int32_t n_canciones;
+		std::int32_t activeRows;
+		std::int32_t n_canciones;
 		void clean_row(int);
 		const char *homedir;
 		struct System *favorito[ N_FAVORITOS ];
@@ -137,5 +141,12 @@ class Database {/*{{{*/
 
 		friend class Playlist;
 	};/*}}}*/
+
+// JSON{{{
+void from_json( const nlohmann::json &_JSONobject, Patch &_Patch );
+void from_json( const nlohmann::json &_JSONobject, Settings &_Settings );
+void from_json( const nlohmann::json &_JSONobject, Performance &_Performance );
+void from_json( const nlohmann::json &_JSONobject, Scene &_Scene );
+void from_json( const nlohmann::json &_JSONobject, Metadata &_Metadata );/*}}}*/
 
 #endif

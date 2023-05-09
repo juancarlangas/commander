@@ -75,7 +75,6 @@ void Combinations::load_from_json( const std::string &_Path )/*{{{*/
 	// LOAD DATA
 	std::ifstream json_file{ _Path };
 	if ( json_file.fail() ) {
-
 		std::cerr << "Failed to open " + _Path + " in Combinations::load_from_json()\n";
 		exit(EXIT_FAILURE);
 	}
@@ -117,7 +116,6 @@ void Combinations::from_new_to_old() noexcept/*{{{*/
 					combination_list[i_bank][i_patch].instrument_list[i_inst];
 		}
 }/*}}}*/
-
 
 Combinations::~Combinations()/*{{{*/
 {
@@ -166,4 +164,3 @@ void from_json( const nlohmann::json &_JSONobject, struct Combi &_Combination ) 
     _JSONobject.at( "name").get_to( _Combination.name );
     _JSONobject.at( "instrument_list").get_to( _Combination.instrument_list );
 }/*}}}*/
-
