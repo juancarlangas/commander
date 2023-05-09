@@ -13,10 +13,24 @@
 #define ROWS 1000
 #define MAXIMO_DE_CANCIONES 1000
 #define N_FAVORITOS 10
+static const std::int16_t &TRACKS_PER_PERFORMANCE{ 8 };
 
 enum Switch : bool { OFF = 0, ON };
 
-// NEW TYPE{{{
+// NEW STRUCT TYPE{{{
+struct Metadata {
+	std::string title;
+	std::string artist;
+	std::string genre;
+	std::string mood;
+	std::string key_word;
+};
+
+struct Patch {
+	std::int32_t bnk;
+	std::int32_t num;
+};
+
 struct Settings {
 	enum Switch state;
 	std::int16_t volume;
@@ -27,23 +41,20 @@ struct Settings {
 
 struct Scene {
 	std::string label;
-	std::array <Settings, 8> track;
+	std::array<Settings, TRACKS_PER_PERFORMANCE> track_list;
 };
 
 struct Performance {
-	std::string title;
-	std::string artist;
-	std::string genre;
-	std::string mood;
-	std::string key_words;
+	Metadata metadata;
+	Patch patch;
 	std::string type;
+	std::array<std::string, 8> instrument_list;
+	std::vector<Scene> scene_list;
 	std::int16_t n_variations;
 	std::int16_t initial_variation;
-	std::array<std::string, 8> instrument_list;
-	std::vector<Scene> scene;
 };/*}}}*/
 		
-// OLD TYPE{{{
+// OLD STRUCT TYPE{{{
 struct Track {
 	enum Switch status;
 	int16_t volume;
