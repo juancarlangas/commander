@@ -74,6 +74,37 @@ void Database::load_from_json( const std::string &_Path)/*{{{*/
 
 	json_file.close();
 
+	std::ofstream debug_file{ "/home/juancarlangas/Desktop/debug_file.txt" };
+	// Loop through each performance in the vector
+    for (const auto& perf : performances) {
+        debug_file << "Metadata:\n"
+                  << "  Title: " << perf.metadata.title << "\n"
+                  << "  Artist: " << perf.metadata.artist << "\n"
+                  << "  Genre: " << perf.metadata.genre << "\n"
+                  << "  Mood: " << perf.metadata.mood << "\n"
+                  << "  Key Word: " << perf.metadata.keyword << "\n"
+                  << "Patch: " << perf.patch.bnk << "/" << perf.patch.num << "\n"
+                  << "Type: " << perf.type << "\n"
+                  << "Instruments:\n";
+        for (const auto& inst : perf.instruments) {
+            debug_file << "  " << inst << "\n";
+        }
+        debug_file << "Scenes:\n";
+        for (const auto& scene : perf.scenes) {
+            debug_file << "  Label: " << scene.label << "\n";
+            for (const auto& track : scene.tracks) {
+                debug_file << "    State: " << (track.state == ON ? "ON" : "OFF") << "\n"
+                          << "    Volume: " << track.volume << "\n"
+                          << "    Lower Key: " << track.lower_key << "\n"
+                          << "    Upper Key: " << track.upper_key << "\n"
+                          << "    Transposition: " << track.transposition << "\n";
+            }
+        }
+        debug_file << "Initial Variation: " << perf.initial_scene << "\n";
+    }
+
+	debug_file.close();
+
 	activeRows = n_canciones = performances.size();
 	from_new_to_old();
 }/*}}}*/
@@ -98,12 +129,12 @@ void Database::from_new_to_old() noexcept/*{{{*/
 		base[i].key_words = performances[i].metadata.keyword;
 
 		// Global
-		base[i].bnk = std::to_string( performances[i].patch.bnk ).c_str()[0];
+		base[i].bnk = std::to_string( performances[i].patch.bnk ).c_str()[0] + 17;
 		base[i].num = performances[i].patch.num;
 
 		// New
 		base[i].n_variaciones = performances[i].scenes.size();
-		base[i].variacion_inicial = performances[i].initial_scene;
+		base[i].variacion_inicial = performances[i].initial_scene + 1;
 		for (size_t j = 0; j < 8; ++j )
 			base[i].instrumento[j] = performances[i].instruments[j];
 		for ( size_t j = 0; j < performances[i].scenes.size(); ++j ) {
@@ -442,6 +473,7 @@ int32_t Database::get_activeRows() noexcept/*{{{*/
 	return n_canciones;
 }/*}}}*/
 
+
 void Database::write_csv( const std::string &_Path ) noexcept/*{{{*/
 {
 	std::ofstream archivo{ _Path };
@@ -697,13 +729,14 @@ struct System *Database::get_favourite_row( const int32_t &_FavNumber ) noexcept
 	return favorito[ _FavNumber ];
 }/*}}}*/
 
+/************************************* from_json **************************************************/
 // Overload for Metadata struct{{{
 void from_json(const nlohmann::json& j, Metadata& m) {
 	m.title = j.at("title").get<std::string>();
 	m.artist = j.at("artist").get<std::string>();
 	m.genre = j.at("genre").get<std::string>();
 	m.mood = j.at("mood").get<std::string>();
-	m.keyword = j.at("key_word").get<std::string>();
+	m.keyword = j.at("keyword").get<std::string>();
 }/*}}}*/
 
 // Overload for Patch struct{{{
@@ -712,7 +745,7 @@ void from_json(const nlohmann::json& j, Patch& p) {
 	p.num = j.at("num").get<std::int32_t>();
 }/*}}}*/
 
-// Overload for Switch enum{{{
+// Overload for Swith enum{{{
 void from_json(const nlohmann::json& j, Switch& s) {
 	static const std::unordered_map<std::string, Switch> switch_map = {
 		{"OFF", OFF},
@@ -727,7 +760,7 @@ void from_json(const nlohmann::json& j, Switch& s) {
 
 // Overload for Settings struct{{{
 void from_json(const nlohmann::json& j, Settings& s) {
-	//s.state = j.at("state").get<Switch>();
+	s.state = j.at("state").get<Switch>();
 	s.volume = j.at("volume").get<std::int16_t>();
 	s.lower_key = j.at("lower_key").get<std::int16_t>();
 	s.upper_key = j.at("upper_key").get<std::int16_t>();
@@ -756,4 +789,9 @@ void from_json(const nlohmann::json& j, Performance& p) {
 		p.scenes.push_back(sc);
 	}
 	p.initial_scene = j.at("initial_scene").get<std::int16_t>();
+}/*}}}*/
+
+/*************************************** to_json ****************************************************/
+void to_json(nlohmann::json& j, const Switch& s) {/*{{{*/
+    j = (s == ON) ? "ON" : "OFF";
 }/*}}}*/

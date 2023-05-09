@@ -107,7 +107,7 @@ class Database {/*{{{*/
 		void load_csv( const std::string &_Path ) noexcept;
 		void cargar( const std::string &_Path ) noexcept
 		{
-			load_csv( _Path );
+			load_from_json( _Path );
 		}
 
 		int32_t get_activeRows() noexcept;

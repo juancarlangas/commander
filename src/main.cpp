@@ -24,7 +24,7 @@ int32_t main()
 	// Databases{{{
 	Combinations combinaciones { config_directory + "/combinations.json" };
 
-	Database *dBase = new Database []{ { config_directory + "/catalogo.csv", &combinaciones } };
+	Database *dBase = new Database []{ { config_directory + "/catalog.json", &combinaciones } };
 	int dbRows[1] { dBase[COMBINATIONS].get_activeRows() };
 /*}}}*/
 
