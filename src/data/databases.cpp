@@ -660,12 +660,14 @@ void Database::ordenate()/*{{{*/
 	//Sounds	
 	a = 0;
 	b = a + 1;
-	while (a <= activeRows - 2 && b <= activeRows - 1) {	
-		if (strstr(base[a].section, "Sound") == NULL || strstr("Sound", base[a].section) == NULL) {
+	/* sorting the structures in the base array based on whether the section field contains the
+	 * substring "Sound". */
+	while (a < activeRows - 1 and b < activeRows) {	
+		if (strcmp(base[a].section, "Sound") == 0) {
 			b = a + 1;
 			success = false;
 			while (success == false && b <= activeRows - 1) {
-				if (strstr(base[b].section, "Sound") == NULL || strstr("Sound", base[b].section) == NULL)
+				if (strcmp(base[b].section, "Sound") == 0)
 					b++;
 				else {
 					aux = base[a];

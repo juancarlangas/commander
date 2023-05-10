@@ -10,7 +10,7 @@
 void llenado_displayTable(	System *_DisplayTable[], System _DataBase[], /*{{{*/
 							const int _DBRows, const std::string_view _Cadena, int *_DisplayRows )
 {
-	switch ( _Cadena.data()[0] ) {
+	switch (_Cadena.data()[0]) {
 
 		case '\0': // RESET_QUERY
 			*_DisplayRows = _DBRows; // reiniciamos
@@ -25,20 +25,17 @@ void llenado_displayTable(	System *_DisplayTable[], System _DataBase[], /*{{{*/
 		default: // Palabra
 			*_DisplayRows = 0; // Reiniciamos
 
-			for ( int32_t i = 0; i < _DBRows; ++i )
-				if (	low_string( _DataBase[i].titulo ).find( low_string( _Cadena ) )
-							!= std::string::npos or
-						low_string( _DataBase[i].artista ).find( low_string( _Cadena ) )
-							!= std::string::npos or
-						low_string( _DataBase[i].genero ).find( low_string( _Cadena  ) )
-							!= std::string::npos or
-						low_string( _DataBase[i].mood ).find( low_string( _Cadena ) )
-							!= std::string::npos or
-						low_string( _DataBase[i].key_words ).find( low_string( _Cadena ) )
-							!= std::string::npos ) {
+			for (int32_t i = 0; i < _DBRows; ++i)
+				// Si encontró en algún campo la palabra clave
+				if (low_string(_DataBase[i].titulo).find(low_string(_Cadena))		!= std::string::npos or
+					low_string(_DataBase[i].artista).find(low_string(_Cadena))		!= std::string::npos or
+					low_string(_DataBase[i].genero).find(low_string(_Cadena))		!= std::string::npos or
+					low_string(_DataBase[i].mood).find(low_string(_Cadena))			!= std::string::npos or
+					low_string(_DataBase[i].key_words).find(low_string(_Cadena))	!= std::string::npos ) {
 
-					_DisplayTable[ *_DisplayRows ] = _DataBase + i;
-					( *_DisplayRows )++;
+					// Agrégala
+					_DisplayTable[*_DisplayRows] = _DataBase + i;
+					++(*_DisplayRows);
 				}
 			break;
 	}
