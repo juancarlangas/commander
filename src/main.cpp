@@ -454,8 +454,8 @@ int32_t main()
 				break;/*}}}*/
 
 			case EXPORTATE:/*{{{*/
-				dBase[COMBINATIONS].escribir( config_directory + "/catalogo.csv" );
-				combinaciones.escribir( config_directory + "/combinaciones.csv" );
+				dBase[COMBINATIONS].escribir( config_directory + "/catalog.json" );
+				combinaciones.escribir( config_directory + "/combinaciones.json" );
 
 				*keyword = '\0';
 
@@ -476,8 +476,8 @@ int32_t main()
 			case EXPORTATE_AND_QUIT :/*{{{*/
 				// Esta madrola hace lo básico del EXPORTATE y diréctamente modifica
 				// el command para que el while saque a la chingada el programa
-				dBase[COMBINATIONS].escribir( config_directory + "/catalogo.csv" );
-				combinaciones.escribir( config_directory + "/combinaciones.csv" );
+				dBase[COMBINATIONS].escribir( config_directory + "/catalog.json" );
+				combinaciones.escribir( config_directory + "/combinaciones.json" );
 
 				command = EXIT;
 

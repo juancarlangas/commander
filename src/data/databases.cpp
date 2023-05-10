@@ -17,6 +17,7 @@
 #include "data/databases.hpp"
 #include "graphics/form.hpp"
 #include "common/string.hpp"
+#include "nlohmann/json.hpp"
 #include "utilities/src/files.hpp"
 #include "graphics/ncurses.hpp"
 
@@ -60,55 +61,6 @@ void Database::clean_row(int line)/*{{{*/
 	base[line].num = 0;
 }/*}}}*/
 
-void Database::load_from_json( const std::string &_Path)/*{{{*/
-{
-	// LOAD DATA
-	std::ifstream json_file{ _Path };
-	if ( json_file.fail() ) {
-		std::cerr << "Failed to open " + _Path + " in Database::load_from_json()\n";
-		exit(EXIT_FAILURE);
-	}
-	nlohmann::json json_object;
-	json_file >> json_object;
-	json_object.get_to(performances);
-
-	json_file.close();
-
-	std::ofstream debug_file{ "/home/juancarlangas/Desktop/debug_file.txt" };
-	// Loop through each performance in the vector
-    for (const auto& perf : performances) {
-        debug_file << "Metadata:\n"
-                  << "  Title: " << perf.metadata.title << "\n"
-                  << "  Artist: " << perf.metadata.artist << "\n"
-                  << "  Genre: " << perf.metadata.genre << "\n"
-                  << "  Mood: " << perf.metadata.mood << "\n"
-                  << "  Key Word: " << perf.metadata.keyword << "\n"
-                  << "Patch: " << perf.patch.bnk << "/" << perf.patch.num << "\n"
-                  << "Type: " << perf.type << "\n"
-                  << "Instruments:\n";
-        for (const auto& inst : perf.instruments) {
-            debug_file << "  " << inst << "\n";
-        }
-        debug_file << "Scenes:\n";
-        for (const auto& scene : perf.scenes) {
-            debug_file << "  Label: " << scene.label << "\n";
-            for (const auto& track : scene.tracks) {
-                debug_file << "    State: " << (track.state == ON ? "ON" : "OFF") << "\n"
-                          << "    Volume: " << track.volume << "\n"
-                          << "    Lower Key: " << track.lower_key << "\n"
-                          << "    Upper Key: " << track.upper_key << "\n"
-                          << "    Transposition: " << track.transposition << "\n";
-            }
-        }
-        debug_file << "Initial Variation: " << perf.initial_scene << "\n";
-    }
-
-	debug_file.close();
-
-	activeRows = n_canciones = performances.size();
-	from_new_to_old();
-}/*}}}*/
-
 void Database::from_new_to_old() noexcept/*{{{*/
 {
 	for ( size_t i = 0; i < performances.size(); ++i ) {
@@ -129,7 +81,7 @@ void Database::from_new_to_old() noexcept/*{{{*/
 		base[i].key_words = performances[i].metadata.keyword;
 
 		// Global
-		base[i].bnk = std::to_string( performances[i].patch.bnk ).c_str()[0] + 17;
+		base[i].bnk = performances[i].patch.bnk + 65;
 		base[i].num = performances[i].patch.num;
 
 		// New
@@ -149,6 +101,26 @@ void Database::from_new_to_old() noexcept/*{{{*/
 			}
 		}
 	}
+}/*}}}*/
+
+void Database::load_from_json( const std::string &_Path)/*{{{*/
+{
+	// LOAD DATA
+	std::ifstream json_file{ _Path };
+	if ( json_file.fail() ) {
+		std::cerr << "Failed to open " + _Path + " in Database::load_from_json()\n";
+		exit(EXIT_FAILURE);
+	}
+	nlohmann::json json_object;
+	json_file >> json_object;
+	json_object.get_to(performances);
+
+	json_file.close();
+
+
+	activeRows = n_canciones = performances.size();
+
+	from_new_to_old();
 }/*}}}*/
 
 void Database::load_csv( const std::string &_Path ) noexcept/*{{{*/
@@ -473,6 +445,94 @@ int32_t Database::get_activeRows() noexcept/*{{{*/
 	return n_canciones;
 }/*}}}*/
 
+void Database::from_old_to_new() noexcept/*{{{*/
+{
+	for (size_t i = 0; i < performances.size(); ++i) {
+		// C
+		base[i].titulo = base[i].title;
+		base[i].artista = base[i].artist;
+		base[i].genero = base[i].genre;
+		base[i].mood = base[i].section;
+		base[i].key_words = base[i].keywords;
+		base[i].tipo = base[i].type;
+
+		// C++
+		performances[i].metadata.title = base[i].titulo;
+		performances[i].metadata.artist = base[i].artista;
+		performances[i].metadata.genre = base[i].genero;
+		performances[i].metadata.mood = base[i].mood;
+		performances[i].metadata.keyword = base[i].key_words;
+		performances[i].type = base[i].tipo;
+
+		// Global
+		performances[i].patch.bnk = (base[i].bnk - 65);
+		performances[i].patch.num = base[i].num;
+
+		// New
+		performances[i].scenes.resize(base[i].n_variaciones);
+		performances[i].initial_scene = base[i].variacion_inicial - 1;
+		for (size_t j = 0; j < 8; ++j) {
+			performances[i].instruments[j] = base[i].instrumento[j];
+		}
+		for (size_t j = 0; j < static_cast<size_t>( base[i].n_variaciones ); ++j) {
+			performances[i].scenes[j].label = base[i].variacion[j].etiqueta;
+			for (size_t k = 0; k < TRACKS_PER_PERFORMANCE; ++k) {
+				performances[i].scenes[j].tracks[k].state = base[i].variacion[j].track[k].status;
+				performances[i].scenes[j].tracks[k].volume = base[i].variacion[j].track[k].volume;
+				performances[i].scenes[j].tracks[k].lower_key = base[i].variacion[j].track[k].lower_key;
+				performances[i].scenes[j].tracks[k].upper_key = base[i].variacion[j].track[k].upper_key;
+				performances[i].scenes[j].tracks[k].transposition =
+					base[i].variacion[j].track[k].transposition;
+			}
+		}
+	}
+
+	std::ofstream debug_file{ "/home/juancarlangas/Desktop/debug_file.txt" };
+	// Loop through each performance in the vector
+    for (const auto& perf : performances) {
+        debug_file << "Metadata:\n"
+                  << "  Title: " << perf.metadata.title << "\n"
+                  << "  Artist: " << perf.metadata.artist << "\n"
+                  << "  Genre: " << perf.metadata.genre << "\n"
+                  << "  Mood: " << perf.metadata.mood << "\n"
+                  << "  Key Word: " << perf.metadata.keyword << "\n"
+                  << "Patch: " << perf.patch.bnk << "/" << perf.patch.num << "\n"
+                  << "Type: " << perf.type << "\n"
+                  << "Instruments:\n";
+        for (const auto& inst : perf.instruments) {
+            debug_file << "  " << inst << "\n";
+        }
+        debug_file << "Scenes:\n";
+        for (const auto& scene : perf.scenes) {
+            debug_file << "  Label: " << scene.label << "\n";
+            for (const auto& track : scene.tracks) {
+                debug_file << "    State: " << (track.state == ON ? "ON" : "OFF") << "\n"
+                          << "    Volume: " << track.volume << "\n"
+                          << "    Lower Key: " << track.lower_key << "\n"
+                          << "    Upper Key: " << track.upper_key << "\n"
+                          << "    Transposition: " << track.transposition << "\n";
+            }
+        }
+        debug_file << "Initial Variation: " << perf.initial_scene << "\n";
+    }
+	debug_file.close();
+}/*}}}*/
+
+void Database::save_to_json(const std::string& _Path) noexcept {/*{{{*/
+	from_old_to_new();
+
+    // Create a JSON object and fill it with the data from performances vector
+    nlohmann::ordered_json json_object = performances;
+
+    // Open a file and write the JSON object to it
+    std::ofstream json_file{ _Path };
+    if (json_file.fail()) {
+        std::cerr << "Failed to open " + _Path + " in Database::save_to_json()\n";
+        exit(EXIT_FAILURE);
+    }
+    json_file << std::setfill('\t') << std::setw(1) << json_object << std::endl;
+    json_file.close();
+}/*}}}*/
 
 void Database::write_csv( const std::string &_Path ) noexcept/*{{{*/
 {
@@ -792,6 +852,55 @@ void from_json(const nlohmann::json& j, Performance& p) {
 }/*}}}*/
 
 /*************************************** to_json ****************************************************/
-void to_json(nlohmann::json& j, const Switch& s) {/*{{{*/
-    j = (s == ON) ? "ON" : "OFF";
+// Overload for Metadata struct{{{
+void to_json(nlohmann::ordered_json& j, const Metadata& m) {
+	j = nlohmann::ordered_json{{"title", m.title},
+							   {"artist", m.artist},
+							   {"genre", m.genre},
+							   {"mood", m.mood},
+							   {"keyword", m.keyword}};
+}/*}}}*/
+
+// Overload for Patch struct{{{
+void to_json(nlohmann::ordered_json& j, const Patch& p) {
+	j = nlohmann::ordered_json{{"bnk", p.bnk},
+							   {"num", p.num}};
+}/*}}}*/
+
+// Overload for Switch enum{{{
+void to_json(nlohmann::ordered_json& j, const Switch& s) {
+	static const std::unordered_map<Switch, std::string> switch_map = {
+		{OFF, "OFF"},
+		{ON, "ON"}
+	};
+	auto it = switch_map.find(s);
+	if (it == switch_map.end()) {
+		throw std::invalid_argument("Invalid Switch value");
+	}
+	j = it->second;
+}/*}}}*/
+
+// Overload for Settings struct{{{
+void to_json(nlohmann::ordered_json& j, const Settings& s) {
+	j = nlohmann::ordered_json{{"state", s.state},
+							   {"volume", s.volume},
+							   {"lower_key", s.lower_key},
+							   {"upper_key", s.upper_key},
+							   {"transposition", s.transposition}};
+}/*}}}*/
+
+// Overload for Scene struct{{{
+void to_json(nlohmann::ordered_json& j, const Scene& sc) {
+	j = nlohmann::ordered_json{{"label", sc.label},
+							   {"tracks", sc.tracks}};
+}/*}}}*/
+
+// Overload for Performance struct{{{
+void to_json(nlohmann::ordered_json& j, const Performance& p) {
+	j = nlohmann::ordered_json{{"metadata", p.metadata},
+							   {"patch", p.patch},
+							   {"type", p.type},
+							   {"instruments", p.instruments},
+							   {"scenes", p.scenes},
+							   {"initial_scene", p.initial_scene}};
 }/*}}}*/

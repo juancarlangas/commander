@@ -120,10 +120,11 @@ class Database {/*{{{*/
 		void delete_duplicated() noexcept;
 		void clonar_from_old( Database & ) noexcept;
 		void write_csv( const std::string &_Path ) noexcept;
-		void write_json( const std::string &_Path ) noexcept;
+		void save_to_json( const std::string &_Path ) noexcept;
+		void from_old_to_new() noexcept;
 		void escribir( const std::string &_Path ) noexcept
 		{
-			write_csv( _Path );
+			save_to_json( _Path );
 		}
 		struct System get_cancion( const int ) noexcept;
 		struct System *get_cancion_ptr( const int32_t &_Index ) noexcept;
@@ -145,8 +146,16 @@ class Database {/*{{{*/
 // JSON{{{
 void from_json( const nlohmann::json &_JSONobject, Patch &_Patch );
 void from_json( const nlohmann::json &_JSONobject, Settings &_Settings );
+void from_json( const nlohmann::json& j, Switch& s);
 void from_json( const nlohmann::json &_JSONobject, Performance &_Performance );
 void from_json( const nlohmann::json &_JSONobject, Scene &_Scene );
-void from_json( const nlohmann::json &_JSONobject, Metadata &_Metadata );/*}}}*/
+void from_json( const nlohmann::json &_JSONobject, Metadata &_Metadata );
+
+void to_json(nlohmann::ordered_json& j, const Metadata& m);
+void to_json(nlohmann::ordered_json& j, const Patch& p);
+void to_json(nlohmann::ordered_json& j, const Switch& s);
+void to_json(nlohmann::ordered_json& j, const Settings& s);
+void to_json(nlohmann::ordered_json& j, const Scene& sc);
+void to_json(nlohmann::ordered_json& j, const Performance& p);/*}}}*/
 
 #endif
