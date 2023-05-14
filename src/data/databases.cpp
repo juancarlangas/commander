@@ -86,7 +86,7 @@ void Database::from_new_to_old() noexcept/*{{{*/
 
 		// New
 		base[i].n_variaciones = performances[i].scenes.size();
-		base[i].variacion_inicial = performances[i].initial_scene + 1;
+		base[i].variacion_inicial = performances[i].initial_scene;
 		for (size_t j = 0; j < 8; ++j )
 			base[i].instrumento[j] = performances[i].instruments[j];
 		for ( size_t j = 0; j < performances[i].scenes.size(); ++j ) {
@@ -470,7 +470,7 @@ void Database::from_old_to_new() noexcept/*{{{*/
 
 		// New
 		performances[i].scenes.resize(base[i].n_variaciones);
-		performances[i].initial_scene = base[i].variacion_inicial - 1;
+		performances[i].initial_scene = base[i].variacion_inicial;
 		for (size_t j = 0; j < 8; ++j) {
 			performances[i].instruments[j] = base[i].instrumento[j];
 		}
