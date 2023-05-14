@@ -447,7 +447,11 @@ int32_t Database::get_activeRows() noexcept/*{{{*/
 
 void Database::from_old_to_new() noexcept/*{{{*/
 {
-	for (size_t i = 0; i < performances.size(); ++i) {
+	performances.clear();
+
+	for (size_t i = 0; i < static_cast<size_t>(n_canciones); ++i) {
+		performances.push_back( Performance{} );
+
 		// C
 		base[i].titulo = base[i].title;
 		base[i].artista = base[i].artist;
@@ -455,6 +459,7 @@ void Database::from_old_to_new() noexcept/*{{{*/
 		base[i].mood = base[i].section;
 		base[i].key_words = base[i].keywords;
 		base[i].tipo = base[i].type;
+
 
 		// C++
 		performances[i].metadata.title = base[i].titulo;
