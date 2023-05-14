@@ -61,6 +61,26 @@ void Database::clean_row(int line)/*{{{*/
 	base[line].num = 0;
 }/*}}}*/
 
+void Database::load_from_json( const std::string &_Path)/*{{{*/
+{
+	// LOAD DATA
+	std::ifstream json_file{ _Path };
+	if ( json_file.fail() ) {
+		std::cerr << "Failed to open " + _Path + " in Database::load_from_json()\n";
+		exit(EXIT_FAILURE);
+	}
+	nlohmann::json json_object;
+	json_file >> json_object;
+	json_object.get_to(performances);
+
+	json_file.close();
+
+
+	activeRows = n_canciones = performances.size();
+
+	from_new_to_old();
+}/*}}}*/
+
 void Database::from_new_to_old() noexcept/*{{{*/
 {
 	for ( size_t i = 0; i < performances.size(); ++i ) {
@@ -101,26 +121,9 @@ void Database::from_new_to_old() noexcept/*{{{*/
 			}
 		}
 	}
-}/*}}}*/
 
-void Database::load_from_json( const std::string &_Path)/*{{{*/
-{
-	// LOAD DATA
-	std::ifstream json_file{ _Path };
-	if ( json_file.fail() ) {
-		std::cerr << "Failed to open " + _Path + " in Database::load_from_json()\n";
-		exit(EXIT_FAILURE);
-	}
-	nlohmann::json json_object;
-	json_file >> json_object;
-	json_object.get_to(performances);
-
-	json_file.close();
-
-
-	activeRows = n_canciones = performances.size();
-
-	from_new_to_old();
+	delete_duplicated();
+	ordenate();
 }/*}}}*/
 
 void Database::load_csv( const std::string &_Path ) noexcept/*{{{*/
@@ -667,12 +670,12 @@ void Database::ordenate()/*{{{*/
 	b = a + 1;
 	/* sorting the structures in the base array based on whether the section field contains the
 	 * substring "Sound". */
-	while (a < activeRows - 1 and b < activeRows) {	
+	while (a < activeRows - 1) {	
 		if (strcmp(base[a].section, "Sound") == 0) {
 			b = a + 1;
 			success = false;
 			while (success == false && b <= activeRows - 1) {
-				if (strcmp(base[b].section, "Sound") == 0)
+				if (strcmp(base[b].section, "Sound") != 0)
 					b++;
 				else {
 					aux = base[a];
@@ -682,18 +685,18 @@ void Database::ordenate()/*{{{*/
 				}
 			}
 		}
-		a++;
+		++a;
 	}
 
 	//Lobby
 	a--;
 	b = a + 1;
 	while (a <= activeRows - 2 && b <= activeRows - 1) {	
-		if (strstr(base[a].section, "Lobby") == NULL || strstr("Lobby", base[a].section) == NULL) {
+		if (strcmp(base[a].section, "Lobby") == 0){
 			b = a + 1;
 			success = false;
 			while (success == false && b <= activeRows - 1) {
-				if (strstr(base[b].section, "Lobby") == NULL || strstr("Lobby", base[b].section) == NULL)
+				if (strcmp(base[b].section, "Lobby") != 0)
 					b++;
 				else {
 					aux = base[a];
@@ -710,11 +713,11 @@ void Database::ordenate()/*{{{*/
 	a--;
 	b = a + 1;
 	while (a <= activeRows - 2 && b <= activeRows - 1) {	
-		if (strstr(base[a].section, "Cena") == NULL || strstr("Cena", base[a].section) == NULL) {
+		if (strcmp(base[a].section, "Cena") == 0) {
 			b = a + 1;
 			success = false;
 			while (success == false && b <= activeRows - 1) {
-				if (strstr(base[b].section, "Cena") == NULL || strstr("Cena", base[b].section) == NULL)
+				if (strcmp(base[b].section, "Cena") != 0)
 					b++;
 				else {
 					aux = base[a];
@@ -731,11 +734,11 @@ void Database::ordenate()/*{{{*/
 	a--;
 	b = a + 1;
 	while (a <= activeRows - 2 && b <= activeRows - 1) {	
-		if (strstr(base[a].section, "Baile") == NULL || strstr("Baile", base[a].section) == NULL) {
+		if (strcmp(base[a].section, "Bale") == 0){
 			b = a + 1;
 			success = false;
 			while (success == false && b <= activeRows - 1) {
-				if (strstr(base[b].section, "Baile") == NULL || strstr("Baile", base[b].section) == NULL)
+				if (strcmp(base[b].section, "Baile") != 0)
 					b++;
 				else {
 					aux = base[a];
