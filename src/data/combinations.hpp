@@ -39,7 +39,6 @@ class Combinations {
 		size_t channels_per_combi;
 	private:
 		size_t n_bancos;
-		struct Row *data;
 		std::vector<std::array<struct Combi, PATCHES_PER_BANK>> combinations;
 		int16_t bnk_num_to_int( const char &, const int16_t & ) noexcept;
 };

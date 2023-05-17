@@ -1,6 +1,7 @@
 #include <curses.h>
 #include <stdlib.h>
 
+#include "databases.hpp"
 #include "form.hpp"
 
 #include "../common/common.hpp"
@@ -71,19 +72,19 @@ bool Form::capture_value()/*{{{*/
 	return success;
 }/*}}}*/
 
-bool Form::capture_value(System get)/*{{{*/
+bool Form::capture_value(Performance _Performance)/*{{{*/
 {
-	row = get;
+	performance = _Performance;
 	
 	show();
-		field[TITLE].set_string(row.title);
-		field[ARTIST].set_string(row.artist);
-		field[GENRE].set_string(row.genre);
-		field[SECTION].set_string(row.section);
+		field[TITLE].set_string(performance.metadata.title);
+		field[ARTIST].set_string(performance.metadata.artist);
+		field[GENRE].set_string(performance.metadata.genre);
+		field[SECTION].set_string(row.metadata.section);
+		field[KEYWORDS].set_string(row.metadata.keywords);
 		field[TYPE].set_string(row.type);
-		field[KEYWORDS].set_string(row.keywords);
-		field[BNK].set_string(row.bnk);
-		field[NUM].set_string(row.num);
+		field[BNK].set_string(row.patch.bnk);
+		field[NUM].set_string(row.patch.num);
 		
 		bool success = capture();
 	hide();
@@ -169,9 +170,9 @@ bool Form::capture()/*{{{*/
 	return success;
 }/*}}}*/
 
-System Form::get_value()/*{{{*/
+auto Form::get_value() -> Performance/*{{{*/
 {
-	return row;
+	Systemreturn performance;
 }/*}}}*/
 
 void Form::show()/*{{{*/

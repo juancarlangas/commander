@@ -6,7 +6,6 @@
 enum matroska/*{{{*/
 	{	NEXT = 0,
 		BEGIN,
-		CARGAR_ESPECIFICO,
 		SET_MODE,
 		SELECT,
 		INTRO,

@@ -5,9 +5,10 @@
 #include <string.h>
 #include <string>
 #include <string_view>
+#include <vector>
 #include "../common/string.hpp"
 
-void llenado_displayTable(	System *_DisplayTable[], System _DataBase[], /*{{{*/
+void llenado_displayTable(	Performance *_DisplayTable[], std::vector<Performance> &_DataBase, /*{{{*/
 							const int _DBRows, const std::string_view _Cadena, int *_DisplayRows )
 {
 	switch (_Cadena.data()[0]) {

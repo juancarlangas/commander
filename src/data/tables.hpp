@@ -5,7 +5,7 @@
 
 short int compare(const char stringSystem[], const char stringUser[]);
 
-void llenado_displayTable(	System *displayTable[], System dataBase[], 
+void llenado_displayTable(	Performance *displayTable[], std::vector<Performance> &dataBase,
 							const int dbRows, const std::string_view _Cadena,
 							int *dRows);
 

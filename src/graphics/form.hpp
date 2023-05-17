@@ -30,10 +30,10 @@ public:
 	Form();
 	~Form();
 	bool capture_value();
-	bool capture_value(System);
-	System get_value();
+	bool capture_value(Performance _Performance);
+	auto get_value() -> Performance;
 private:
-	System row;
+	Performance performance;
 	Field *field;
 	short activeField;
 	short cursor;

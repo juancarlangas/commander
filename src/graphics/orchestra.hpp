@@ -18,7 +18,7 @@ enum Moved : bool { NO, YES };
 
 struct Clipboard {
 	int16_t n_variaciones;
-	struct Variacion variacion[ MAX_VARIATIONS ];
+	Scene variacion[ MAX_VARIATIONS ];
 };
 
 class KeyboardScheme : public TextPopup {
@@ -30,7 +30,7 @@ class Orchestra {
 	public:
 		Orchestra();
 		void init( const int32_t, const int32_t, const int32_t, const int32_t ) noexcept;
-		void show( struct System *& ) noexcept;
+		void show( Performance *&_Performance ) noexcept;
 		void update() noexcept;
 		void hide() noexcept;
 		void capture_key() noexcept;
@@ -53,7 +53,7 @@ class Orchestra {
 		std::array<struct Font, 8> native_font;
 		struct Font cursor_font, MIDI_font, dimmed_font;
 		int16_t variacion;
-		struct System *info;
+		Performance *info;
 		Combinations *comb_ptr;
 		Keyboard *keyboard;
 		struct Clipboard clipboard;

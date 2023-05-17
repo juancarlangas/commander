@@ -13,7 +13,7 @@ extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
 
 void print_displayTable(	WINDOW *window,/*{{{*/
-							System *displayTable[],
+							Performance *displayTable[],
 							const int32_t top, const short resultRows, 
 							const int index,
 							short int winMode)
@@ -24,7 +24,7 @@ void print_displayTable(	WINDOW *window,/*{{{*/
 	wclear(window);
 	
 	for (i = top; ( i <= top + displayShowResults - 1) && (i <= resultRows - 1); i++) {
-		switch ((displayTable[i]->section)[0]) {
+		switch ((displayTable[i]->metadata.mood[0]) {
 			case 'L':
 				wattron(window, COLOR_PAIR(MAGENTA_DEFAULT));
 				break;
@@ -124,7 +124,7 @@ void print_search(WINDOW *window, char cadena[])/*{{{*/
 	return;	
 }/*}}}*/
 
-void print_lcd(WINDOW *window, System *linea )/*{{{*/
+void print_lcd(WINDOW *window, Performance *linea )/*{{{*/
 {
 	short int k = 0, yPos;
 	
@@ -212,7 +212,7 @@ void print_computer(WINDOW *window, const short int oxygen, const short int mode
 	return;
 }/*}}}*/
 
-void print_zoom(WINDOW *window, System *linea)
+void print_zoom(WINDOW *window, Performance *linea)
 {
 	//static char message[50];
 

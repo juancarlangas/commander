@@ -8,7 +8,7 @@
 
 
 void print_displayTable(	WINDOW *window,
-							System *displayTable[],
+							Performance *displayTable[],
 							const int32_t top, const short resultRows, 
 							const int index,
 							short int winMode);
@@ -22,11 +22,11 @@ void lcd(	WINDOW *window,
 
 void print_search(WINDOW *window, char cadena[]);
 
-void print_lcd(WINDOW *window, System *linea );
+void print_lcd(WINDOW *window, Performance *linea );
 
 void print_computer(WINDOW *window, const short int oxygen, const short int mode, const Variation var);
 
-void print_zoom(WINDOW *window, System *linea);
+void print_zoom(WINDOW *window, Performance *linea);
 
 void print_MIDI_state( WINDOW *&_Ventana, const enum Switch &_State ) noexcept;
 #endif

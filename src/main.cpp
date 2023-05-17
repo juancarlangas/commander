@@ -29,8 +29,8 @@ int32_t main()
 /*}}}*/
 
 	// Tables{{{
-	System **displayTable = new System *[ dbRows[COMBINATIONS] ](); // arreglo de apuntadores
-	System *buffer, *orch_clipboard_ptr; // apuntadores simple
+	Performance **displayTable = new Performance *[ dbRows[COMBINATIONS] ](); // arreglo de apuntadores
+	Performance *buffer, *orch_clipboard_ptr; // apuntadores simple
 
 	Playlist *playlist = new Playlist( &dBase[COMBINATIONS] );
 
@@ -68,13 +68,13 @@ int32_t main()
 
 		switch (command) {
 			case BEGIN:/*{{{*/
-				llenado_displayTable( displayTable, dBase[COMBINATIONS].base, dbRows[COMBINATOR],
+				llenado_displayTable( displayTable, dBase[COMBINATIONS].performances, dbRows[COMBINATOR],
 						keyword, &n_matches );
 
 				if (dbRows[COMBINATOR] > 0) // permitimos 0 lineas
-					buffer = dBase[COMBINATIONS].base;
+					buffer = &dBase[COMBINATIONS].performances[0];
 
-				x50.set_buffer( *buffer );
+				x50.set_performance( *buffer );
 
 				playlist->cargar( "/home/juancarlangas/.config/commander/Playlists/default.csv" );
 
@@ -89,15 +89,6 @@ int32_t main()
 
 				break;/*}}}*/
 
-			case CARGAR_ESPECIFICO :/*{{{*/
-				dBase[ COMBINATIONS ].cargar_especifico( config_directory + "/catalogo.csv",
-						buffer - dBase[ COMBINATIONS ].base );
-				buffer = displayTable[ dIndex ];
-				// x50.select_page( TIMBRE );
-				x50.set_buffer( *buffer );
-				x50.dump_variation();
-				break;/*}}}*/
-
 			case SET_MODE:/*{{{*/
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
@@ -107,7 +98,8 @@ int32_t main()
 				else
 					mode = COMBINATOR;
 
-				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
+				llenado_displayTable(
+						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;
@@ -126,7 +118,8 @@ int32_t main()
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
-				llenado_displayTable(displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches);
+				llenado_displayTable(
+						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
 
 				charIndex = 0;
 				dTop = 0;
@@ -156,7 +149,7 @@ int32_t main()
 					// Garantizamos que la última letra válida añadida sea minúscula
 					// keyword[ charIndex - 1 ] = std::tolower( keyword[ charIndex - 1 ] );
 
-					llenado_displayTable(	displayTable, dBase[mode].base,
+					llenado_displayTable(	displayTable, dBase[mode].performances,
 											dbRows[mode], keyword, &n_matches	);
 
 					if (winMode == MODE_PLAYLIST) {
@@ -180,7 +173,8 @@ int32_t main()
 				charIndex--;
 				keyword[charIndex] = '\0';
 
-				llenado_displayTable(displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches);
+				llenado_displayTable(
+						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
 				
 				dTop = 0;
 				dIndex = 0;
@@ -238,7 +232,7 @@ int32_t main()
 					x50.set_program( *buffer );
 				else
 					// solo actualizamos el buffer para poder trabajar online
-					x50.set_buffer( *buffer );
+					x50.set_performance( *buffer );
 
 				updateWindow[LCD] = true;
 
@@ -336,7 +330,7 @@ int32_t main()
 
 				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
 				llenado_displayTable(
-						displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches );
+						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches );
 
 				draw_windows();
 				updateWindow[LCD]		= true;
@@ -354,13 +348,13 @@ int32_t main()
 			case DELETE_VALUE:/*{{{*/
 			{
 				// obtenemos el índice real en dBase al cual displayTable[dIndex] apunta
-				int real_index = displayTable[dIndex] - &(dBase[mode].base[0]);
+				int real_index = displayTable[dIndex] - &(dBase[mode].performances[0]);
 
 				dBase[mode].delete_value( real_index );
 
 
 				llenado_displayTable(
-						displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches );
+						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches );
 
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;
@@ -378,14 +372,14 @@ int32_t main()
 			{
 				Form forma;
 
-				int difference = displayTable[dIndex] - &(dBase[mode].base[0]);
+				int difference = displayTable[dIndex] - &(dBase[mode].performances[0]);
 
-				if (forma.capture_value(dBase[mode].base[difference]) == true) {
+				if (forma.capture_value(dBase[mode].performances[difference]) == true) {
 					dBase[mode].edit_value(difference, forma.get_value());
 					dBase[mode].ordenate();
 				}
 
-				llenado_displayTable(displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches);
+				llenado_displayTable(displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
 
 				draw_windows();
 				updateWindow[LCD]		= true;
@@ -433,33 +427,34 @@ int32_t main()
 				break;/*}}}*/
 
 			case PASTE_ORCHESTRATION :/*{{{*/
-				displayTable[ dIndex ]->n_variaciones = orch_clipboard_ptr->n_variaciones;
-				displayTable[ dIndex]->variacion_inicial = orch_clipboard_ptr->variacion_inicial;
-				for ( i = 0; i < orch_clipboard_ptr->n_variaciones; ++i ) {
-					displayTable[ dIndex ]->variacion[ i ].etiqueta =
-						orch_clipboard_ptr->variacion[ i ].etiqueta;
+				displayTable[ dIndex ]->n_scenes = orch_clipboard_ptr->n_scenes;
+				displayTable[ dIndex]->initial_scene = orch_clipboard_ptr->initial_scene;
+				for ( i = 0; i < orch_clipboard_ptr->n_scenes; ++i ) {
+					displayTable[ dIndex ]->scenes[ i ].label =
+						orch_clipboard_ptr->scenes[ i ].label;
 					for ( j = 0; j < NUMBER_OF_PARTS; ++j ) {
-						displayTable[ dIndex ]->variacion[ i ].track[ j ].status =
-							orch_clipboard_ptr->variacion[ i ].track[ j ].status;
-						displayTable[ dIndex ]->variacion[ i ].track[ j ].volume =
-							orch_clipboard_ptr->variacion[ i ].track[ j ].volume;
-						displayTable[ dIndex ]->variacion[ i ].track[ j ].lower_key =
-							orch_clipboard_ptr->variacion[ i ].track[ j ].lower_key;
-						displayTable[ dIndex ]->variacion[ i ].track[ j ].upper_key =
-							orch_clipboard_ptr->variacion[ i ].track[ j ].upper_key;
-						displayTable[ dIndex ]->variacion[ i ].track[ j ].transposition =
-							orch_clipboard_ptr->variacion[ i ].track[ j ].transposition;
+						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].state =
+							orch_clipboard_ptr->scenes[ i ].tracks[ j ].state;
+						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].volume =
+							orch_clipboard_ptr->scenes[ i ].tracks[ j ].volume;
+						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].lower_key =
+							orch_clipboard_ptr->scenes[ i ].tracks[ j ].lower_key;
+						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].upper_key =
+							orch_clipboard_ptr->scenes[ i ].tracks[ j ].upper_key;
+						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].transposition =
+							orch_clipboard_ptr->scenes[ i ].tracks[ j ].transposition;
 					}
 				}
 				break;/*}}}*/
 
 			case EXPORTATE:/*{{{*/
-				dBase[COMBINATIONS].escribir( config_directory + "/catalog.json" );
+				dBase[COMBINATIONS].save_to_json( config_directory + "/catalog.json" );
 				combinaciones.escribir( config_directory + "/combinaciones.json" );
 
 				*keyword = '\0';
 
-				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
+				llenado_displayTable(
+						displayTable, dBase[mode].performances,dbRows[mode],  keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;
@@ -476,7 +471,7 @@ int32_t main()
 			case EXPORTATE_AND_QUIT :/*{{{*/
 				// Esta madrola hace lo básico del EXPORTATE y diréctamente modifica
 				// el command para que el while saque a la chingada el programa
-				dBase[COMBINATIONS].escribir( config_directory + "/catalog.json" );
+				dBase[COMBINATIONS].save_to_json( config_directory + "/catalog.json" );
 				combinaciones.escribir( config_directory + "/combinaciones.json" );
 
 				command = EXIT;
@@ -520,7 +515,8 @@ int32_t main()
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
-				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
+				llenado_displayTable(
+						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;
@@ -572,7 +568,8 @@ int32_t main()
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
-				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
+				llenado_displayTable(
+						displayTable, dBase[mode].performances, dbRows[mode],  keyword, &n_matches);
 
 				if (winMode == MODE_PLAYLIST)
 					winMode = MODE_DISPLAY;
@@ -625,7 +622,8 @@ int32_t main()
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
-				llenado_displayTable(displayTable, dBase[mode].base,  dbRows[mode],  keyword, &n_matches);
+				llenado_displayTable(
+						displayTable, dBase[mode].performances, dbRows[mode],  keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;

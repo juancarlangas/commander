@@ -72,10 +72,10 @@ void Playlist::cargar( const std::string &_Path ) noexcept/*{{{*/
 	sincronizar();
 }/*}}}*/
 
-void Playlist::agregar( struct System *&_Row_ptr ) noexcept/*{{{*/
+void Playlist::agregar( Performance *&_Row_ptr ) noexcept/*{{{*/
 {
-	pista[ n_pistas ].titulo = _Row_ptr->titulo;
-	pista[ n_pistas ].artista = _Row_ptr->artista;
+	pista[ n_pistas ].titulo = _Row_ptr->metadata.title;
+	pista[ n_pistas ].artista = _Row_ptr->metadata.artist;
 	pista[ n_pistas ].row_ptr = _Row_ptr;
 
 	++n_pistas;
@@ -121,8 +121,8 @@ void Playlist::sincronizar() noexcept/*{{{*/
 	for ( i = 0; i < n_pistas; ++i ) {
 		j = 0;
 		while ( j < database_ptr->get_activeRows() and
-				( pista[i].titulo != database_ptr->get_cancion(j).titulo or
-				pista[i].artista != database_ptr->get_cancion(j).artista ) )
+				( pista[i].titulo != database_ptr->get_cancion(j).metadata.title or
+				pista[i].artista != database_ptr->get_cancion(j).metadata.title ) )
 			++j;
 		if ( j < database_ptr->get_activeRows() ) // lo encontró -> anéxale el (nuevo) apuntador
 			pista[i].row_ptr = database_ptr->get_cancion_ptr(j);
@@ -146,9 +146,9 @@ const std::string &Playlist::get_artista( const int32_t &_Index ) noexcept/*{{{*
 	return pista[ _Index ].titulo;
 }/*}}}*/
 		
-struct System *Playlist::get_pointer( const int32_t &_Index) noexcept
+Performance* Playlist::get_pointer( const int32_t &_Index) noexcept/*{{{*/
 {
 	return pista[ _Index ].row_ptr;
-}
+}/*}}}*/
 
 Playlist::~Playlist() {}

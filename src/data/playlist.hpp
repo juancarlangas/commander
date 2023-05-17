@@ -11,7 +11,7 @@
 struct Pista {
 	std::string titulo;
 	std::string artista;
-	struct System *row_ptr;
+	Performance* row_ptr;
 };
 
 class Playlist {
@@ -22,7 +22,7 @@ class Playlist {
 		void cargar( const std::string &_Path ) noexcept;
 		void guardar( const std::string &_Path) noexcept;
 
-		void agregar( struct System *&_Row_ptr ) noexcept;
+		void agregar( Performance *&_Row_ptr ) noexcept;
 		void eliminar( const int32_t &_Index ) noexcept;
 		void sincronizar() noexcept;
 
@@ -33,7 +33,7 @@ class Playlist {
 
 		/* Esta función es la efectiva para mandar la información al teclado.
 		 * Mandará el APUNTADOR correcto hacia el renglón en la base de datos */
-		struct System *get_pointer( const int32_t &_Index) noexcept;
+		Performance* get_pointer( const int32_t &_Index) noexcept;
 
 		~Playlist();
 

@@ -13,7 +13,7 @@
 using Coordinates::X;
 using Coordinates::Y;
 
-Orchestra::Orchestra() :/*{{{*/
+Orchestra::Orchestra() : // Sets colors /*{{{*/
 	native_font { { { GREEN_DEFAULT, "Bold" },
 					{ BLUE_DEFAULT, "Bold" },
 					{ YELLOW_DEFAULT, "Bold" },
@@ -125,15 +125,15 @@ void KeyboardScheme::auto_draw() noexcept/*{{{*/
 void Orchestra::update() noexcept/*{{{*/
 {
 	variacion_text_box.set_text( "Variacion " + std::to_string( variacion + 1 ) +
-								" de " + std::to_string( info->n_variaciones ) );
-	vi_field.set_content( std::to_string( info->variacion_inicial ) );
-	etiqueta_field.set_content( info->variacion[ variacion ].etiqueta );
+								" de " + std::to_string( info->n_scenes ) );
+	vi_field.set_content( std::to_string( info->initial_scene ) );
+	etiqueta_field.set_content( info->scenes[ variacion ].label );
 
 	for ( int32_t i = 0; i < 8; ++i ) {
 
 		// Preparando las dobles barras
-		int16_t &l_Value = info->variacion[ variacion ].track[ i ].lower_key;
-		int16_t &r_Value = info->variacion[ variacion ].track[ i ].upper_key;
+		int16_t &l_Value = info->scenes[ variacion ].tracks[ i ].lower_key;
+		int16_t &r_Value = info->scenes[ variacion ].tracks[ i ].upper_key;
 		// Límites
 		if ( r_Value < MIN_KEY )
 			r_Value = MIN_KEY;
@@ -148,7 +148,7 @@ void Orchestra::update() noexcept/*{{{*/
 			r_Value = l_Value;
 		double_X_slider[i].set_values( l_Value, r_Value );
 
-		if ( info->variacion[ variacion ].track[ i ].status == Switch::ON ) {
+		if ( info->scenes[ variacion ].tracks[ i ].state == Switch::ON ) {
 			status_field[ i ].on();
 			instrument_field[ i ].on();
 			volume_field[i].on();
@@ -163,18 +163,19 @@ void Orchestra::update() noexcept/*{{{*/
 			double_X_slider[ i ].off();
 		}
 
-		instrument_field[ i ].set_text( comb_ptr->get_instrument_name( info->bnk, info->num, i ) );
+		instrument_field[ i ].set_text( comb_ptr->get_instrument_name(	info->patch.bnk,
+																		info->patch.num, i ) );
 		volume_field[i].set_text(
-				std::to_string( info->variacion[ variacion ].track[ i ].volume ) );
+				std::to_string( info->scenes[ variacion ].tracks[ i ].volume ) );
 		transposition_field[ i ].set_text(
-				std::to_string( info->variacion[ variacion ].track[ i ].transposition ) );
+				std::to_string( info->scenes[ variacion ].tracks[ i ].transposition ) );
 	}
 }/*}}}*/
 
-void Orchestra::show( struct System *&_Row ) noexcept/*{{{*/
+void Orchestra::show( Performance *&_Performance ) noexcept/*{{{*/
 {
 	// solo obtiene la información y aparece los páneles
-	info = _Row;
+	info = _Performance;
 
 	base.show();
 	variacion_text_box.show();
@@ -228,7 +229,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 	vi_field.set_cursor(); // Por defalt el cursor estará sobre el campo variacion_inicial
 
 	/* Cadena para almacenar la palabra la palabra que está siendo editada. */
-	temp_word = std::to_string( info->variacion_inicial );
+	temp_word = std::to_string( info->initial_scene );
 	int32_t tecla;
 	char tecla_c_string[3];
 	bool again = true;

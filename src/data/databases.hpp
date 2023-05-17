@@ -51,50 +51,9 @@ struct Performance {
 	Patch patch;
 	std::string type;
 	std::array<std::string, 8> instruments;
+	std::int16_t n_scenes;
 	std::vector<Scene> scenes;
 	std::int16_t initial_scene;
-};/*}}}*/
-
-// OLD STRUCT TYPE{{{
-struct Track {
-	enum Switch status;
-	int16_t volume;
-	int16_t lower_key;
-	int16_t upper_key;
-	int16_t transposition;
-};
-
-struct Variacion {
-	std::string etiqueta;
-	struct Track track[ 8 ];
-};
-
-struct System {
-	// C
-	char title[LONG_STRING];
-	char artist[LONG_STRING];
-	char genre[LONG_STRING];
-	char section[LONG_STRING];
-	char keywords[LONG_STRING];
-	char type[10];
-	
-	// C++
-	std::string titulo;
-	std::string artista;
-	std::string genero;
-	std::string mood;
-	std::string key_words;
-	std::string tipo;
-
-	// Global
-	char bnk;
-	short num;
-
-	// New
-	int16_t n_variaciones;
-	int16_t variacion_inicial;
-	std::string instrumento[ 8 ];
-	struct Variacion variacion[ 16 ];
 };/*}}}*/
 
 class Database {/*{{{*/
@@ -105,16 +64,10 @@ class Database {/*{{{*/
 		void load_from_json( const std::string &_Path);
 		void from_new_to_old() noexcept;
 		void load_csv( const std::string &_Path ) noexcept;
-		void cargar( const std::string &_Path ) noexcept
-		{
-			load_from_json( _Path );
-		}
-
 		int32_t get_activeRows() noexcept;
-		void cargar_especifico( const std::string &, int32_t ) noexcept;
 		void clonar_to_old( Database & ) noexcept;
-		void add_value(System);
-		void edit_value(int, System);
+		void add_value(Performance _Performance);
+		void edit_value(int, Performance _Performance);
 		void delete_value(int);
 		void ordenate();
 		void delete_duplicated() noexcept;
@@ -122,16 +75,11 @@ class Database {/*{{{*/
 		void write_csv( const std::string &_Path ) noexcept;
 		void save_to_json( const std::string &_Path ) noexcept;
 		void from_old_to_new() noexcept;
-		void escribir( const std::string &_Path ) noexcept
-		{
-			save_to_json( _Path );
-		}
-		struct System get_cancion( const int ) noexcept;
-		struct System *get_cancion_ptr( const int32_t &_Index ) noexcept;
-		struct System *get_favourite_row( const int32_t & ) noexcept;
-		struct System base[1000];
-	private:
+		Performance get_cancion( const int ) noexcept;
+		Performance *get_cancion_ptr( const int32_t &_Index ) noexcept;
+		Performance *get_favourite_row( const int32_t & ) noexcept;
 		std::vector<Performance> performances;
+	private:
 		std::int32_t activeRows;
 		std::int32_t n_canciones;
 		void clean_row(int);
