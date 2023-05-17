@@ -33,16 +33,16 @@ void increase_index(	int *top, const int resultRows, int *index, /*{{{*/
 	return;
 }/*}}}*/
 
-void korg_drag(	System table[],
+void korg_drag(	Performance table[],/*{{{*/
 				const int rows, const int indexUP, const int indexDOWN,
 				const int caracter									)
 {
 	static int i;
 
-	System store;
+	Performance store;
 
 	if (caracter == 566) {
-		if (rows >= static_cast<int32_t>( vabs(indexUP - indexDOWN) + 1) ) {
+		if (rows >= static_cast<int32_t>(vabs(indexUP - indexDOWN) + 1)) {
 			store = table[indexUP - 1];
 			for (i = indexUP; i <= indexDOWN; i++)
 				table[i - 1] = table[i];
@@ -59,6 +59,6 @@ void korg_drag(	System table[],
 		}	
 	}
 	return;
-}
+}/*}}}*/
 
 

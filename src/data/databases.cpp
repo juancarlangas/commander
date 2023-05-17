@@ -36,7 +36,7 @@ Database::Database( const std::string &_Path ) noexcept/*{{{*/
 	if ((homedir = getenv("HOME")) == NULL)
 		homedir = getpwuid(getuid())->pw_dir;
 
-	cargar( _Path );
+	load_from_json( _Path );
 }/*}}}*/
 
 Database::Database( const std::string &_Path, Combinations *_CombinationsPtr ) noexcept :/*{{{*/
@@ -46,19 +46,18 @@ Database::Database( const std::string &_Path, Combinations *_CombinationsPtr ) n
 	if ((homedir = getenv("HOME")) == NULL)
 		homedir = getpwuid(getuid())->pw_dir;
 
-	cargar( _Path );
+	load_from_json( _Path );
 }/*}}}*/
 
 void Database::clean_row(int line)/*{{{*/
 {
-	*base[line].title = '\0';
-	*base[line].artist = '\0';
-	*base[line].genre = '\0';
-	*base[line].section = '\0';
-	*base[line].keywords = '\0';
-	*base[line].type = '\0';
-	base[line].bnk = 0;
-	base[line].num = 0;
+	performances[line].metadata.title.clear();
+	performances[line].metadata.genre.clear();
+	performances[line].metadata.mood.clear();
+	performances[line].metadata.keyword.clear();
+	performances[line].type.clear();
+	performances[line].patch.bnk = 0;
+	performances[line].patch.num = 0;
 }/*}}}*/
 
 void Database::load_from_json( const std::string &_Path)/*{{{*/
@@ -79,51 +78,6 @@ void Database::load_from_json( const std::string &_Path)/*{{{*/
 	activeRows = n_canciones = performances.size();
 
 	from_new_to_old();
-}/*}}}*/
-
-void Database::from_new_to_old() noexcept/*{{{*/
-{
-	for ( size_t i = 0; i < performances.size(); ++i ) {
-		// C
-		strcpy( base[i].title, performances[i].metadata.title.c_str() );
-		strcpy( base[i].artist, performances[i].metadata.artist.c_str() );
-		strcpy( base[i].genre, performances[i].metadata.genre.c_str() );
-		strcpy( base[i].section, performances[i].metadata.mood.c_str() );
-		strcpy( base[i].keywords, performances[i].metadata.keyword.c_str() );
-		strcpy( base[i].type, performances[i].type.c_str() );
-
-		// C++
-		base[i].titulo = performances[i].metadata.title;
-		base[i].artista = performances[i].metadata.artist;
-		base[i].genero = performances[i].metadata.genre;
-		base[i].mood = performances[i].metadata.mood;
-		base[i].tipo = performances[i].type;
-		base[i].key_words = performances[i].metadata.keyword;
-
-		// Global
-		base[i].bnk = performances[i].patch.bnk + 65;
-		base[i].num = performances[i].patch.num;
-
-		// New
-		base[i].n_variaciones = performances[i].scenes.size();
-		base[i].variacion_inicial = performances[i].initial_scene;
-		for (size_t j = 0; j < 8; ++j )
-			base[i].instrumento[j] = performances[i].instruments[j];
-		for ( size_t j = 0; j < performances[i].scenes.size(); ++j ) {
-			base[i].variacion[j].etiqueta = performances[i].scenes[j].label;
-			for ( size_t k = 0; k < TRACKS_PER_PERFORMANCE; ++k ) {
-				base[i].variacion[j].track[k].status = performances[i].scenes[j].tracks[k].state;
-				base[i].variacion[j].track[k].volume = performances[i].scenes[j].tracks[k].volume;
-				base[i].variacion[j].track[k].lower_key = performances[i].scenes[j].tracks[k].lower_key;
-				base[i].variacion[j].track[k].upper_key = performances[i].scenes[j].tracks[k].upper_key;
-				base[i].variacion[j].track[k].transposition =
-					performances[i].scenes[j].tracks[k].transposition;
-			}
-		}
-	}
-
-	delete_duplicated();
-	ordenate();
 }/*}}}*/
 
 void Database::load_csv( const std::string &_Path ) noexcept/*{{{*/
@@ -316,84 +270,6 @@ int32_t Database::get_activeRows() noexcept/*{{{*/
 	return n_canciones;
 }/*}}}*/
 
-void Database::from_old_to_new() noexcept/*{{{*/
-{
-	performances.clear();
-
-	for (size_t i = 0; i < static_cast<size_t>(n_canciones); ++i) {
-		performances.push_back( Performance{} );
-
-		// C
-		base[i].titulo = base[i].title;
-		base[i].artista = base[i].artist;
-		base[i].genero = base[i].genre;
-		base[i].mood = base[i].section;
-		base[i].key_words = base[i].keywords;
-		base[i].tipo = base[i].type;
-
-
-		// C++
-		performances[i].metadata.title = base[i].titulo;
-		performances[i].metadata.artist = base[i].artista;
-		performances[i].metadata.genre = base[i].genero;
-		performances[i].metadata.mood = base[i].mood;
-		performances[i].metadata.keyword = base[i].key_words;
-		performances[i].type = base[i].tipo;
-
-		// Global
-		performances[i].patch.bnk = (base[i].bnk - 65);
-		performances[i].patch.num = base[i].num;
-
-		// New
-		performances[i].scenes.resize(base[i].n_variaciones);
-		performances[i].initial_scene = base[i].variacion_inicial;
-		for (size_t j = 0; j < 8; ++j) {
-			performances[i].instruments[j] = base[i].instrumento[j];
-		}
-		for (size_t j = 0; j < static_cast<size_t>( base[i].n_variaciones ); ++j) {
-			performances[i].scenes[j].label = base[i].variacion[j].etiqueta;
-			for (size_t k = 0; k < TRACKS_PER_PERFORMANCE; ++k) {
-				performances[i].scenes[j].tracks[k].state = base[i].variacion[j].track[k].status;
-				performances[i].scenes[j].tracks[k].volume = base[i].variacion[j].track[k].volume;
-				performances[i].scenes[j].tracks[k].lower_key = base[i].variacion[j].track[k].lower_key;
-				performances[i].scenes[j].tracks[k].upper_key = base[i].variacion[j].track[k].upper_key;
-				performances[i].scenes[j].tracks[k].transposition =
-					base[i].variacion[j].track[k].transposition;
-			}
-		}
-	}
-
-	std::ofstream debug_file{ "/home/juancarlangas/Desktop/debug_file.txt" };
-	// Loop through each performance in the vector
-    for (const auto& perf : performances) {
-        debug_file << "Metadata:\n"
-                  << "  Title: " << perf.metadata.title << "\n"
-                  << "  Artist: " << perf.metadata.artist << "\n"
-                  << "  Genre: " << perf.metadata.genre << "\n"
-                  << "  Mood: " << perf.metadata.mood << "\n"
-                  << "  Key Word: " << perf.metadata.keyword << "\n"
-                  << "Patch: " << perf.patch.bnk << "/" << perf.patch.num << "\n"
-                  << "Type: " << perf.type << "\n"
-                  << "Instruments:\n";
-        for (const auto& inst : perf.instruments) {
-            debug_file << "  " << inst << "\n";
-        }
-        debug_file << "Scenes:\n";
-        for (const auto& scene : perf.scenes) {
-            debug_file << "  Label: " << scene.label << "\n";
-            for (const auto& track : scene.tracks) {
-                debug_file << "    State: " << (track.state == ON ? "ON" : "OFF") << "\n"
-                          << "    Volume: " << track.volume << "\n"
-                          << "    Lower Key: " << track.lower_key << "\n"
-                          << "    Upper Key: " << track.upper_key << "\n"
-                          << "    Transposition: " << track.transposition << "\n";
-            }
-        }
-        debug_file << "Initial Variation: " << perf.initial_scene << "\n";
-    }
-	debug_file.close();
-}/*}}}*/
-
 void Database::save_to_json(const std::string& _Path) noexcept {/*{{{*/
 	from_old_to_new();
 
@@ -481,49 +357,22 @@ void Database::write_csv( const std::string &_Path ) noexcept/*{{{*/
 	archivo.close();
 }/*}}}*/
 
-void Database::add_value( System row )/*{{{*/
+void Database::add_value( const Performance& _Performance )/*{{{*/
 {
-	base[activeRows] = row;
-
-	// C++ values
-	base[activeRows].titulo = base[activeRows].title;
-	base[activeRows].artista = base[activeRows].artist;
-	base[activeRows].genero = base[activeRows].genre;
-	base[activeRows].mood = base[activeRows].section;
-	base[activeRows].key_words = base[activeRows].keywords;
-	base[activeRows].tipo = base[activeRows].type;
-
-	// extras
-	base[activeRows].n_variaciones = 1;
-	base[activeRows].variacion_inicial = 0;
-
-	base[activeRows].variacion[0].etiqueta = "Label";
-
-	for ( int32_t i = 0; i < 8; ++i ) {
-		base[activeRows].instrumento[i] =
-			combinationsPtr->get_instrument_name( row.bnk, row.num, i );
-		base[activeRows].variacion[0].track[i].status = Switch::OFF;
-		base[activeRows].variacion[0].track[i].volume = 100;
-		base[activeRows].variacion[0].track[i].transposition = 0;
-		base[activeRows].variacion[0].track[i].lower_key = 36;
-		base[activeRows].variacion[0].track[i].upper_key = 96;
-	}
+	performances.push_back(_Performance);
 
 	n_canciones = ++activeRows;
 }/*}}}*/
 
-void Database::edit_value(int line, System row)/*{{{*/
+void Database::edit_value(const std::int32_t line, const Performance& _Performance)/*{{{*/
 {
-	base[line] = row;
+	performances[ line ] = _Performance;
 }/*}}}*/
 
 void Database::delete_value( int line )/*{{{*/
 {
-	for ( int i = line; i < activeRows - 1; i++ )
-		base[i] = base[i + 1];
-
-	clean_row( activeRows-- );
-	n_canciones = activeRows;
+	performances.erase(line);
+	n_canciones = --activeRows;
 }/*}}}*/
 
 void Database::ordenate()/*{{{*/
@@ -531,24 +380,22 @@ void Database::ordenate()/*{{{*/
 	int32_t a, b;
 	int32_t k;
 	bool success;
-	System aux;
+	Performance aux;
 
-	//Sounds	
+	// Mood: Sound
 	a = 0;
 	b = a + 1;
-	/* sorting the structures in the base array based on whether the section field contains the
-	 * substring "Sound". */
 	while (a < activeRows - 1) {	
-		if (strcmp(base[a].section, "Sound") == 0) {
+		if (performances[a].metadata.mood != "Sound") {
 			b = a + 1;
 			success = false;
-			while (success == false && b <= activeRows - 1) {
-				if (strcmp(base[b].section, "Sound") != 0)
+			while (success == false && b < activeRows) {
+				if (performances[b].metadata.mood == "Sound")
 					b++;
 				else {
-					aux = base[a];
-					base[a] = base[b];
-					base[b] = aux;
+					aux = performances[a];
+					performances[a] = performances[b];
+					performances[b] = aux;
 					success = true;
 				}
 			}
@@ -556,20 +403,20 @@ void Database::ordenate()/*{{{*/
 		++a;
 	}
 
-	//Lobby
+	// mood: Lobby
 	a--;
 	b = a + 1;
-	while (a <= activeRows - 2 && b <= activeRows - 1) {	
-		if (strcmp(base[a].section, "Lobby") == 0){
+	while (a < activeRows - 1) {	
+		if (performances[a].metadata.mood != "Lobby") {
 			b = a + 1;
 			success = false;
 			while (success == false && b <= activeRows - 1) {
-				if (strcmp(base[b].section, "Lobby") != 0)
+				if (performances[b].metadata.mood == "Lobby")
 					b++;
 				else {
-					aux = base[a];
-					base[a] = base[b];
-					base[b] = aux;
+					aux = performances[a];
+					performances[a] = performances[b];
+					performances[b] = aux;
 					success = true;
 				}
 			}
@@ -577,20 +424,20 @@ void Database::ordenate()/*{{{*/
 		a++;
 	}
 
-	//Cena
+	// mood: "Cena"
 	a--;
 	b = a + 1;
 	while (a <= activeRows - 2 && b <= activeRows - 1) {	
-		if (strcmp(base[a].section, "Cena") == 0) {
+		if (performances[a].metadata.mood != "Cena") {
 			b = a + 1;
 			success = false;
 			while (success == false && b <= activeRows - 1) {
-				if (strcmp(base[b].section, "Cena") != 0)
+				if (performances[b].metadata.mood == "Cena")
 					b++;
 				else {
-					aux = base[a];
-					base[a] = base[b];
-					base[b] = aux;
+					aux = performances[a];
+					performances[a] = performances[b];
+					performances[b] = aux;
 					success = true;
 				}
 			}
@@ -609,9 +456,9 @@ void Database::ordenate()/*{{{*/
 				if (strcmp(base[b].section, "Baile") != 0)
 					b++;
 				else {
-					aux = base[a];
-					base[a] = base[b];
-					base[b] = aux;
+					aux = performances[a];
+					performances[a] = performances[b];
+					performances[b] = aux;
 					success = true;
 				}
 			}
@@ -619,22 +466,20 @@ void Database::ordenate()/*{{{*/
 		a++;
 	}
 
-	//ALphabet
-	for (a = 0; a <= activeRows - 2; a++)
-		for (b = a + 1; b <= activeRows - 1; b++) {
-			if (strstr(base[a].section, base[b].section) &&
-				strstr(base[b].section, base[a].section))  {
+	// ALphabet
+	for (a = 0; a < activeRows - 1; a++)
+		for (b = a + 1; b < activeRows; b++) {
+			if (performances[a].metadata.mood == performances[b].metadata.mood) {
 				k = 0;
 				success = false;
 				while (success == false && k < LONG_STRING) {
-					if (base[a].title[k] > base[b].title[k]) { // cambio y EXITO
-						aux 	= base[a];
-						base[a] = base[b];
-						base[b] = aux;
-						success = true;		
-					} else if (base[a].title[k] < base[b].title[k]) // se queda pero EXITO
+					if (performances[a].metadata.title[k] > performances[b].metadata.title[k] {
+						aux = performances[a];
+						performances[a] = performances[b];
+						performances[b] = aux;
 						success = true;
-						
+					} else if (performances[a].metadata.title[k] < performances[b].metadata.title[k]) {
+						success = true;
 					k++;
 				}
 			}

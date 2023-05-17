@@ -9,7 +9,6 @@ set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/midi/audio.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/midi/keyboards.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/form.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/matroska.cpp"

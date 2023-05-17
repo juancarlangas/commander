@@ -47,24 +47,24 @@ Form::Form()/*{{{*/
 bool Form::capture_value()/*{{{*/
 {
 	// Initialize
-		*row.title = '\0';
-		*row.artist = '\0';
-		*row.genre = '\0';
-		*row.section = '\0';
-		*row.keywords = '\0';
-		*row.type = '\0';
-		row.bnk = 'A';
-		row.num = 0;
+		performance.metadata.title.clear();
+		performance.metadata.artist.clear();
+		performance.metadata.genre.clear();
+		performance.metadata.mood.clear();
+		performance.metadata.keyword.clear();
+		performance.type.clear();
+		performance.patch.bnk = 0;
+		performance.patch.num = 0;
 
 	show();
-		field[TITLE].set_string(row.title);
-		field[ARTIST].set_string(row.artist);
-		field[GENRE].set_string(row.genre);
-		field[SECTION].set_string(row.section);
-		field[TYPE].set_string(row.type);
-		field[KEYWORDS].set_string(row.keywords);
-		field[BNK].set_string(row.bnk);
-		field[NUM].set_string(row.num);
+		field[TITLE].set_string(performance.metadata.title);
+		field[ARTIST].set_string(performance.metadata.artist);
+		field[GENRE].set_string(performance.metadata.genre);
+		field[SECTION].set_string(performance.metadata.mood);
+		field[TYPE].set_string(performance.type);
+		field[KEYWORDS].set_string(performance.metadata.keyword);
+		field[BNK].set_string(static_cast<const char>(performance.patch.bnk + 65));
+		field[NUM].set_string(std::int32_t{ performance.patch.num });
 		
 		bool success = capture();
 	hide();
@@ -80,11 +80,11 @@ bool Form::capture_value(Performance _Performance)/*{{{*/
 		field[TITLE].set_string(performance.metadata.title);
 		field[ARTIST].set_string(performance.metadata.artist);
 		field[GENRE].set_string(performance.metadata.genre);
-		field[SECTION].set_string(row.metadata.section);
-		field[KEYWORDS].set_string(row.metadata.keywords);
-		field[TYPE].set_string(row.type);
-		field[BNK].set_string(row.patch.bnk);
-		field[NUM].set_string(row.patch.num);
+		field[SECTION].set_string(performance.metadata.mood);
+		field[KEYWORDS].set_string(performance.metadata.keyword);
+		field[TYPE].set_string(performance.type);
+		field[BNK].set_string(performance.patch.bnk);
+		field[NUM].set_string(performance.patch.num);
 		
 		bool success = capture();
 	hide();
@@ -133,32 +133,28 @@ bool Form::capture()/*{{{*/
 						field[activeField].get_string(word);
 						switch (activeField) {
 							case TITLE:
-								sprintf(row.title, "%s", word);
+								performance.metadata.title = word;
 								break;
 							case ARTIST:
-								sprintf(row.artist, "%s", word);
+								performance.metadata.artist = word;
 								break;
 							case GENRE:
-								sprintf(row.genre, "%s", word);
+								performance.metadata.genre = word;
 								break;
 							case SECTION:
-								sprintf(row.section, "%s", word);
+								performance.metadata.mood = word;
 								break;
 							case KEYWORDS:
-								sprintf(row.keywords, "%s", word);
+								performance.metadata.keyword = word;
 								break;
-							case TYPE: {
-								// hacemos esta perracera para evitar warning sobre intentar
-								// meter una cadena larga (40) en una variable de solo 10
-								std::string palabra { word };
-								sprintf( row.type, "%s", palabra.substr( 0, 10 ).c_str() );
+							case TYPE:
+								performance.type = word;
 								break;
-								}
 							case BNK:
-								row.bnk = word[0];
+								performance.patch.bnk = word[0] - 65;
 								break;
 							case NUM:
-								row.num = atoi(word);
+								performance.patch.num = std::stoi(word);
 								break;
 						}
 					}
@@ -172,7 +168,7 @@ bool Form::capture()/*{{{*/
 
 auto Form::get_value() -> Performance/*{{{*/
 {
-	Systemreturn performance;
+	return performance;
 }/*}}}*/
 
 void Form::show()/*{{{*/

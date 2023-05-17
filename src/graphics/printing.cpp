@@ -24,7 +24,7 @@ void print_displayTable(	WINDOW *window,/*{{{*/
 	wclear(window);
 	
 	for (i = top; ( i <= top + displayShowResults - 1) && (i <= resultRows - 1); i++) {
-		switch ((displayTable[i]->metadata.mood[0]) {
+		switch (displayTable[i]->metadata.mood[0]) {
 			case 'L':
 				wattron(window, COLOR_PAIR(MAGENTA_DEFAULT));
 				break;
@@ -47,10 +47,10 @@ void print_displayTable(	WINDOW *window,/*{{{*/
 		if (i == index && winMode == 1)
 			wattron(window, A_REVERSE);
 		mvwprintw( window, 1 + row++, 0, "%32s  %-20s  %-15s  %-15s", 
-				displayTable[i]->titulo.substr( 0, 31 ).c_str(),
-				displayTable[i]->artista.substr( 0, 20 ).c_str(),
-				displayTable[i]->genero.substr( 0, 15 ).c_str(),
-				displayTable[i]->key_words.substr( 0, 14 ).c_str() );
+				displayTable[i]->metadata.title.substr( 0, 31 ).c_str(),
+				displayTable[i]->metadata.artist.substr( 0, 20 ).c_str(),
+				displayTable[i]->metadata.genre.substr( 0, 15 ).c_str(),
+				displayTable[i]->metadata.keyword.substr( 0, 14 ).c_str() );
 		wattroff(window, A_REVERSE);
 		wattroff(window, A_BOLD);
 	}
@@ -150,9 +150,9 @@ void print_lcd(WINDOW *window, Performance *linea )/*{{{*/
 	//	}
 
 	k = 0;
-	while (linea->title[k] != '\0' && k <= 11) {
+	while (linea->metadata.title[k] != '\0' && k <= 11) {
 		for (yPos = 0; yPos <= 2; yPos++)
-			mvwprintw(window, yPos, 2 + k * 4, "%s", get_digit(toupper(linea->title[k]), yPos));
+			mvwprintw(window, yPos, 2 + k * 4, "%s", get_digit(toupper(linea->metadata.title[k]), yPos));
 		k++;
 	}
 
@@ -212,7 +212,7 @@ void print_computer(WINDOW *window, const short int oxygen, const short int mode
 	return;
 }/*}}}*/
 
-void print_zoom(WINDOW *window, Performance *linea)
+void print_zoom(WINDOW *window, Performance *linea)/*{{{*/
 {
 	//static char message[50];
 
@@ -244,13 +244,13 @@ void print_zoom(WINDOW *window, Performance *linea)
 		
 		//sprintf(message, "%c-%03hd %s", linea->bnk2, linea->num2, linea->title);
 
-		lcd(window, 1, 2, 13, FALSE, linea->title);
+		lcd(window, 1, 2, 13, FALSE, linea->metadata.title.c_str());
 
-		mvwprintw(window, 0, 2, "%c-%03hd", linea->bnk, linea->num);
+		mvwprintw(window, 0, 2, "%c-%03d", linea->patch.bnk + 65, linea->patch.num);
 		wrefresh(window);
 	
 	return;
-}
+}/*}}}*/
 
 void print_MIDI_state( WINDOW *&_Ventana, const enum Switch &_State ) noexcept
 {/*{{{*/

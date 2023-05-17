@@ -62,29 +62,25 @@ class Database {/*{{{*/
 		Database( const std::string & ) noexcept;
 		Database( const std::string &, Combinations *_CombinationPtr ) noexcept;
 		void load_from_json( const std::string &_Path);
-		void from_new_to_old() noexcept;
-		void load_csv( const std::string &_Path ) noexcept;
 		int32_t get_activeRows() noexcept;
-		void clonar_to_old( Database & ) noexcept;
-		void add_value(Performance _Performance);
-		void edit_value(int, Performance _Performance);
+		void add_value(const Performance& _Performance);
+		void edit_value(std::int32_t, const Performance& _Performance);
 		void delete_value(int);
 		void ordenate();
 		void delete_duplicated() noexcept;
-		void clonar_from_old( Database & ) noexcept;
-		void write_csv( const std::string &_Path ) noexcept;
 		void save_to_json( const std::string &_Path ) noexcept;
-		void from_old_to_new() noexcept;
 		Performance get_cancion( const int ) noexcept;
 		Performance *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		Performance *get_favourite_row( const int32_t & ) noexcept;
 		std::vector<Performance> performances;
+		[[deprecated]]void load_csv( const std::string &_Path ) noexcept;
+		[[deprecated]]void write_csv( const std::string &_Path ) noexcept;
 	private:
 		std::int32_t activeRows;
 		std::int32_t n_canciones;
 		void clean_row(int);
 		const char *homedir;
-		struct System *favorito[ N_FAVORITOS ];
+		struct Performance *favorito[ N_FAVORITOS ];
 		void fill_favourites() noexcept;
 		Combinations *combinationsPtr;
 

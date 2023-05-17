@@ -52,15 +52,9 @@ void Field::set_cursor() noexcept/*{{{*/
 	get_cursor();
 }/*}}}*/
 
-void Field::set_string(const char *word)/*{{{*/
+void Field::set_string(const std::string& _Cadena)/*{{{*/
 {
-	sprintf(cadena, "%s", word);
-	nCaracter = 0;
-
-	while (word[nCaracter] != '\0') {
-		cadena[nCaracter] = word[nCaracter];
-		nCaracter++;
-	}
+	strcpy(cadena, _Cadena.c_str());
 
 	wclear(wEspacio);
 	waddstr(wEspacio, cadena);
@@ -69,7 +63,7 @@ void Field::set_string(const char *word)/*{{{*/
 
 void Field::set_string(const char digit)/*{{{*/
 {
-	cadena[0] = digit;
+	cadena[0] = digit + 65;
 	cadena[1] = '\0';
 
 	wclear(wEspacio);
@@ -77,7 +71,7 @@ void Field::set_string(const char digit)/*{{{*/
 	wrefresh(wEspacio);
 }/*}}}*/
 
-void Field::set_string(const short number)/*{{{*/
+void Field::set_string(const std::int32_t& number)/*{{{*/
 {
 	sprintf(cadena, "%03d", number); 
 

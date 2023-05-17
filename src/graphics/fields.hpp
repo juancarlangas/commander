@@ -19,9 +19,9 @@ public:
 	void set_cursor() noexcept;
 	bool process_key(int);
 	void get_string(char []);
-	void set_string(const char *);
+	void set_string(const std::string& _Cadena);
 	void set_string(const char);
-	void set_string(const short);
+	void set_string(const std::int32_t &_Number);
 	void set_content( const std::string & ) noexcept;
 	void set_font_color( const int32_t &color ) noexcept;
 	void set_font_width( const std::string_view ) noexcept;

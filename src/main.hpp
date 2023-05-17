@@ -9,7 +9,6 @@
 
 #include "graphics/orchestra.hpp"
 #include "midi/keyboards.hpp"
-#include "midi/communicator.hpp"
 #include "graphics/printing.hpp"
 #include "graphics/form.hpp"
 #include "graphics/windows.hpp"
