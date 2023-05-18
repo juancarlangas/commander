@@ -46,7 +46,7 @@ void print_displayTable(	WINDOW *window,/*{{{*/
 
 		if (i == index && winMode == 1)
 			wattron(window, A_REVERSE);
-		mvwprintw( window, 1 + row++, 0, "%32s  %-20s  %-15s  %-15s", 
+		mvwprintw( window, 1 + row++, 0, "%32s  %-20s  %-15s  %-14s", 
 				displayTable[i]->metadata.title.substr( 0, 31 ).c_str(),
 				displayTable[i]->metadata.artist.substr( 0, 20 ).c_str(),
 				displayTable[i]->metadata.genre.substr( 0, 15 ).c_str(),
