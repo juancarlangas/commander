@@ -9,7 +9,7 @@ void llenado_displayTable(	Performance *displayTable[], std::vector<Performance>
 							const int dbRows, const std::string_view _Cadena,
 							int *dRows);
 
-void llenado_favourite(int fav[], System base[], const int baseRows);
+void llenado_favourite(int fav[], Performance base[], const int baseRows);
 
 short int compare(const char stringSystem[], const char stringUser[]);
 

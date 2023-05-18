@@ -16,7 +16,7 @@ void llenado_displayTable(	Performance *_DisplayTable[], std::vector<Performance
 		case '\0': // RESET_QUERY
 			*_DisplayRows = _DBRows; // reiniciamos
 			for ( int32_t i = 0; i < _DBRows; ++i )
-				_DisplayTable[i] = _DataBase + i;
+				_DisplayTable[i] = &_DataBase[i];
 			break;
 
 		case '/': // Caracter de escape
@@ -28,14 +28,14 @@ void llenado_displayTable(	Performance *_DisplayTable[], std::vector<Performance
 
 			for (int32_t i = 0; i < _DBRows; ++i)
 				// Si encontró en algún campo la palabra clave
-				if (low_string(_DataBase[i].titulo).find(low_string(_Cadena))		!= std::string::npos or
-					low_string(_DataBase[i].artista).find(low_string(_Cadena))		!= std::string::npos or
-					low_string(_DataBase[i].genero).find(low_string(_Cadena))		!= std::string::npos or
-					low_string(_DataBase[i].mood).find(low_string(_Cadena))			!= std::string::npos or
-					low_string(_DataBase[i].key_words).find(low_string(_Cadena))	!= std::string::npos ) {
+				if (low_string(_DataBase[i].metadata.title).find(low_string(_Cadena)) != std::string::npos or
+					low_string(_DataBase[i].metadata.artist).find(low_string(_Cadena)) != std::string::npos or
+					low_string(_DataBase[i].metadata.genre).find(low_string(_Cadena)) != std::string::npos or
+					low_string(_DataBase[i].metadata.mood).find(low_string(_Cadena)) != std::string::npos or
+					low_string(_DataBase[i].metadata.keyword).find(low_string(_Cadena))	!= std::string::npos){
 
 					// Agrégala
-					_DisplayTable[*_DisplayRows] = _DataBase + i;
+					_DisplayTable[*_DisplayRows] = &_DataBase[i];
 					++(*_DisplayRows);
 				}
 			break;
@@ -44,12 +44,12 @@ void llenado_displayTable(	Performance *_DisplayTable[], std::vector<Performance
 	return;
 }/*}}}*/
 
-void llenado_favourite(int fav[], System base[], const int baseRows)/*{{{*/
+void llenado_favourite(int fav[], Performance base[], const int baseRows)/*{{{*/
 {
 	int i, count = 1;
 
 	for (i = 0; i <= baseRows - 1; i++)
-		if (strstr(base[i].keywords, "Favourite") != NULL)
+		if (strstr(base[i].metadata.keyword.c_str(), "Favourite") != NULL)
 			fav[count++ % 10] = i;
 
 	return;

@@ -74,195 +74,7 @@ void Database::load_from_json( const std::string &_Path)/*{{{*/
 
 	json_file.close();
 
-
 	activeRows = n_canciones = performances.size();
-
-	from_new_to_old();
-}/*}}}*/
-
-void Database::load_csv( const std::string &_Path ) noexcept/*{{{*/
-{
- 	std::int32_t value{ Files::contar_lineas( _Path ) };
-	if ( value == -1 )
-		activeRows = n_canciones = 0;
-	else {
-		activeRows = n_canciones = value;
-
-		std::ifstream archivo{ _Path };
-		if ( archivo.fail() ) {
-			std::cerr << "No se pudo abrir " + _Path + "en BaseDeDatos::cargar()" << std::endl;
-			end_screen();
-			exit( EXIT_FAILURE );
-		}
-
-		for ( int32_t i = 0; i < n_canciones; i++ )
-			clean_row(i);
-
-		std::string linea;
-
-		// Leemos
-		for ( int32_t n_linea = 0; n_linea < n_canciones; ++n_linea ) {
-			// Titulo
-			std::getline( archivo, linea );
-			if ( linea.starts_with( '\"' ) ) { // Incluye comas
-				linea = linea.substr( 1 ); // Quitamos "
-				base[n_linea].titulo = linea.substr( 0, linea.find_first_of( '\"' ) );
-				linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
-			}
-			else {
-				base[n_linea].titulo = linea.substr( 0, linea.find_first_of( ',' ) );
-				linea = linea.substr( linea.find_first_of( ',' ) + 1 );
-			}
-
-			// Artista
-			if ( linea.starts_with( '\"' ) ) { // Incluye comas
-				linea = linea.substr( 1 ); // Quitamos "
-				base[n_linea].artista = linea.substr( 0, linea.find_first_of( '\"' ) );
-				linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
-			}
-			else {
-				base[n_linea].artista = linea.substr( 0, linea.find_first_of( ',' ) );
-				linea = linea.substr( linea.find_first_of( ',' ) + 1 );
-			}
-
-			// Genero
-			if ( linea.starts_with( '\"' ) ) { // Incluye comas
-				linea = linea.substr( 1 ); // Quitamos "
-				base[n_linea].genero = linea.substr( 0, linea.find_first_of( '\"' ) );
-				linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
-			}
-			else {
-				base[n_linea].genero = linea.substr( 0, linea.find_first_of( ',' ) );
-				linea = linea.substr( linea.find_first_of( ',' ) + 1 );
-			}
-
-			// Mood
-			if ( linea.starts_with( '\"' ) ) { // Incluye comas
-				linea = linea.substr( 1 ); // Quitamos "
-				base[n_linea].mood = linea.substr( 0, linea.find_first_of( '\"' ) );
-				linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
-			}
-			else {
-				base[n_linea].mood = linea.substr( 0, linea.find_first_of( ',' ) );
-				linea = linea.substr( linea.find_first_of( ',' ) + 1 );
-			}
-
-			// Keywords
-			if ( linea.starts_with( '\"' ) ) { // Incluye comas
-				linea = linea.substr( 1 ); // Quitamos "
-				base[n_linea].key_words = linea.substr( 0, linea.find_first_of( '\"' ) );
-				linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
-			}
-			else {
-				base[n_linea].key_words = linea.substr( 0, linea.find_first_of( ',' ) );
-				linea = linea.substr( linea.find_first_of( ',' ) + 1 );
-			}
-
-			// Tipo
-			base[n_linea].tipo = linea.substr( 0, linea.find_first_of( ',' ) );
-			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
-
-			// BNK
-			base[n_linea].bnk = linea.data()[0];
-			linea = linea.substr( 2 ); // garantiza que queda después de la 'coma'
-
-			// NUM
-			base[n_linea].num = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
-			linea = linea.substr( linea.find_first_of( ',' ) + 1 );
-
-			///////////////////////////// VARIACIONES ///////////////////////////////////////
-			// n_variaciones
-			base[n_linea].n_variaciones = std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
-			if ( base[n_linea].n_variaciones > MAX_VARIATIONS ) {
-				std::cerr << "Exceso de variaciones en Database::cargar(), línea " << n_linea
-					<< std::endl;
-				exit( EXIT_FAILURE );
-			}
-			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
-
-			// Variación inicial
-			base[n_linea].variacion_inicial = std::stoi( linea.substr( 0, linea.find( ',' ) ) );
-			linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
-
-
-			// Label
-			for ( int32_t i = 0; i < base[n_linea].n_variaciones; ++i ) {
-				base[n_linea].variacion[i].etiqueta =
-					linea.substr( 0, linea.find_first_of( ',' ) );
-				linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
-			}
-
-			for ( int32_t i = 0; i < 8; ++i ) {
-
-				// instrumento
-				if ( linea.starts_with( '\"' ) ) { // Incluye comas
-					linea = linea.substr( 1 ); // Quitamos "
-					base[n_linea].instrumento[ i ] = linea.substr( 0, linea.find_first_of( '\"' ) );
-					linea = linea.substr( linea.find_first_of( '\"' ) + 2 );
-				}
-				else {
-					base[n_linea].instrumento[ i ] = linea.substr( 0, linea.find_first_of( ',' ) );
-					linea = linea.substr( linea.find_first_of( ',' ) + 1 );
-				}
-
-				for ( int32_t j = 0; j < base[n_linea].n_variaciones; ++j ) {
-					// status
-					base[n_linea].variacion[j].track[i].status = static_cast<enum Switch>(
-								std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) ) );
-					linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
-
-					// volume
-					base[n_linea].variacion[j].track[i].volume =
-						std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
-					linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
-
-					// lower_key
-					base[n_linea].variacion[j].track[i].lower_key =
-						std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
-					linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
-
-					// upper_key
-					base[n_linea].variacion[j].track[i].upper_key =
-						std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
-					linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
-
-					// transposition
-					base[n_linea].variacion[j].track[i].transposition =
-						std::stoi( linea.substr( 0, linea.find_first_of( ',' ) ) );
-					linea = linea.substr( linea.find_first_of( ',' ) + 1 ); // 1 después de la 'coma'
-				}
-			}
-			
-		}
-
-		archivo.close();
-
-		// Cloning
-		activeRows = n_canciones;
-		for ( int32_t i = 0; i < activeRows; ++i ) {
-			strcpy( base[i].title,		base[i].titulo.c_str() );
-			strcpy( base[i].artist,		base[i].artista.c_str() );
-			strcpy( base[i].genre,		base[i].genero.c_str() );
-			strcpy( base[i].section,	base[i].mood.c_str() );
-			strcpy( base[i].keywords,	base[i].key_words.c_str() );
-			strcpy( base[i].type,		base[i].tipo.c_str() );
-		}
-
-		delete_duplicated();
-	}
-
-	// Favoritos{{{
-	int32_t i { 0 };
-	int16_t favoritos_leidos { 0 };
-	
-	while ( i < n_canciones and favoritos_leidos < N_FAVORITOS ) {
-		if ( base[ i ].key_words.substr( 0, 10 ) == "Favourite_" ) {
-			favorito[ std::stoi( base[ i ].key_words.substr( 10 ) ) - 1 ] = base + i;
-			++favoritos_leidos;
-		}
-		++i;
-	}/*}}}*/
-
 }/*}}}*/
 
 int32_t Database::get_activeRows() noexcept/*{{{*/
@@ -271,8 +83,6 @@ int32_t Database::get_activeRows() noexcept/*{{{*/
 }/*}}}*/
 
 void Database::save_to_json(const std::string& _Path) noexcept {/*{{{*/
-	from_old_to_new();
-
     // Create a JSON object and fill it with the data from performances vector
     nlohmann::ordered_json json_object = performances;
 
@@ -284,77 +94,6 @@ void Database::save_to_json(const std::string& _Path) noexcept {/*{{{*/
     }
     json_file << std::setfill('\t') << std::setw(1) << json_object << std::endl;
     json_file.close();
-}/*}}}*/
-
-void Database::write_csv( const std::string &_Path ) noexcept/*{{{*/
-{
-	std::ofstream archivo{ _Path };
-
-	if ( archivo.fail() ) {
-		std::cerr << "No s pudo abrir " + _Path + "en BaseDeDatos::cargar()" << std::endl;
-		exit( EXIT_FAILURE );
-	}
-
-	////////////////////////////////// clonando del esquema C ///////////////////////////////////
-	n_canciones = activeRows;
-
-	for ( int32_t i = 0; i < n_canciones; ++i ) {
-		base[i].titulo		= base[i].title;
-		base[i].artista		= base[i].artist;
-		base[i].genero		= base[i].genre;
-		base[i].mood		= base[i].section;
-		base[i].key_words	= base[i].keywords;
-		base[i].tipo		= base[i].type;
-	}
-
-	///////////////////////////////////// escritura ///////////////////////////////////////////
-	std::string delimitador;
-
-	for ( int32_t i = 0; i < activeRows; ++i ) {
-		// Tags
-		delimitador = base[i].titulo.find( ',' ) < base[i].titulo.npos ? "\"" : "";
-		archivo << delimitador << base[i].titulo << delimitador << ',';
-
-		delimitador = base[i].artista.find( ',' ) < base[i].artista.npos ? "\"" : "";
-		archivo << delimitador << base[i].artista << delimitador << ',';
-
-		delimitador = base[i].genero.find( ',' ) < base[i].genero.npos ? "\"" : "";
-		archivo << delimitador << base[i].genero << delimitador << ',';
-
-		archivo << base[i].mood << ',';
-
-		delimitador = base[i].key_words.find( ',' ) < base[i].key_words.npos ? "\"" : "";
-		archivo << delimitador << base[i].key_words << delimitador << ",";
-
-		archivo	<< base[i].tipo	<< ','
-				<< base[i].bnk	<< ','
-				<< std::setw( 3 ) << std::setfill( '0' ) << base[i].num	<< ","
-				<< base[i].n_variaciones << ','
-				<< base[i].variacion_inicial << ',';
-
-		// Etiqueta de variación
-		for ( int32_t j = 0; j < base[i].n_variaciones; ++j ) {
-			delimitador = 	base[i].variacion[j].etiqueta.find( ',' ) <
-							base[i].variacion[j].etiqueta.npos	? "\"" : "";
-			archivo << delimitador << base[i].variacion[j].etiqueta << delimitador << ',';
-		}
-
-		for ( int32_t k = 0; k < 8; ++k ) {
-			delimitador = base[i].instrumento[ k ].find( ',' ) < base[i].instrumento[ k ].npos ?
-				"\"" : "";
-			archivo << delimitador << base[i].instrumento[ k ] << delimitador << ',';
-			for ( int32_t j = 0; j < base[i].n_variaciones; ++j ) {
-				archivo << base[i].variacion[j].track[k].status << ','
-						<< base[i].variacion[j].track[k].volume << ','
-						<< base[i].variacion[j].track[k].lower_key << ','
-						<< base[i].variacion[j].track[k].upper_key << ','
-						<< base[i].variacion[j].track[k].transposition
-						<< ( k < 7 or j < base[i].n_variaciones - 1 ? ',' : '\n' );
-			}
-		}
-	}
-
-	archivo.close();
 }/*}}}*/
 
 void Database::add_value( const Performance& _Performance )/*{{{*/
@@ -371,7 +110,7 @@ void Database::edit_value(const std::int32_t line, const Performance& _Performan
 
 void Database::delete_value( int line )/*{{{*/
 {
-	performances.erase(line);
+	performances.erase(std::begin(performances) + line);
 	n_canciones = --activeRows;
 }/*}}}*/
 
@@ -449,11 +188,11 @@ void Database::ordenate()/*{{{*/
 	a--;
 	b = a + 1;
 	while (a <= activeRows - 2 && b <= activeRows - 1) {	
-		if (strcmp(base[a].section, "Bale") == 0){
+		if (performances[a].metadata.mood != "Baile") {
 			b = a + 1;
 			success = false;
 			while (success == false && b <= activeRows - 1) {
-				if (strcmp(base[b].section, "Baile") != 0)
+				if (performances[b].metadata.mood == "Baile")
 					b++;
 				else {
 					aux = performances[a];
@@ -473,12 +212,12 @@ void Database::ordenate()/*{{{*/
 				k = 0;
 				success = false;
 				while (success == false && k < LONG_STRING) {
-					if (performances[a].metadata.title[k] > performances[b].metadata.title[k] {
+					if (performances[a].metadata.title[k] > performances[b].metadata.title[k]) {
 						aux = performances[a];
 						performances[a] = performances[b];
 						performances[b] = aux;
 						success = true;
-					} else if (performances[a].metadata.title[k] < performances[b].metadata.title[k]) {
+					} else if (performances[a].metadata.title[k] < performances[b].metadata.title[k])
 						success = true;
 					k++;
 				}
@@ -491,7 +230,8 @@ void Database::delete_duplicated() noexcept/*{{{*/
 	int32_t i, j;
 	for ( i = 0; i < n_canciones - 1; ++i )
 		for ( j = i + 1; j < n_canciones; ++j )
-			if ( ( base[i].titulo == base[j].titulo ) and ( base[i].artista == base[j].artista ) ) {
+			if ((performances[i].metadata.title == performances[j].metadata.title ) and
+				(performances[i].metadata.artist == performances[j].metadata.artist ) ) {
 				delete_value( j );
 				--n_canciones;
 			}
@@ -499,15 +239,15 @@ void Database::delete_duplicated() noexcept/*{{{*/
 
 Performance Database::get_cancion( const int _Index ) noexcept/*{{{*/
 {
-	return base[ _Index ];
+	return performances[ _Index ];
 }/*}}}*/
 
-struct System *Database::get_cancion_ptr( const int32_t &_Index ) noexcept/*{{{*/
+Performance *Database::get_cancion_ptr( const int32_t &_Index ) noexcept/*{{{*/
 {
-	return base + _Index;
+	return &performances[_Index];
 }/*}}}*/
 
-struct System *Database::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
+Performance *Database::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
 {
 	return favorito[ _FavNumber ];
 }/*}}}*/

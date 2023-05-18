@@ -40,7 +40,7 @@ class Orchestra {
 	private:
 		std::string temp_word;
 		BoxedPopup base;
-			TextPopup variacion_text_box;
+			TextPopup scene_text_box;
 			KeyboardScheme keyboard_scheme;
 			Field vi_field;
 			Field etiqueta_field;
@@ -52,7 +52,7 @@ class Orchestra {
 				std::array<int16_t, 2> cursor;
 		std::array<struct Font, 8> native_font;
 		struct Font cursor_font, MIDI_font, dimmed_font;
-		int16_t variacion;
+		int16_t current_scene;
 		Performance *info;
 		Combinations *comb_ptr;
 		Keyboard *keyboard;

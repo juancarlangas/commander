@@ -28,10 +28,7 @@ class Combinations {
 	public:
 		Combinations( const std::string & );
 		~Combinations();
-		void load_from_csv( const std::string & ) noexcept;
 		void load_from_json( const std::string & );
-		void from_new_to_old() noexcept;
-		void escribir( const std::string & ) noexcept;
 		std::string get_instrument_name(
 				const char &_Banco, const int16_t &_Num, const int16_t &_Track ) noexcept;
 		void set_instrument_name( const char &, const int16_t &, const int16_t &,
