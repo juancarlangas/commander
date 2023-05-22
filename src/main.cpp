@@ -325,14 +325,14 @@ int32_t main()
 				Form forma;
 
 				if (forma.capture_value() == true) {
-					dBase[mode].add_value(forma.get_value());
+					database.add_value(forma.get_value());
+					database.ordenate();
 					performance_ptr = &database.performances[0]; // Actualizamos después del cambio
-					dBase[mode].ordenate();
 				}
 
 				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
 				llenado_displayTable(
-						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches );
+						displayTable, database.performances, dbRows[mode], keyword, &n_matches );
 
 				draw_windows();
 				updateWindow[LCD]		= true;
@@ -375,7 +375,9 @@ int32_t main()
 			{
 				Form forma;
 
-				int difference = displayTable[dIndex] - &(dBase[mode].performances[0]);
+				// dIndex represents absolute iterator over displayTable, but NOT OVER database, so we whould
+				// get the exact database index calculating the difference
+				int difference = displayTable[dIndex] - &(database.performances[0]);
 
 				if (forma.capture_value(dBase[mode].performances[difference]) == true) {
 					dBase[mode].edit_value(difference, forma.get_value());
@@ -668,7 +670,7 @@ int32_t main()
 		if (updateWindow[ZOOM] == true) {
 			if (winMode == MODE_PLAYLIST)
 				print_zoom(zoomWindow, playlist->get_pointer( pl_index ) );
-			else if ( keyword[0] != '/' and dIndex >= 0 )
+			else if ( keyword[0] != ':' and dIndex >= 0 )
 				print_zoom(zoomWindow, displayTable[dIndex]);
 			else {
 				wclear(zoomWindow);
