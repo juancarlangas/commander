@@ -121,108 +121,110 @@ void Database::ordenate()/*{{{*/
 	bool success;
 	Performance aux;
 
-	// Mood: Sound
-	a = 0;
-	b = a + 1;
-	while (a < activeRows - 1) {	
-		if (performances[a].metadata.mood != "Sound") {
-			b = a + 1;
-			success = false;
-			while (success == false && b < activeRows) {
-				if (performances[b].metadata.mood == "Sound")
-					b++;
-				else {
-					aux = performances[a];
-					performances[a] = performances[b];
-					performances[b] = aux;
-					success = true;
-				}
-			}
-		}
-		++a;
-	}
-
-	// mood: Lobby
-	a--;
-	b = a + 1;
-	while (a < activeRows - 1) {	
-		if (performances[a].metadata.mood != "Lobby") {
-			b = a + 1;
-			success = false;
-			while (success == false && b <= activeRows - 1) {
-				if (performances[b].metadata.mood == "Lobby")
-					b++;
-				else {
-					aux = performances[a];
-					performances[a] = performances[b];
-					performances[b] = aux;
-					success = true;
-				}
-			}
-		}
-		a++;
-	}
-
-	// mood: "Cena"
-	a--;
-	b = a + 1;
-	while (a <= activeRows - 2 && b <= activeRows - 1) {	
-		if (performances[a].metadata.mood != "Cena") {
-			b = a + 1;
-			success = false;
-			while (success == false && b <= activeRows - 1) {
-				if (performances[b].metadata.mood == "Cena")
-					b++;
-				else {
-					aux = performances[a];
-					performances[a] = performances[b];
-					performances[b] = aux;
-					success = true;
-				}
-			}
-		}
-		a++;
-	}
-
-	//Baile
-	a--;
-	b = a + 1;
-	while (a <= activeRows - 2 && b <= activeRows - 1) {	
-		if (performances[a].metadata.mood != "Baile") {
-			b = a + 1;
-			success = false;
-			while (success == false && b <= activeRows - 1) {
-				if (performances[b].metadata.mood == "Baile")
-					b++;
-				else {
-					aux = performances[a];
-					performances[a] = performances[b];
-					performances[b] = aux;
-					success = true;
-				}
-			}
-		}
-		a++;
-	}
-
-	// ALphabet
-	for (a = 0; a < activeRows - 1; a++)
-		for (b = a + 1; b < activeRows; b++) {
-			if (performances[a].metadata.mood == performances[b].metadata.mood) {
-				k = 0;
+	if (activeRows > 1) {
+		// Mood: Sound
+		a = 0;
+		b = a + 1;
+		while (a < activeRows - 1 and b < activeRows) {	
+			if (performances[a].metadata.mood != "Sound") {
+				b = a + 1;
 				success = false;
-				while (success == false && k < LONG_STRING) {
-					if (performances[a].metadata.title[k] > performances[b].metadata.title[k]) {
+				while (success == false && b < activeRows) {
+					if (performances[b].metadata.mood == "Sound")
+						b++;
+					else {
 						aux = performances[a];
 						performances[a] = performances[b];
 						performances[b] = aux;
 						success = true;
-					} else if (performances[a].metadata.title[k] < performances[b].metadata.title[k])
-						success = true;
-					k++;
+					}
 				}
 			}
+			++a;
 		}
+
+		// mood: Lobby
+		a--;
+		b = a + 1;
+		while (a < activeRows - 1 and b < activeRows) {	
+			if (performances[a].metadata.mood != "Lobby") {
+				b = a + 1;
+				success = false;
+				while (success == false && b <= activeRows - 1) {
+					if (performances[b].metadata.mood == "Lobby")
+						b++;
+					else {
+						aux = performances[a];
+						performances[a] = performances[b];
+						performances[b] = aux;
+						success = true;
+					}
+				}
+			}
+			a++;
+		}
+
+		// mood: "Cena"
+		a--;
+		b = a + 1;
+		while (a < activeRows - 1 && b < activeRows) {	
+			if (performances[a].metadata.mood != "Cena") {
+				b = a + 1;
+				success = false;
+				while (success == false && b <= activeRows - 1) {
+					if (performances[b].metadata.mood == "Cena")
+						b++;
+					else {
+						aux = performances[a];
+						performances[a] = performances[b];
+						performances[b] = aux;
+						success = true;
+					}
+				}
+			}
+			a++;
+		}
+
+		//Baile
+		a--;
+		b = a + 1;
+		while (a < activeRows - 1 && b < activeRows) {	
+			if (performances[a].metadata.mood != "Baile") {
+				b = a + 1;
+				success = false;
+				while (success == false && b <= activeRows - 1) {
+					if (performances[b].metadata.mood == "Baile")
+						b++;
+					else {
+						aux = performances[a];
+						performances[a] = performances[b];
+						performances[b] = aux;
+						success = true;
+					}
+				}
+			}
+			a++;
+		}
+
+		// ALphabet
+		for (a = 0; a < activeRows - 1; a++)
+			for (b = a + 1; b < activeRows; b++) {
+				if (performances[a].metadata.mood == performances[b].metadata.mood) {
+					k = 0;
+					success = false;
+					while (success == false && k < LONG_STRING) {
+						if (performances[a].metadata.title[k] > performances[b].metadata.title[k]) {
+							aux = performances[a];
+							performances[a] = performances[b];
+							performances[b] = aux;
+							success = true;
+						} else if (performances[a].metadata.title[k] < performances[b].metadata.title[k])
+							success = true;
+						k++;
+					}
+				}
+			}
+	}
 }/*}}}*/
 
 void Database::delete_duplicated() noexcept/*{{{*/

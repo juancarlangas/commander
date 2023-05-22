@@ -40,14 +40,18 @@ void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
 	MIDI == Switch::OFF ? connect() : disconnect();
 }/*}}}*/
 
-void Keyboard::set_performance( const Performance &_Performance ) noexcept/*{{{*/
+void Keyboard::set_buffer( const Performance &_Performance ) noexcept/*{{{*/
 {
-	buffer_performance = _Performance;
+	performance_buffer = _Performance;
+}/*}}}*/
+
+auto Keyboard::get_buffer() noexcept -> const Performance& {/*{{{*/
+	return performance_buffer;
 }/*}}}*/
 
 void Keyboard::reset_variation() noexcept/*{{{*/
 {
-	variacion = buffer_performance.initial_scene;
+	variacion = performance_buffer.initial_scene;
 }/*}}}*/
 
 void Keyboard::prev_variation() noexcept/*{{{*/
@@ -58,13 +62,13 @@ void Keyboard::prev_variation() noexcept/*{{{*/
 
 void Keyboard::next_variation() noexcept/*{{{*/
 {
-	if ( variacion < buffer_performance.n_scenes - 1 )
+	if ( variacion < performance_buffer.n_scenes - 1 )
 		++variacion;
 }/*}}}*/
 
 void Keyboard::set_variation( const int16_t _Variacion ) noexcept/*{{{*/
 {
-	if ( _Variacion < buffer_performance.n_scenes )
+	if ( _Variacion < performance_buffer.n_scenes )
 		variacion = _Variacion;
 }/*}}}*/
 
@@ -144,24 +148,24 @@ void Keyboard::dump_variation() noexcept/*{{{*/
 	// Ajuste
 	for ( int16_t i = 0; i < 8; ++i ) {
 		// STATE
-		if ( buffer_performance.scenes[variacion].tracks[i].state == ON )
+		if ( performance_buffer.scenes[variacion].tracks[i].state == ON )
 			x50_on_off[i][11] = 0x00; // -> ON
 
 		// volumen
-		x50_volume[i][11] = buffer_performance.scenes[variacion].tracks[i].volume;
+		x50_volume[i][11] = performance_buffer.scenes[variacion].tracks[i].volume;
 
 		// zone
-		x50_lower_key[i][11] = buffer_performance.scenes[variacion].tracks[i].lower_key;
-		x50_upper_key[i][11] = buffer_performance.scenes[variacion].tracks[i].upper_key;
+		x50_lower_key[i][11] = performance_buffer.scenes[variacion].tracks[i].lower_key;
+		x50_upper_key[i][11] = performance_buffer.scenes[variacion].tracks[i].upper_key;
 
 		// transposition =	columna 11 hacemos + porque es número negativo, de este modo
 		// 					obtenemos una RESTA
-		if ( buffer_performance.scenes[variacion].tracks[i].transposition < 0 ) {
+		if ( performance_buffer.scenes[variacion].tracks[i].transposition < 0 ) {
 			x50_transposition[i][10] = 0x7F;
-			x50_transposition[i][11] = 0x80 + buffer_performance.scenes[variacion].tracks[i].transposition;
+			x50_transposition[i][11] = 0x80 + performance_buffer.scenes[variacion].tracks[i].transposition;
 		}
 		else
-			x50_transposition[i][11] = buffer_performance.scenes[variacion].tracks[i].transposition;
+			x50_transposition[i][11] = performance_buffer.scenes[variacion].tracks[i].transposition;
 	}
 
 	for ( int16_t channel = 0; channel < 8; ++channel ) {
@@ -175,7 +179,7 @@ void Keyboard::dump_variation() noexcept/*{{{*/
 
 void Keyboard::dump_variation( const Performance &_Performance, const int16_t &_Variacion ) noexcept/*{{{*/
 {
-	set_performance( _Performance );
+	set_buffer( _Performance );
 	variacion = _Variacion;
 	dump_variation();
 }/*}}}*/
@@ -199,7 +203,7 @@ void Keyboard::select_page( const enum Page &_Pagina ) noexcept/*{{{*/
 	snd_rawmidi_write( device, pageSysEx[ _Pagina ], 7 );
 	nanosleep( &keyboardTimer, NULL );
 
-	set_variation( buffer_performance.initial_scene );
+	set_variation( performance_buffer.initial_scene );
 }/*}}}*/
 
 void Keyboard::set_modality(short toMode)/*{{{*/
@@ -216,7 +220,7 @@ void Keyboard::set_modality(short toMode)/*{{{*/
 
 void Keyboard::set_program( const Performance &_Performance ) noexcept/*{{{*/
 {
-	set_performance( _Performance ); // We pass to the buffer
+	set_buffer( _Performance ); // We pass to the buffer
 
 	// sleep
 	static struct timespec keyboardTimer;
@@ -231,8 +235,8 @@ void Keyboard::set_program( const Performance &_Performance ) noexcept/*{{{*/
 	unsigned char msb[3] = {0xB0, 0x00, 0x3F}, lsb[3] = {0xB0, 0x20, 0x00}, pc[2] = {0xC0, 0x00};
 
 	// ajuste
-	lsb[2] = buffer_performance.patch.bnk - 65; /*LSB*/
-	pc[1] = buffer_performance.patch.num; /*PC*/
+	lsb[2] = performance_buffer.patch.bnk - 65; /*LSB*/
+	pc[1] = performance_buffer.patch.num; /*PC*/
 
 	snd_rawmidi_write( device, pageSysEx[COMBI], 7 );
 	nanosleep( &keyboardTimer, NULL );
@@ -242,8 +246,12 @@ void Keyboard::set_program( const Performance &_Performance ) noexcept/*{{{*/
 	snd_rawmidi_write( device, pageSysEx[TIMBRE], 7 );
 	nanosleep( &keyboardTimer, NULL );
 
-	set_variation( buffer_performance.initial_scene );
+	set_variation( performance_buffer.initial_scene );
 	dump_variation();
+}/*}}}*/
+
+auto Keyboard::load_buffer() noexcept -> void {/*{{{*/
+	set_program( performance_buffer );
 }/*}}}*/
 
 void Keyboard::set_song(const char song)/*{{{*/

@@ -25,12 +25,13 @@ int32_t main()
 	Combinations combinaciones { config_directory + "/combinations.json" };
 
 	Database *dBase = new Database []{ { config_directory + "/catalog.json", &combinaciones } };
+	Database& database{dBase[COMBINATIONS]};
 	int dbRows[1] { dBase[COMBINATIONS].get_activeRows() };
 /*}}}*/
 
 	// Tables{{{
 	Performance **displayTable = new Performance *[ dbRows[COMBINATIONS] ](); // arreglo de apuntadores
-	Performance *buffer, *orch_clipboard_ptr; // apuntadores simple
+	Performance* orch_clipboard_ptr, *performance_ptr; // apuntadores simple
 
 	Playlist *playlist = new Playlist( &dBase[COMBINATIONS] );
 
@@ -72,9 +73,9 @@ int32_t main()
 						keyword, &n_matches );
 
 				if (dbRows[COMBINATOR] > 0) // permitimos 0 lineas
-					buffer = &dBase[COMBINATIONS].performances[0];
+					performance_ptr = &dBase[COMBINATIONS].performances[0];
 
-				x50.set_performance( *buffer );
+				x50.set_buffer( *performance_ptr );
 
 				playlist->cargar( "/home/juancarlangas/.config/commander/Playlists/default.csv" );
 
@@ -213,10 +214,10 @@ int32_t main()
 			case INTRO:/*{{{*/
 				switch ( winMode ) {
 					case MODE_DISPLAY:
-						buffer = displayTable[ dIndex ];
+						performance_ptr = displayTable[ dIndex ];
 						break;
 					case MODE_PLAYLIST:
-						buffer = playlist->get_pointer( pl_index );
+						performance_ptr = playlist->get_pointer( pl_index );
 						//avance carro
 						if ( plIndexB < playlist->get_n_pistas() - 1 ) {
 							plIndexB++;
@@ -229,10 +230,10 @@ int32_t main()
 				}
 
 				if ( x50.is_connected() )
-					x50.set_program( *buffer );
+					x50.set_program( *performance_ptr );
 				else
 					// solo actualizamos el buffer para poder trabajar online
-					x50.set_performance( *buffer );
+					x50.set_buffer( *performance_ptr );
 
 				updateWindow[LCD] = true;
 
@@ -240,7 +241,7 @@ int32_t main()
 
 			case FAVOURITE: {/*{{{*/
 				int32_t caracter_a_numero = caracter == 48 ? 9 : ( caracter - 49 );
-				buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
+				performance_ptr = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
 
 				updateWindow[LCD] 	  = true;
 
@@ -325,6 +326,7 @@ int32_t main()
 
 				if (forma.capture_value() == true) {
 					dBase[mode].add_value(forma.get_value());
+					performance_ptr = &database.performances[0]; // Actualizamos después del cambio
 					dBase[mode].ordenate();
 				}
 
@@ -351,6 +353,7 @@ int32_t main()
 				int real_index = displayTable[dIndex] - &(dBase[mode].performances[0]);
 
 				dBase[mode].delete_value( real_index );
+				performance_ptr = &database.performances[0]; // Actualizamos después del cambio
 
 
 				llenado_displayTable(
@@ -401,9 +404,9 @@ int32_t main()
 					buffer = displayTable[ dIndex ];
 					x50.set_program( *buffer );
 					*/
-					buffer = displayTable[ dIndex ];
+					performance_ptr = displayTable[ dIndex ];
 					orquestacion.reset_variation();
-					orquestacion.show( buffer );
+					orquestacion.show( performance_ptr );
 					update_popups(); // se decide poner aquí para no refrescar varias veces
 					orquestacion.capture_key();
 
@@ -562,7 +565,6 @@ int32_t main()
 				break;/*}}}*/
 
 			case CLEAR_PLAYLIST:/*{{{*/
-
 				// save_playlist(playlistTable, plRows, "default");
 
 				for (k = 0; k <= LONG_STRING - 1; k++)
@@ -658,7 +660,7 @@ int32_t main()
 			print_search(searchWindow, keyword);
 
 		if (updateWindow[LCD] == true)
-			print_lcd( lcdWindow, buffer );
+			print_lcd( lcdWindow, performance_ptr );
 
 		if ( updateWindow[ MIDI_STATE ] )
 			print_MIDI_state( MIDI_state_window, x50.get_MIDI_state() );
@@ -681,9 +683,9 @@ int32_t main()
 			 *
 			 * Por lo pronto reservamos esta funcionalidad para el comando FAVOURITE*/
 			if ( command == FAVOURITE and x50.is_connected() )
-				x50.set_program( *buffer );/*}}}*/
+				x50.set_program( *performance_ptr );/*}}}*/
 
-		if ( command != EXIT ) // Que no eche a perder el :wq
+		if ( command != EXIT ) // Que no eche a perder el :w
 			command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
 
 	} while ( command != EXIT );/*}}}*/
@@ -697,7 +699,7 @@ int32_t main()
 	delete playlist;
 
 	delete [] displayTable;
-	buffer = NULL;
+	performance_ptr = NULL;
 
 	delete [] dBase;
 

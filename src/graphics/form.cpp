@@ -63,7 +63,7 @@ bool Form::capture_value()/*{{{*/
 		field[SECTION].set_string(performance.metadata.mood);
 		field[TYPE].set_string(performance.type);
 		field[KEYWORDS].set_string(performance.metadata.keyword);
-		field[BNK].set_string(static_cast<const char>(performance.patch.bnk + 65));
+		field[BNK].set_string(static_cast<const char>(performance.patch.bnk));
 		field[NUM].set_string(std::int32_t{ performance.patch.num });
 		
 		bool success = capture();
@@ -83,7 +83,7 @@ bool Form::capture_value(Performance _Performance)/*{{{*/
 		field[SECTION].set_string(performance.metadata.mood);
 		field[KEYWORDS].set_string(performance.metadata.keyword);
 		field[TYPE].set_string(performance.type);
-		field[BNK].set_string(performance.patch.bnk);
+		field[BNK].set_string(static_cast<char>(performance.patch.bnk + 65));
 		field[NUM].set_string(performance.patch.num);
 		
 		bool success = capture();
@@ -151,7 +151,7 @@ bool Form::capture()/*{{{*/
 								performance.type = word;
 								break;
 							case BNK:
-								performance.patch.bnk = word[0] - 65;
+								performance.patch.bnk = static_cast<std::int16_t>(word[0] - 65);
 								break;
 							case NUM:
 								performance.patch.num = std::stoi(word);

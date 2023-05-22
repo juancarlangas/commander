@@ -16,7 +16,8 @@ public:
 	void connect() noexcept;
 	void disconnect() noexcept;
 	void toggle_MIDI_state() noexcept;
-	void set_performance( const Performance &_Performance ) noexcept;
+	void set_buffer( const Performance &_Performance ) noexcept;
+	auto get_buffer() noexcept -> const Performance&;
 	void prev_variation() noexcept;
 	void next_variation() noexcept;
 	void set_variation( const int16_t ) noexcept;
@@ -31,12 +32,13 @@ public:
 	void set_name(const char *);
 	void set_modality(const short);
 	void set_program( const Performance &_Performance) noexcept;
+	auto load_buffer() noexcept -> void;
 	void set_krome_program(const char, const short);
 	void set_song(const char);
 	enum Switch get_MIDI_state() noexcept;
 	bool is_connected() noexcept;
 private:
-	Performance buffer_performance;
+	Performance performance_buffer;
 	int16_t variacion;
 	char name[20];
 	bool activeMode;
