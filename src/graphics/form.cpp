@@ -83,7 +83,7 @@ bool Form::capture_value(Performance _Performance)/*{{{*/
 		field[SECTION].set_string(performance.metadata.mood);
 		field[KEYWORDS].set_string(performance.metadata.keyword);
 		field[TYPE].set_string(performance.type);
-		field[BNK].set_string(static_cast<char>(performance.patch.bnk));
+		field[BNK].set_string(static_cast<char>(performance.patch.bnk)); // We dont add anything here
 		field[NUM].set_string(performance.patch.num);
 		
 		bool success = capture();
