@@ -996,9 +996,15 @@ void Orchestra::capture_key() noexcept/*{{{*/
 		}
 
 	} while ( again );
-}
+}/*}}}*/
 
 void Orchestra::reset_variation() noexcept/*{{{*/
 {
 	current_scene = 0;
+}/*}}}*/
+
+auto Orchestra::add_empty_scene(Performance*& _Performance) noexcept -> void {/*{{{*/
+	info = _Performance;
+	++info->n_scenes;
+	info->scenes.push_back(Scene {});
 }/*}}}*/

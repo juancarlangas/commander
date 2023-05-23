@@ -400,13 +400,10 @@ int32_t main()
 
 			case EDIT_ORCHESTRATION :/*{{{*/
 				if ( winMode == MODE_DISPLAY ) {
-					// ida
-					/* Tal vez esto no sea útil
-					if ( x50.get_MIDI_state() == Switch::ON )
-					buffer = displayTable[ dIndex ];
-					x50.set_program( *buffer );
-					*/
-					performance_ptr = displayTable[ dIndex ];
+					performance_ptr = displayTable[dIndex];
+
+					if (performance_ptr->n_scenes == 0)
+						orquestacion.add_empty_scene(performance_ptr);
 					orquestacion.reset_variation();
 					orquestacion.show( performance_ptr );
 					update_popups(); // se decide poner aquí para no refrescar varias veces

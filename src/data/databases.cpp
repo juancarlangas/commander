@@ -306,7 +306,6 @@ void from_json(const nlohmann::json& j, Performance& p) {
 	from_json(j.at("metadata"), p.metadata);
 	from_json(j.at("patch"), p.patch);
 	p.type = j.at("type").get<std::string>();
-	p.instruments = j.at("instruments").get<std::array<std::string, 8>>();
 	p.n_scenes = j.at("n_scenes").get<std::int16_t>();
 	auto& scenes = j.at("scenes");
 	for (std::size_t i = 0; i < scenes.size(); ++i) {
@@ -366,7 +365,6 @@ void to_json(nlohmann::ordered_json& j, const Performance& p) {
 	j = nlohmann::ordered_json{{"metadata", p.metadata},
 							   {"patch", p.patch},
 							   {"type", p.type},
-							   {"instruments", p.instruments},
 							   {"n_scenes", p.n_scenes },
 							   {"scenes", p.scenes},
 							   {"initial_scene", p.initial_scene}};

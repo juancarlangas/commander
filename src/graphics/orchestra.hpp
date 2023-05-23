@@ -37,6 +37,7 @@ class Orchestra {
 		void link_combinations( Combinations * ) noexcept;
 		void link_MIDI_device( Keyboard * ) noexcept;
 		void reset_variation() noexcept;
+		auto add_empty_scene(Performance*& _Performance) noexcept -> void;
 	private:
 		std::string temp_word;
 		BoxedPopup base;

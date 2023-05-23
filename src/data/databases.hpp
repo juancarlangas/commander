@@ -50,7 +50,6 @@ struct Performance {
 	Metadata metadata;
 	Patch patch;
 	std::string type;
-	std::array<std::string, 8> instruments;
 	std::int16_t n_scenes{ 0 };
 	std::vector<Scene> scenes;
 	std::int16_t initial_scene{ 0 };
