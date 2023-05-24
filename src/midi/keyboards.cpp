@@ -15,7 +15,6 @@ Keyboard::Keyboard() :/*{{{*/
 	*name = '\0';
 	activeMode = false;
 	passiveMode = false;
-	part = 1;
 }/*}}}*/
 
 void Keyboard::connect() noexcept/*{{{*/
@@ -40,39 +39,49 @@ void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
 	MIDI == Switch::OFF ? connect() : disconnect();
 }/*}}}*/
 
-void Keyboard::set_buffer( const Performance &_Performance ) noexcept/*{{{*/
+enum Switch Keyboard::get_MIDI_state() noexcept/*{{{*/
+{
+	return MIDI;
+}/*}}}*/
+
+bool Keyboard::is_connected() noexcept/*{{{*/
+{
+	return MIDI == Switch::ON ? true : false;
+}/*}}}*/
+
+void Keyboard::set_performance_buffer( const Performance &_Performance ) noexcept/*{{{*/
 {
 	performance_buffer = _Performance;
 }/*}}}*/
 
-auto Keyboard::get_buffer() noexcept -> const Performance& {/*{{{*/
+auto Keyboard::get_performance_buffer() noexcept -> const Performance& {/*{{{*/
 	return performance_buffer;
 }/*}}}*/
 
-void Keyboard::reset_variation() noexcept/*{{{*/
+void Keyboard::set_to_default_scene() noexcept/*{{{*/
 {
-	variacion = performance_buffer.initial_scene;
+	scene = performance_buffer.default_scene;
 }/*}}}*/
 
-void Keyboard::prev_variation() noexcept/*{{{*/
+void Keyboard::to_prev_scene() noexcept/*{{{*/
 {
-	if ( variacion > 0 )
-		--variacion;
+	if ( scene > 0 )
+		--scene;
 }/*}}}*/
 
-void Keyboard::next_variation() noexcept/*{{{*/
+void Keyboard::to_next_scene() noexcept/*{{{*/
 {
-	if ( variacion < performance_buffer.n_scenes - 1 )
-		++variacion;
+	if ( scene < performance_buffer.n_scenes - 1 )
+		++scene;
 }/*}}}*/
 
-void Keyboard::set_variation( const int16_t _Variacion ) noexcept/*{{{*/
+void Keyboard::set_scene( const int16_t _Variacion ) noexcept/*{{{*/
 {
 	if ( _Variacion < performance_buffer.n_scenes )
-		variacion = _Variacion;
+		scene = _Variacion;
 }/*}}}*/
 
-void Keyboard::dump_variation() noexcept/*{{{*/
+void Keyboard::dump_scene() noexcept/*{{{*/
 {
 	// sleep
 	/*
@@ -148,24 +157,24 @@ void Keyboard::dump_variation() noexcept/*{{{*/
 	// Ajuste
 	for ( int16_t i = 0; i < 8; ++i ) {
 		// STATE
-		if ( performance_buffer.scenes[variacion].tracks[i].state == ON )
+		if ( performance_buffer.scenes[scene].tracks[i].state == ON )
 			x50_on_off[i][11] = 0x00; // -> ON
 
 		// volumen
-		x50_volume[i][11] = performance_buffer.scenes[variacion].tracks[i].volume;
+		x50_volume[i][11] = performance_buffer.scenes[scene].tracks[i].volume;
 
 		// zone
-		x50_lower_key[i][11] = performance_buffer.scenes[variacion].tracks[i].lower_key;
-		x50_upper_key[i][11] = performance_buffer.scenes[variacion].tracks[i].upper_key;
+		x50_lower_key[i][11] = performance_buffer.scenes[scene].tracks[i].lower_key;
+		x50_upper_key[i][11] = performance_buffer.scenes[scene].tracks[i].upper_key;
 
 		// transposition =	columna 11 hacemos + porque es número negativo, de este modo
 		// 					obtenemos una RESTA
-		if ( performance_buffer.scenes[variacion].tracks[i].transposition < 0 ) {
+		if ( performance_buffer.scenes[scene].tracks[i].transposition < 0 ) {
 			x50_transposition[i][10] = 0x7F;
-			x50_transposition[i][11] = 0x80 + performance_buffer.scenes[variacion].tracks[i].transposition;
+			x50_transposition[i][11] = 0x80 + performance_buffer.scenes[scene].tracks[i].transposition;
 		}
 		else
-			x50_transposition[i][11] = performance_buffer.scenes[variacion].tracks[i].transposition;
+			x50_transposition[i][11] = performance_buffer.scenes[scene].tracks[i].transposition;
 	}
 
 	for ( int16_t channel = 0; channel < 8; ++channel ) {
@@ -177,11 +186,11 @@ void Keyboard::dump_variation() noexcept/*{{{*/
 	}
 }/*}}}*/
 
-void Keyboard::dump_variation( const Performance &_Performance, const int16_t &_Variacion ) noexcept/*{{{*/
+void Keyboard::dump_scene( const Performance &_Performance, const int16_t &_Variacion ) noexcept/*{{{*/
 {
-	set_buffer( _Performance );
-	variacion = _Variacion;
-	dump_variation();
+	set_performance_buffer( _Performance );
+	scene = _Variacion;
+	dump_scene();
 }/*}}}*/
 
 void Keyboard::set_name(const char *id)/*{{{*/
@@ -203,7 +212,7 @@ void Keyboard::select_page( const enum Page &_Pagina ) noexcept/*{{{*/
 	snd_rawmidi_write( device, pageSysEx[ _Pagina ], 7 );
 	nanosleep( &keyboardTimer, NULL );
 
-	set_variation( performance_buffer.initial_scene );
+	set_scene( performance_buffer.default_scene );
 }/*}}}*/
 
 void Keyboard::set_modality(short toMode)/*{{{*/
@@ -218,9 +227,9 @@ void Keyboard::set_modality(short toMode)/*{{{*/
 	snd_rawmidi_write(device, sysex, 7);
 }/*}}}*/
 
-void Keyboard::set_program( const Performance &_Performance ) noexcept/*{{{*/
+void Keyboard::dump_performance( const Performance &_Performance ) noexcept/*{{{*/
 {
-	set_buffer( _Performance ); // We pass to the buffer
+	set_performance_buffer( _Performance ); // We pass to the buffer
 
 	// sleep
 	static struct timespec keyboardTimer;
@@ -246,12 +255,8 @@ void Keyboard::set_program( const Performance &_Performance ) noexcept/*{{{*/
 	snd_rawmidi_write( device, pageSysEx[TIMBRE], 7 );
 	nanosleep( &keyboardTimer, NULL );
 
-	set_variation( performance_buffer.initial_scene );
-	dump_variation();
-}/*}}}*/
-
-auto Keyboard::load_buffer() noexcept -> void {/*{{{*/
-	set_program( performance_buffer );
+	set_scene( performance_buffer.default_scene );
+	dump_scene();
 }/*}}}*/
 
 void Keyboard::set_song(const char song)/*{{{*/
@@ -262,14 +267,4 @@ void Keyboard::set_song(const char song)/*{{{*/
 	
 	songSelect[1] = song; /*SongSelect */
 		snd_rawmidi_write(device, songSelect, 2);	
-}/*}}}*/
-
-enum Switch Keyboard::get_MIDI_state() noexcept/*{{{*/
-{
-	return MIDI;
-}/*}}}*/
-
-bool Keyboard::is_connected() noexcept/*{{{*/
-{
-	return MIDI == Switch::ON ? true : false;
 }/*}}}*/

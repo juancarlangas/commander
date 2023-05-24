@@ -127,7 +127,7 @@ void Orchestra::update() noexcept/*{{{*/ {
 
 	scene_text_box.set_text( "Variacion " + std::to_string( current_scene + 1 ) +
 								" de " + std::to_string( info->n_scenes ) );
-	vi_field.set_content( std::to_string( info->initial_scene ) );
+	vi_field.set_content( std::to_string( info->default_scene ) );
 	etiqueta_field.set_content( info->scenes[ current_scene ].label );
 
 	for ( int32_t i = 0; i < static_cast<std::int32_t>(programming_ptr->channels_per_combi); ++i ) {
@@ -225,10 +225,10 @@ void Orchestra::capture_key() noexcept/*{{{*/
 	cursor[ Y ] = -1;
 
 	curs_set( true );
-	vi_field.set_cursor(); // Por defalt el cursor estará sobre el campo initial_scene
+	vi_field.set_cursor(); // Por defalt el cursor estará sobre el campo default_scene
 
 	/* Cadena para almacenar la palabra la palabra que está siendo editada. */
-	temp_word = std::to_string( info->initial_scene );
+	temp_word = std::to_string( info->default_scene );
 	int32_t tecla;
 	char tecla_c_string[3];
 	bool again = true;
@@ -274,8 +274,8 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 					if ( cursor[Y] == -1 ) { // si está hasta arriba
 						if ( cursor[X] <= 1 ) {
-							vi_field.set_content( std::to_string( info->initial_scene ) );
-							info->initial_scene = std::stoi( temp_word );
+							vi_field.set_content( std::to_string( info->default_scene ) );
+							info->default_scene = std::stoi( temp_word );
 							vi_field.set_cursor();
 						}
 						else {
@@ -322,7 +322,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 					if ( keyboard->get_MIDI_state() == Switch::ON ) {
 						keyboard->select_page( Page::TIMBRE );
-						keyboard->dump_variation( *info, current_scene );
+						keyboard->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
 				}
@@ -334,8 +334,8 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					update();
 					if ( cursor[Y] == -1 ) { // si está hasta arriba
 						if ( cursor[X] <= 1 ) {
-							info->initial_scene = std::stoi( temp_word );
-							vi_field.set_content( std::to_string( info->initial_scene ) );
+							info->default_scene = std::stoi( temp_word );
+							vi_field.set_content( std::to_string( info->default_scene ) );
 							vi_field.set_cursor();
 						}
 						else {
@@ -381,7 +381,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						}
 					if ( keyboard->get_MIDI_state() == Switch::ON ) {
 						keyboard->select_page( Page::TIMBRE );
-						keyboard->dump_variation( *info, current_scene );
+						keyboard->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
 				}
@@ -395,7 +395,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 							cursor[X] = 1;
 						if ( cursor[X] == 1 ) {
 							info->scenes[ current_scene ].label = temp_word;
-							temp_word = std::to_string( info->initial_scene );
+							temp_word = std::to_string( info->default_scene );
 							vi_field.set_cursor();
 						}
 					}
@@ -445,7 +445,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						if ( cursor[X] == 1 )
 							cursor[X] = 2;
 						if ( cursor[X] == 2 ) {
-							info->initial_scene = std::stoi( temp_word );
+							info->default_scene = std::stoi( temp_word );
 							temp_word = info->scenes[ current_scene ].label;
 							etiqueta_field.set_cursor();
 						}
@@ -495,14 +495,14 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					switch ( cursor[ Coordinates::X ] ) {
 						case 0: // Check
 							if ( cursor[ Coordinates::Y ] == 0 ) // viene de arriba
-								info->initial_scene = std::stoi( temp_word );
+								info->default_scene = std::stoi( temp_word );
 							else
 								status_field[ cursor[ Coordinates::Y ] - 1 ].leave_cursor();
 							status_field[ cursor[ Coordinates::Y ] ].set_cursor();
 							break;
 						case 1: // Instrument
 							if ( cursor[ Coordinates::Y ] == 0 )
-								info->initial_scene = std::stoi( temp_word );
+								info->default_scene = std::stoi( temp_word );
 							else
 								programming_ptr->set_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y] - 1, temp_word );
@@ -562,7 +562,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						case 0: // check: nada que salvar
 							status_field[ cursor[ Coordinates::Y ] + 1 ].leave_cursor();
 							if ( cursor[ Coordinates::Y ] == -1 ) {
-								temp_word = std::to_string( info->initial_scene );
+								temp_word = std::to_string( info->default_scene );
 								vi_field.set_cursor();
 							}
 							else
@@ -573,7 +573,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 							programming_ptr->set_instrument_name(
 									info->patch.bnk, info->patch.num, cursor[Y] + 1, temp_word );
 							if ( cursor[ Coordinates::Y ] == -1 ) {
-								temp_word = std::to_string( info->initial_scene );
+								temp_word = std::to_string( info->default_scene );
 								vi_field.set_cursor();
 							}
 							else {
@@ -733,7 +733,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 			case '\n' :/*{{{*/
 				if ( cursor[Y] == -1 )
 					if ( cursor[X] <= 1 )
-						info->initial_scene = std::stoi( temp_word );
+						info->default_scene = std::stoi( temp_word );
 					else
 						info->scenes[ current_scene ].label = temp_word;
 				else switch ( cursor[X] ) {
@@ -756,7 +756,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				// Dumpeamos sí o sí
 				if ( keyboard->get_MIDI_state() == Switch::ON ) {
 					keyboard->select_page( Page::TIMBRE );
-					keyboard->dump_variation( *info, current_scene );
+					keyboard->dump_scene( *info, current_scene );
 				}
 
 				break;/*}}}*/
@@ -820,7 +820,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						}
 					if ( keyboard->get_MIDI_state() == Switch::ON ) {
 						keyboard->select_page( Page::TIMBRE );
-						keyboard->dump_variation( *info, current_scene );
+						keyboard->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
 				}
@@ -876,7 +876,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						}
 					if ( keyboard->get_MIDI_state() == Switch::ON ) {
 						keyboard->select_page( Page::TIMBRE );
-						keyboard->dump_variation( *info, current_scene );
+						keyboard->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
 				}
@@ -949,7 +949,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						}
 					if ( keyboard->get_MIDI_state() == Switch::ON ) {
 						keyboard->select_page( Page::TIMBRE );
-						keyboard->dump_variation( *info, current_scene );
+						keyboard->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
 				}
@@ -991,7 +991,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 		 */
 		if ( will_dump and keyboard->get_MIDI_state() == Switch::ON ) {
 			// keyboard->select_page( Page::TIMBRE );
-			// keyboard->dump_variation( *info, scenes );
+			// keyboard->dump_scene( *info, scenes );
 		}
 
 	} while ( again );

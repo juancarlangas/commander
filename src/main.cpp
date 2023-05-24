@@ -29,7 +29,7 @@ int32_t main()
 
 	// Variables{{{
 	Performance **displayTable = new Performance *[n_performances](); // arreglo de apuntadores
-	Performance* orch_clipboard_ptr, *buffer_performance; // apuntadores simple
+	Performance* orch_clipboard_ptr, *performance_buffer; // apuntadores simple
 
 	Playlist *playlist = new Playlist( &catalog );
 
@@ -69,9 +69,9 @@ int32_t main()
 				llenado_displayTable(displayTable, catalog.performances, n_performances, keyword, &n_matches);
 
 				if (n_performances > 0) // permitimos 0 lineas
-					buffer_performance = &catalog.performances.front();
+					performance_buffer = &catalog.performances.front();
 
-				x50.set_buffer( *buffer_performance );
+				x50.set_performance_buffer( *performance_buffer );
 
 				playlist->cargar( "/home/juancarlangas/.config/commander/Playlists/default.csv" );
 
@@ -186,34 +186,34 @@ int32_t main()
 
 				break;/*}}}*/
 
-			case SET_VARIATION: {/*{{{*/
+			case SET_SCENE: {/*{{{*/
 				// la conversión de 1 a 9 es -48, pero por indice de arreglo restamos uno más
 				int32_t funcion_a_variacion = caracter - KEY_F0;
-				x50.set_variation( funcion_a_variacion );
+				x50.set_scene( funcion_a_variacion );
 				if ( x50.is_connected() )
-					x50.dump_variation();
+					x50.dump_scene();
 				break;
 			}/*}}}*/
 
-			case PREV_VARIATION:/*{{{*/
-				x50.prev_variation();
+			case TO_PREV_SCENE:/*{{{*/
+				x50.to_prev_scene();
 				if ( x50.is_connected() )
-					x50.dump_variation();
+					x50.dump_scene();
 				break;/*}}}*/
 
-			case NEXT_VARIATION :/*{{{*/
-				x50.next_variation();
+			case TO_NEXT_SCENE :/*{{{*/
+				x50.to_next_scene();
 				if ( x50.is_connected() )
-					x50.dump_variation();
+					x50.dump_scene();
 				break;/*}}}*/
 
 			case INTRO:/*{{{*/
 				switch ( winMode ) {
 					case MODE_DISPLAY:
-						buffer_performance = displayTable[ dIndex ];
+						performance_buffer = displayTable[ dIndex ];
 						break;
 					case MODE_PLAYLIST:
-						buffer_performance = playlist->get_pointer( pl_index );
+						performance_buffer = playlist->get_pointer( pl_index );
 						//avance carro
 						if ( plIndexB < playlist->get_n_pistas() - 1 ) {
 							plIndexB++;
@@ -226,10 +226,10 @@ int32_t main()
 				}
 
 				if ( x50.is_connected() )
-					x50.set_program( *buffer_performance );
+					x50.set_performance_buffer( *performance_buffer );
 				else
 					// solo actualizamos el buffer para poder trabajar online
-					x50.set_buffer( *buffer_performance );
+					x50.set_performance_buffer( *performance_buffer );
 
 				updateWindow[LCD] = true;
 
@@ -237,7 +237,7 @@ int32_t main()
 
 			case FAVOURITE: {/*{{{*/
 				int32_t caracter_a_numero = caracter == 48 ? 9 : ( caracter - 49 );
-				buffer_performance = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
+				performance_buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
 
 				updateWindow[LCD] 	  = true;
 
@@ -323,7 +323,7 @@ int32_t main()
 				if (forma.capture_value() == true) {
 					catalog.add_value(forma.get_value());
 					catalog.ordenate();
-					buffer_performance = &catalog.performances[0]; // Actualizamos después del cambio
+					performance_buffer = &catalog.performances[0]; // Actualizamos después del cambio
 				}
 
 				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
@@ -349,7 +349,7 @@ int32_t main()
 				int real_index = displayTable[dIndex] - &(dBase[mode].performances[0]);
 
 				dBase[mode].delete_value( real_index );
-				buffer_performance = &catalog.performances[0]; // Actualizamos después del cambio
+				performance_buffer = &catalog.performances[0]; // Actualizamos después del cambio
 
 
 				llenado_displayTable(
@@ -396,12 +396,12 @@ int32_t main()
 
 			case EDIT_ORCHESTRATION :/*{{{*/
 				if ( winMode == MODE_DISPLAY ) {
-					buffer_performance = displayTable[dIndex];
+					performance_buffer = displayTable[dIndex];
 
-					if (buffer_performance->n_scenes == 0)
-						orquestacion.add_empty_scene(buffer_performance);
+					if (performance_buffer->n_scenes == 0)
+						orquestacion.add_empty_scene(performance_buffer);
 					orquestacion.reset_variation();
-					orquestacion.show( buffer_performance );
+					orquestacion.show( performance_buffer );
 					update_popups(); // se decide poner aquí para no refrescar varias veces
 					orquestacion.capture_key();
 
@@ -426,7 +426,7 @@ int32_t main()
 
 			case PASTE_ORCHESTRATION :/*{{{*/
 				displayTable[ dIndex ]->n_scenes = orch_clipboard_ptr->n_scenes;
-				displayTable[ dIndex]->initial_scene = orch_clipboard_ptr->initial_scene;
+				displayTable[ dIndex]->default_scene = orch_clipboard_ptr->default_scene;
 				for ( i = 0; i < orch_clipboard_ptr->n_scenes; ++i ) {
 					displayTable[ dIndex ]->scenes[ i ].label =
 						orch_clipboard_ptr->scenes[ i ].label;
@@ -655,7 +655,7 @@ int32_t main()
 			print_search(searchWindow, keyword);
 
 		if (updateWindow[LCD] == true)
-			print_lcd( lcdWindow, buffer_performance );
+			print_lcd( lcdWindow, performance_buffer );
 
 		if ( updateWindow[ MIDI_STATE ] )
 			print_MIDI_state( MIDI_state_window, x50.get_MIDI_state() );
@@ -678,7 +678,7 @@ int32_t main()
 			 *
 			 * Por lo pronto reservamos esta funcionalidad para el comando FAVOURITE*/
 			if ( command == FAVOURITE and x50.is_connected() )
-				x50.set_program( *buffer_performance );/*}}}*/
+				x50.set_performance_buffer( *performance_buffer );/*}}}*/
 
 		if ( command != EXIT ) // Que no eche a perder el :w
 			command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
@@ -694,7 +694,7 @@ int32_t main()
 	delete playlist;
 
 	delete [] displayTable;
-	buffer_performance = NULL;
+	performance_buffer = NULL;
 
 	delete [] dBase;
 

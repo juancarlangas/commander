@@ -62,8 +62,8 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 27: comando = ESCAPE; break;
 		case '\t': comando = CHANGE_WINDOW; break;
 		case KEY_UP: case KEY_DOWN: comando = MOVE_INDEX; break;
-		case KEY_LEFT:	comando = PREV_VARIATION; break;
-		case KEY_RIGHT:	comando = NEXT_VARIATION; break;
+		case KEY_LEFT:	comando = TO_PREV_SCENE; break;
+		case KEY_RIGHT:	comando = TO_NEXT_SCENE; break;
 		case 566: comando = DRAG_UP; break;
 		case 525: comando = DRAG_DOWN; break;
 		case KEY_DC: if (windowMode == MODE_PLAYLIST) comando = DEL_FROM_PLAYLIST; break;
@@ -72,7 +72,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 
 		default:
 			if ( KEY_F(1) <= digit and digit <= KEY_F(10) )
-				comando = SET_VARIATION;
+				comando = SET_SCENE;
 			else if (  48 <= digit and digit <= 57 )
 				comando = FAVOURITE;
 			else if ( ( 58 <= digit and digit <= 122 ) || digit == '/' )
