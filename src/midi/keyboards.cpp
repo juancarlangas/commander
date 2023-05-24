@@ -7,6 +7,17 @@
 #include "midi/keyboards.hpp"
 #include <ncurses.h>
 
+#include <cstddef>
+#include <fstream>
+#include <iomanip>
+#include <math.h>
+#include <stdexcept>
+#include <string>
+#include <algorithm>
+
+#include "utilities/src/files.hpp"
+
+int32_t value;
 Keyboard::Keyboard() :/*{{{*/
 	device( NULL ),
 	port( "hw:1,0,0" ),
@@ -15,6 +26,56 @@ Keyboard::Keyboard() :/*{{{*/
 	*name = '\0';
 	activeMode = false;
 	passiveMode = false;
+}/*}}}*/
+
+Keyboard::Keyboard( const std::string &_Path )/*{{{*/
+{
+	load_prog_from_json( _Path );
+}/*}}}*/
+
+void Keyboard::load_prog_from_json( const std::string &_Path )/*{{{*/
+{
+	// LOAD DATA
+	std::ifstream json_file{ _Path };
+	if ( json_file.fail() ) {
+		std::cerr << "Failed to open " + _Path + " in Keyboard::load_from_json()\n";
+		exit(EXIT_FAILURE);
+	}
+	nlohmann::ordered_json json_object;
+	json_file >> json_object;
+	json_object.get_to(combinations);
+
+	json_file.close();
+
+	// CALCULATE SIZES
+	n_bancos = combinations.size();
+
+	if ( !combinations.empty() ) {
+		channels_per_combi = combinations[0][0].instruments.size();
+
+		for ( const auto &bank : combinations )
+			for ( const auto &combination : bank )
+				if ( combination.instruments.size() != channels_per_combi ) {
+					std::cerr << "instruments vector size mismatch\n";
+					exit( EXIT_FAILURE );
+				}
+	}
+	else
+		throw std::runtime_error( "combinations is empty" );
+}/*}}}*/
+
+std::string Keyboard::get_instrument_name(/*{{{*/
+		const char &_Banco, const int16_t &_Numero, const int16_t &_Track ) noexcept
+{
+	return combinations[_Banco][_Numero].instruments[ _Track ];
+}/*}}}*/
+
+void Keyboard::set_instrument_name(/*{{{*/
+		const char &_Banco, const int16_t &_Numero, const int16_t &_Pista,
+		const std::string_view _Nombre )
+			noexcept
+{
+	combinations[_Banco][_Numero].instruments[ _Pista ] = _Nombre;
 }/*}}}*/
 
 void Keyboard::connect() noexcept/*{{{*/
@@ -268,3 +329,9 @@ void Keyboard::set_song(const char song)/*{{{*/
 	songSelect[1] = song; /*SongSelect */
 		snd_rawmidi_write(device, songSelect, 2);	
 }/*}}}*/
+
+void from_json( const nlohmann::json &_JSONobject, struct Combi &_Combination ) {/*{{{*/
+    _JSONobject.at( "name").get_to( _Combination.name );
+    _JSONobject.at( "instruments" ).get_to( _Combination.instruments );
+}/*}}}*/
+

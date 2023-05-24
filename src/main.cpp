@@ -19,7 +19,6 @@ int32_t main()
     const std::string config_directory{ config_directory_c };/*}}}*/
 
 	// Data{{{
-	Programming programming {config_directory + "/combinations.json"};
 	Catalog *dBase = new Catalog [] {{config_directory + "/catalog.json"}};
 	Catalog& catalog {dBase[COMBINATIONS]};
 
@@ -53,10 +52,10 @@ int32_t main()
 	enum matroska command = BEGIN;/*}}}*/
 
 	// Keyboard{{{
-	Keyboard x50;
+	Keyboard x50 {config_directory + "/combinations.json"};
+
 	x50.set_name("X50");
 
-	orquestacion.link_combinations ( &programming );
 	orquestacion.link_MIDI_device( &x50 );/*}}}*/
 
 	// Engine{{{

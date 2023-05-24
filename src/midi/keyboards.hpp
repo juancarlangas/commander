@@ -3,7 +3,23 @@
 
 #include <bits/stdint-intn.h>
 #include <alsa/asoundlib.h>
+#include <array>
+#include <bits/stdint-intn.h>
+#include <cstddef>
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include "data/nlohmann/json.hpp"
+#include "midi/midi.hpp"
 #include "data/catalog.hpp"
+
+static const size_t &PATCHES_PER_BANK{ 128 };
+
+struct Combi {
+	std::string name;
+	std::vector<std::string> instruments;
+};
 
 enum Section { COMBI, GLOBAL, MULTI };
 enum Page { PLAY = 0, TIMBRE };
@@ -13,6 +29,12 @@ enum Page { PLAY = 0, TIMBRE };
 class Keyboard {
 public:
 	Keyboard();
+	Keyboard(const std::string& _Path);
+	auto load_prog_from_json( const std::string & ) -> void;
+	auto save_prog_to_json(const std::string& ) noexcept -> void;
+	std::string get_instrument_name(const char &_Banco, const int16_t &_Num, const int16_t &_Track) noexcept;
+	void set_instrument_name(const char &, const int16_t &, const int16_t &, const std::string_view) noexcept;
+	size_t channels_per_combi;
 	void connect() noexcept;
 	void disconnect() noexcept;
 	void toggle_MIDI_state() noexcept;
@@ -32,7 +54,9 @@ public:
 	void dump_performance( const Performance &_Performance) noexcept;
 	void set_song(const char);
 private:
+	std::vector<std::array<struct Combi, PATCHES_PER_BANK>> combinations;
 	Performance performance_buffer;
+	size_t n_bancos;
 	int16_t scene;
 	char name[20];
 	bool activeMode;
@@ -41,5 +65,7 @@ private:
 	char port[9];
 	enum Switch MIDI;
 };
+
+void from_json( const nlohmann::json &_JSONobject, struct Combi &_Combination );
 
 #endif
