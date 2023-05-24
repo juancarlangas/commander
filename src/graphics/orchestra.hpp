@@ -4,7 +4,7 @@
 #include "graphics/ncurses.hpp"
 #include "graphics/elements/window.hpp"
 #include "graphics/fields.hpp"
-#include "data/combinations.hpp"
+#include "midi/keyboards.hpp"
 #include "data/catalog.hpp"
 #include "graphics/elements/windows/boxed_windows/boxed_popup.hpp"
 #include "elements/windows/popups/orchestra_elements/check_popup.hpp"
@@ -34,7 +34,6 @@ class Orchestra {
 		void update() noexcept;
 		void hide() noexcept;
 		void capture_key() noexcept;
-		void link_combinations( Programming * ) noexcept;
 		void link_MIDI_device( Keyboard * ) noexcept;
 		void reset_variation() noexcept;
 		auto add_empty_scene(Performance*& _Performance) noexcept -> void;
@@ -55,8 +54,7 @@ class Orchestra {
 		struct Font cursor_font, MIDI_font, dimmed_font;
 		int16_t current_scene;
 		Performance *info;
-		Programming *programming_ptr;
-		Keyboard *keyboard;
+		Keyboard *keyboard_ptr;
 		struct Clipboard clipboard;
 };
 

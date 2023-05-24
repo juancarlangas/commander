@@ -2,7 +2,7 @@
 #define DATABASES_HPP
 
 #include "../common/common.hpp"
-#include "../data/combinations.hpp"
+#include "../midi/midi.hpp"
 
 #include <cstdint>
 #include <string>
@@ -17,7 +17,6 @@
 #define N_FAVORITOS 10
 static const std::int16_t &TRACKS_PER_PERFORMANCE{ 8 };
 
-enum Switch : bool { OFF = 0, ON };
 
 // NEW STRUCT TYPE{{{
 struct Metadata {
