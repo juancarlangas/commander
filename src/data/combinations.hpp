@@ -11,10 +11,11 @@
 #include "data/nlohmann/json.hpp"
 
 static const size_t &PATCHES_PER_BANK{ 128 };
+static const size_t& INSTRUMENTS_PER_COMBI{ 8 };
 
 struct Combi {
 	std::string name;
-	std::vector<std::string> instruments;
+	std::array<std::string, INSTRUMENTS_PER_COMBI> instruments;
 };
 
 struct Row {
@@ -35,8 +36,8 @@ class Combinations {
 				const std::string_view ) noexcept;
 		size_t channels_per_combi;
 	private:
-		size_t n_bancos;
 		std::vector<std::array<struct Combi, PATCHES_PER_BANK>> combinations;
+		size_t n_bancos;
 		int16_t bnk_num_to_int( const char &, const int16_t & ) noexcept;
 };
 		
