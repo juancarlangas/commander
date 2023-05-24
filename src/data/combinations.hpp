@@ -24,10 +24,10 @@ struct Row {
 	std::array<std::string, 8> instrumento;
 };
 
-class Combinations {
+class Programming {
 	public:
-		Combinations( const std::string & );
-		~Combinations();
+		Programming( const std::string & );
+		~Programming();
 		void load_from_json( const std::string & );
 		std::string get_instrument_name(
 				const char &_Banco, const int16_t &_Num, const int16_t &_Track ) noexcept;

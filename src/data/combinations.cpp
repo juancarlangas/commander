@@ -15,17 +15,17 @@
 
 int32_t value;
 
-Combinations::Combinations( const std::string &_Path )/*{{{*/
+Programming::Programming( const std::string &_Path )/*{{{*/
 {
 	load_from_json( _Path );
 }/*}}}*/
 
-void Combinations::load_from_json( const std::string &_Path )/*{{{*/
+void Programming::load_from_json( const std::string &_Path )/*{{{*/
 {
 	// LOAD DATA
 	std::ifstream json_file{ _Path };
 	if ( json_file.fail() ) {
-		std::cerr << "Failed to open " + _Path + " in Combinations::load_from_json()\n";
+		std::cerr << "Failed to open " + _Path + " in Programming::load_from_json()\n";
 		exit(EXIT_FAILURE);
 	}
 	nlohmann::ordered_json json_object;
@@ -51,18 +51,18 @@ void Combinations::load_from_json( const std::string &_Path )/*{{{*/
 		throw std::runtime_error( "combinations is empty" );
 }/*}}}*/
 
-Combinations::~Combinations()/*{{{*/
+Programming::~Programming()/*{{{*/
 {
 	// delete [] data;
 }/*}}}*/
 
-std::string Combinations::get_instrument_name(/*{{{*/
+std::string Programming::get_instrument_name(/*{{{*/
 		const char &_Banco, const int16_t &_Numero, const int16_t &_Track ) noexcept
 {
 	return combinations[_Banco][_Numero].instruments[ _Track ];
 }/*}}}*/
 
-void Combinations::set_instrument_name(/*{{{*/
+void Programming::set_instrument_name(/*{{{*/
 		const char &_Banco, const int16_t &_Numero, const int16_t &_Pista,
 		const std::string_view _Nombre )
 			noexcept
@@ -70,7 +70,7 @@ void Combinations::set_instrument_name(/*{{{*/
 	combinations[_Banco][_Numero].instruments[ _Pista ] = _Nombre;
 }/*}}}*/
 
-int16_t Combinations::bnk_num_to_int( const char &_Banco, const int16_t &_Numero ) noexcept/*{{{*/
+int16_t Programming::bnk_num_to_int( const char &_Banco, const int16_t &_Numero ) noexcept/*{{{*/
 {
 	return ( _Banco - 65 ) * 127 + _Numero;
 }/*}}}*/

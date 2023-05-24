@@ -41,7 +41,7 @@
         <UML:Operation isSpecification="false" isLeaf="false" isRoot="false" isAbstract="false" xmi.id="uyGdWFtely0GW" name="Playlist" comment="Recibe la ruta de carga del Playlist y el apuntador a la base de datos original" visibility="public" isQuery="false" isOverride="false" isVirtual="false" isInline="false">
          <UML:BehavioralFeature.parameter>
           <UML:Parameter isSpecification="false" xmi.id="u0qWoufhtPQb0" name="_Path" visibility="private" type="ue8nBcMXSijVe" value=""/>
-          <UML:Parameter isSpecification="false" xmi.id="uqAQDpbx76LdR" name="_Database_ptr" visibility="private" type="u7AWx5Jhmw2g9" value=""/>
+          <UML:Parameter isSpecification="false" xmi.id="uqAQDpbx76LdR" name="_Catalog_ptr" visibility="private" type="u7AWx5Jhmw2g9" value=""/>
          </UML:BehavioralFeature.parameter>
         </UML:Operation>
         <UML:Operation isSpecification="false" isLeaf="false" isRoot="false" isAbstract="false" xmi.id="uvBp2oMcKJeA5" name="cargar" comment="Realiza la lectura como si fuera la base de datos, solo lee título y artista&#10;Revisa que se encuentre (la base de datos en su constructor ya se asegurará de que no haya duplicados). Si la encuentras, agrégala a la playlist en sí, si no, no hagas nada y solo reduce en 1 el número de tracks en el playlist" visibility="public" isQuery="false" isOverride="false" isVirtual="false" isInline="false">
@@ -57,7 +57,7 @@
        </UML:Classifier.feature>
       </UML:Class>
       <UML:Class isSpecification="false" isLeaf="false" isRoot="false" isAbstract="false" xmi.id="ue8nBcMXSijVe" name="const std::string" namespace="Logical_View" visibility="public"/>
-      <UML:Class isSpecification="false" isLeaf="false" isRoot="false" isAbstract="false" xmi.id="u7AWx5Jhmw2g9" name="Database *" namespace="Logical_View" visibility="public"/>
+      <UML:Class isSpecification="false" isLeaf="false" isRoot="false" isAbstract="false" xmi.id="u7AWx5Jhmw2g9" name="Catalog *" namespace="Logical_View" visibility="public"/>
       <UML:Class isSpecification="false" isLeaf="false" isRoot="false" isAbstract="false" xmi.id="u1Iu9xH1YGRUu" name="const std::string &amp;" namespace="Logical_View" visibility="public"/>
      </UML:Namespace.ownedElement>
      <XMI.extension xmi.extender="umbrello">
@@ -130,7 +130,7 @@
   </listview>
   <codegeneration>
    <codegenerator language="C++">
-    <sourcecode id="uyGdWFtely0GW" value="database_ptr = _Database_ptr;&#10;cargar( _Path );"/>
+    <sourcecode id="uyGdWFtely0GW" value="database_ptr = _Catalog_ptr;&#10;cargar( _Path );"/>
    </codegenerator>
   </codegeneration>
  </XMI.extensions>

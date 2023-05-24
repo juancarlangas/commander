@@ -3,7 +3,7 @@
 
 #include <bits/stdint-intn.h>
 #include <ncurses.h>
-#include "../data/databases.hpp"
+#include "../data/catalog.hpp"
 #include "data/playlist.hpp"
 
 

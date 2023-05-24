@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include "../common/common.hpp"
 #include "colors.hpp"
-#include "../data/databases.hpp"
+#include "../data/catalog.hpp"
 #include "data/playlist.hpp"
 
 extern const char *get_digit(char, short int);

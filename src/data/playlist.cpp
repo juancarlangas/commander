@@ -1,5 +1,5 @@
 #include "playlist.hpp"
-#include "databases.hpp"
+#include "catalog.hpp"
 #include <cstdint>
 #include <curses.h>
 #include <fstream>
@@ -7,15 +7,15 @@
 #include <ostream>
 
 // Solo Inicializa
-Playlist::Playlist( Database *_Database_ptr )
+Playlist::Playlist( Catalog *_Catalog_ptr )
 {
-	database_ptr = _Database_ptr;
+	database_ptr = _Catalog_ptr;
 }
 
 // Inicializa el puntero a la Base de datos e invoca cargar()
-Playlist::Playlist( const std::string &_Path, Database *_Database_ptr )/*{{{*/
+Playlist::Playlist( const std::string &_Path, Catalog *_Catalog_ptr )/*{{{*/
 {
-	database_ptr = _Database_ptr;
+	database_ptr = _Catalog_ptr;
 	cargar( _Path );
 }/*}}}*/
 
@@ -116,7 +116,7 @@ void Playlist::guardar( const std::string &_Path) noexcept/*{{{*/
 void Playlist::sincronizar() noexcept/*{{{*/
 {
 	int32_t i; // iterador para Playlist
-	int32_t j; // iterador para Database
+	int32_t j; // iterador para Catalog
 
 	for ( i = 0; i < n_pistas; ++i ) {
 		j = 0;

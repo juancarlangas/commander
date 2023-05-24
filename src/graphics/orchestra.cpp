@@ -27,9 +27,9 @@ Orchestra::Orchestra() : // Sets colors /*{{{*/
 	dimmed_font { GRAY_DEFAULT, "Bold" }
 {}/*}}}*/
 
-void Orchestra::link_combinations( Combinations * _CombPtr) noexcept/*{{{*/
+void Orchestra::link_combinations( Programming * _ProgrammingPtr) noexcept/*{{{*/
 {
-	comb_ptr = _CombPtr;
+	programming_ptr = _ProgrammingPtr;
 }/*}}}*/
 
 void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept/*{{{*/
@@ -130,7 +130,7 @@ void Orchestra::update() noexcept/*{{{*/ {
 	vi_field.set_content( std::to_string( info->initial_scene ) );
 	etiqueta_field.set_content( info->scenes[ current_scene ].label );
 
-	for ( int32_t i = 0; i < static_cast<std::int32_t>(comb_ptr->channels_per_combi); ++i ) {
+	for ( int32_t i = 0; i < static_cast<std::int32_t>(programming_ptr->channels_per_combi); ++i ) {
 
 		// Preparando las dobles barras
 		int16_t &l_Value = info->scenes[ current_scene ].tracks[ i ].lower_key;
@@ -164,7 +164,7 @@ void Orchestra::update() noexcept/*{{{*/ {
 			double_X_slider[ i ].off();
 		}
 
-		instrument_field[i].set_text(comb_ptr->get_instrument_name(info->patch.bnk, info->patch.num,i));
+		instrument_field[i].set_text(programming_ptr->get_instrument_name(info->patch.bnk, info->patch.num,i));
 		volume_field[i].set_text(std::to_string( info->scenes[ current_scene ].tracks[ i ].volume ) );
 		transposition_field[ i ].set_text(
 				std::to_string( info->scenes[ current_scene ].tracks[ i ].transposition ) );
@@ -290,7 +290,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								status_field[ cursor[Y] ].set_cursor();
 								break;
 							case 1:
-								comb_ptr->set_instrument_name(
+								programming_ptr->set_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y], temp_word );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
@@ -350,7 +350,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								status_field[ cursor[ Coordinates::Y ] ].set_cursor();
 								break;
 							case 1:
-								comb_ptr->set_instrument_name(
+								programming_ptr->set_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y], temp_word );
 								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
 								break;
@@ -402,14 +402,14 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					else // Zona de objetos
 						switch ( cursor[X] ) {
 							case 0 : // Status <- Instrumento
-								comb_ptr->set_instrument_name(
+								programming_ptr->set_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y], temp_word );
 								status_field[ cursor[ Coordinates::Y ] ].set_cursor();
 								break;
 							case 1 : // Instrumento <- Volumen
 								info->scenes[ current_scene ].tracks[ cursor[Y] ].volume =
 									std::stoi( temp_word );
-								temp_word = comb_ptr->get_instrument_name(
+								temp_word = programming_ptr->get_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y] );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
@@ -454,12 +454,12 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						switch ( cursor[ Coordinates::X ] ) {
 							case 1 : // check -> Instrument
 								status_field[ cursor[ Coordinates::Y ] ].leave_cursor();
-								temp_word = comb_ptr->get_instrument_name(
+								temp_word = programming_ptr->get_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y] );
 								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
 								break;
 							case 2 : // Instrument -> volumen
-								comb_ptr->set_instrument_name(
+								programming_ptr->set_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y], temp_word );
 								temp_word = 
 									info->scenes[current_scene].tracks[ cursor[Y] ].volume == 0
@@ -504,9 +504,9 @@ void Orchestra::capture_key() noexcept/*{{{*/
 							if ( cursor[ Coordinates::Y ] == 0 )
 								info->initial_scene = std::stoi( temp_word );
 							else
-								comb_ptr->set_instrument_name(
+								programming_ptr->set_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y] - 1, temp_word );
-							temp_word = comb_ptr->get_instrument_name(
+							temp_word = programming_ptr->get_instrument_name(
 									info->patch.bnk, info->patch.num, cursor[Y] );
 							instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
 							break;
@@ -570,14 +570,14 @@ void Orchestra::capture_key() noexcept/*{{{*/
 							break;
 
 						case 1: // instrumento: se salva siempre
-							comb_ptr->set_instrument_name(
+							programming_ptr->set_instrument_name(
 									info->patch.bnk, info->patch.num, cursor[Y] + 1, temp_word );
 							if ( cursor[ Coordinates::Y ] == -1 ) {
 								temp_word = std::to_string( info->initial_scene );
 								vi_field.set_cursor();
 							}
 							else {
-								temp_word = comb_ptr->get_instrument_name(
+								temp_word = programming_ptr->get_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y] );
 								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
 							}
@@ -660,7 +660,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 					status_field[ cursor[Y] ].set_cursor();
 					instrument_field[ cursor[Y] ].set_text(
-							comb_ptr->get_instrument_name(info->patch.bnk, info->patch.num, cursor[Y]));
+							programming_ptr->get_instrument_name(info->patch.bnk, info->patch.num, cursor[Y]));
 					volume_field[ cursor[Y] ].set_value(
 							info->scenes[ current_scene ].tracks[ cursor[Y] ].volume );
 					transposition_field[ cursor[Y] ].set_value(
@@ -738,7 +738,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						info->scenes[ current_scene ].label = temp_word;
 				else switch ( cursor[X] ) {
 					case 1 :
-						comb_ptr->set_instrument_name(
+						programming_ptr->set_instrument_name(
 								info->patch.bnk, info->patch.num, cursor[Y], temp_word );
 						break;
 					case 2 :
@@ -789,7 +789,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								status_field[ cursor[Y] ].set_cursor();
 								break;
 							case 1:
-								comb_ptr->set_instrument_name(
+								programming_ptr->set_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y], temp_word );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
@@ -845,7 +845,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								status_field[ cursor[Y] ].set_cursor();
 								break;
 							case 1:
-								comb_ptr->set_instrument_name(
+								programming_ptr->set_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y], temp_word );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
@@ -918,7 +918,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								status_field[ cursor[Y] ].set_cursor();
 								break;
 							case 1:
-								comb_ptr->set_instrument_name(
+								programming_ptr->set_instrument_name(
 										info->patch.bnk, info->patch.num, cursor[Y], temp_word );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;

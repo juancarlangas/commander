@@ -1,7 +1,7 @@
 #ifndef SCREEN_HPP
 #define SCREEN_HPP
 
-#include "../data/databases.hpp"
+#include "../data/catalog.hpp"
 
 void decrease_index( int *top, int *index );
 

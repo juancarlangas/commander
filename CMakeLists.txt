@@ -28,7 +28,7 @@ ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/windows/popups/orchestra_elements/text_popup.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/graphics/elements/windows/popups/orchestra_elements/text_popups/field_popup.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/combinations.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/databases.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/catalog.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/tables.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/playlist.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/math.cpp"

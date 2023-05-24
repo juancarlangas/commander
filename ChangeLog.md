@@ -14,7 +14,7 @@ Commander 1.1
 - The Orchestration editor now return to the DEFAULT variation (as is specified in the database)
 when it comes from a new patch, instead of returning to the same.
 
-- std::vector based Database
+- std::vector based Catalog
 
 - The posibility of moving cursor not mathematically but graphically (the cursor will move
 down and up to the nearest fader ( not the relative ).
@@ -189,7 +189,7 @@ Korg-3.2
 --------
 
 - First implementation of WINDOWS ncurses feature, with 2 windows (generalWindow for database and stateWindow for all the rest).
-- Database actualization with MonkeyBongo songs, and some single-instrument patches.
+- Catalog actualization with MonkeyBongo songs, and some single-instrument patches.
 - Return to transparent background with ncurses use_default_colors() function.
 
 Korg-3.1

@@ -218,7 +218,7 @@
       <UML:Class isLeaf="false" visibility="public" isRoot="false" name="int32_t &amp;" namespace="Logical_View" isAbstract="false" xmi.id="uhl1gg6nznppg" isSpecification="false"/>
       <UML:Class isLeaf="false" visibility="public" isRoot="false" name="const int32_t &amp;" namespace="Logical_View" isAbstract="false" xmi.id="uq1A9Z2UO0ILG" isSpecification="false"/>
       <UML:Class isLeaf="false" visibility="public" isRoot="false" name="const struct Font &amp;" namespace="Logical_View" isAbstract="false" xmi.id="uwKZhPOlBMVWp" isSpecification="false"/>
-      <UML:Class isLeaf="false" visibility="public" isRoot="false" name="Database" namespace="Logical_View" isAbstract="false" xmi.id="uS82TQGE5hBww" isSpecification="false">
+      <UML:Class isLeaf="false" visibility="public" isRoot="false" name="Catalog" namespace="Logical_View" isAbstract="false" xmi.id="uS82TQGE5hBww" isSpecification="false">
        <UML:Classifier.feature>
         <UML:Attribute type="uaQpgwMRbVZdD" visibility="private" name="favorito[10]" xmi.id="uW86ZHkVJfF6X" isSpecification="false"/>
         <UML:Operation isInline="false" isQuery="false" isLeaf="false" visibility="private" isRoot="false" isOverride="false" name="fill_favourites()" isAbstract="false" xmi.id="u1eN6wkgN89Wk" isVirtual="false" isSpecification="false"/>

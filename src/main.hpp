@@ -7,6 +7,9 @@
 #include <cstdlib>
 #include <panel.h>
 
+#include "common/common.hpp"
+#include "common/matroska.hpp"
+#include "graphics/printing.hpp"
 #include "graphics/orchestra.hpp"
 #include "midi/keyboards.hpp"
 #include "graphics/printing.hpp"
@@ -20,7 +23,7 @@
 #include "common/matroska.hpp"
 #include "data/tables.hpp"
 #include "data/combinations.hpp"
-#include "data/databases.hpp"
+#include "data/catalog.hpp"
 #include "data/playlist.hpp"
 #include "utilities/src/files.hpp"
 #include "graphics/colors.hpp"

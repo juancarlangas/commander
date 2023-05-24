@@ -1,16 +1,13 @@
 #include "main.hpp"
-#include "common/common.hpp"
-#include "common/matroska.hpp"
-#include "graphics/printing.hpp"
 
 int32_t main()
 {
-	// ncurses{{{
+	// Graphics{{{
 	y = init_ncurses();
 	draw_windows();
 	short int updateWindow[8] = {0};/*}}}*/
 
-	// File System{{{
+	// Folders{{{
 	const char *home_directory_c;
 	if ( ( home_directory_c = getenv("HOME") ) == NULL )
 		home_directory_c = getpwuid( getuid() )->pw_dir;
@@ -21,19 +18,20 @@ int32_t main()
 	std::string generic_path;
     const std::string config_directory{ config_directory_c };/*}}}*/
 
-	// Databases{{{
-	Combinations combinaciones { config_directory + "/combinations.json" };
+	// Data{{{
+	Programming programming {config_directory + "/combinations.json"};
+	Catalog *dBase = new Catalog [] {{config_directory + "/catalog.json"}};
+	Catalog& catalog {dBase[COMBINATIONS]};
 
-	Database *dBase = new Database []{ { config_directory + "/catalog.json", &combinaciones } };
-	Database& database{dBase[COMBINATIONS]};
-	int dbRows[1] { dBase[COMBINATIONS].get_activeRows() };
+	std::int32_t dbRows[1] { dBase[COMBINATIONS].get_activeRows() };
+	std::int32_t& n_performances {dbRows[0]};
 /*}}}*/
 
-	// Tables{{{
-	Performance **displayTable = new Performance *[ dbRows[COMBINATIONS] ](); // arreglo de apuntadores
-	Performance* orch_clipboard_ptr, *performance_ptr; // apuntadores simple
+	// Variables{{{
+	Performance **displayTable = new Performance *[n_performances](); // arreglo de apuntadores
+	Performance* orch_clipboard_ptr, *buffer_performance; // apuntadores simple
 
-	Playlist *playlist = new Playlist( &dBase[COMBINATIONS] );
+	Playlist *playlist = new Playlist( &catalog );
 
 	int32_t n_matches;
 	int32_t dIndex { 0 }; // Absolute selected index of the whole displayTable
@@ -48,18 +46,17 @@ int32_t main()
 	int16_t charIndex { 0 };
 
 	int32_t i, j;
-	int16_t k;/*}}}*/
+	int16_t k;
 
-	// System{{{
 	short int	mode = COMBINATOR,
 				winMode = MODE_DISPLAY;
 	enum matroska command = BEGIN;/*}}}*/
 
-	// Keyboards{{{
+	// Keyboard{{{
 	Keyboard x50;
 	x50.set_name("X50");
 
-	orquestacion.link_combinations ( &combinaciones );
+	orquestacion.link_combinations ( &programming );
 	orquestacion.link_MIDI_device( &x50 );/*}}}*/
 
 	// Engine{{{
@@ -69,13 +66,12 @@ int32_t main()
 
 		switch (command) {
 			case BEGIN:/*{{{*/
-				llenado_displayTable( displayTable, dBase[COMBINATIONS].performances, dbRows[COMBINATOR],
-						keyword, &n_matches );
+				llenado_displayTable(displayTable, catalog.performances, n_performances, keyword, &n_matches);
 
-				if (dbRows[COMBINATOR] > 0) // permitimos 0 lineas
-					performance_ptr = &dBase[COMBINATIONS].performances[0];
+				if (n_performances > 0) // permitimos 0 lineas
+					buffer_performance = &catalog.performances.front();
 
-				x50.set_buffer( *performance_ptr );
+				x50.set_buffer( *buffer_performance );
 
 				playlist->cargar( "/home/juancarlangas/.config/commander/Playlists/default.csv" );
 
@@ -214,10 +210,10 @@ int32_t main()
 			case INTRO:/*{{{*/
 				switch ( winMode ) {
 					case MODE_DISPLAY:
-						performance_ptr = displayTable[ dIndex ];
+						buffer_performance = displayTable[ dIndex ];
 						break;
 					case MODE_PLAYLIST:
-						performance_ptr = playlist->get_pointer( pl_index );
+						buffer_performance = playlist->get_pointer( pl_index );
 						//avance carro
 						if ( plIndexB < playlist->get_n_pistas() - 1 ) {
 							plIndexB++;
@@ -230,10 +226,10 @@ int32_t main()
 				}
 
 				if ( x50.is_connected() )
-					x50.set_program( *performance_ptr );
+					x50.set_program( *buffer_performance );
 				else
 					// solo actualizamos el buffer para poder trabajar online
-					x50.set_buffer( *performance_ptr );
+					x50.set_buffer( *buffer_performance );
 
 				updateWindow[LCD] = true;
 
@@ -241,7 +237,7 @@ int32_t main()
 
 			case FAVOURITE: {/*{{{*/
 				int32_t caracter_a_numero = caracter == 48 ? 9 : ( caracter - 49 );
-				performance_ptr = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
+				buffer_performance = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
 
 				updateWindow[LCD] 	  = true;
 
@@ -325,14 +321,14 @@ int32_t main()
 				Form forma;
 
 				if (forma.capture_value() == true) {
-					database.add_value(forma.get_value());
-					database.ordenate();
-					performance_ptr = &database.performances[0]; // Actualizamos después del cambio
+					catalog.add_value(forma.get_value());
+					catalog.ordenate();
+					buffer_performance = &catalog.performances[0]; // Actualizamos después del cambio
 				}
 
 				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
 				llenado_displayTable(
-						displayTable, database.performances, dbRows[mode], keyword, &n_matches );
+						displayTable, catalog.performances, dbRows[mode], keyword, &n_matches );
 
 				draw_windows();
 				updateWindow[LCD]		= true;
@@ -353,7 +349,7 @@ int32_t main()
 				int real_index = displayTable[dIndex] - &(dBase[mode].performances[0]);
 
 				dBase[mode].delete_value( real_index );
-				performance_ptr = &database.performances[0]; // Actualizamos después del cambio
+				buffer_performance = &catalog.performances[0]; // Actualizamos después del cambio
 
 
 				llenado_displayTable(
@@ -375,9 +371,9 @@ int32_t main()
 			{
 				Form forma;
 
-				// dIndex represents absolute iterator over displayTable, but NOT OVER database, so we whould
-				// get the exact database index calculating the difference
-				int difference = displayTable[dIndex] - &(database.performances[0]);
+				// dIndex represents absolute iterator over displayTable, but NOT OVER catalog, so we whould
+				// get the exact catalog index calculating the difference
+				int difference = displayTable[dIndex] - &(catalog.performances[0]);
 
 				if (forma.capture_value(dBase[mode].performances[difference]) == true) {
 					dBase[mode].edit_value(difference, forma.get_value());
@@ -400,12 +396,12 @@ int32_t main()
 
 			case EDIT_ORCHESTRATION :/*{{{*/
 				if ( winMode == MODE_DISPLAY ) {
-					performance_ptr = displayTable[dIndex];
+					buffer_performance = displayTable[dIndex];
 
-					if (performance_ptr->n_scenes == 0)
-						orquestacion.add_empty_scene(performance_ptr);
+					if (buffer_performance->n_scenes == 0)
+						orquestacion.add_empty_scene(buffer_performance);
 					orquestacion.reset_variation();
-					orquestacion.show( performance_ptr );
+					orquestacion.show( buffer_performance );
 					update_popups(); // se decide poner aquí para no refrescar varias veces
 					orquestacion.capture_key();
 
@@ -451,7 +447,7 @@ int32_t main()
 
 			case EXPORTATE:/*{{{*/
 				dBase[COMBINATIONS].save_to_json( config_directory + "/catalog.json" );
-				//combinaciones.( config_directory + "/combinaciones.json" );
+				//programming.( config_directory + "/programming.json" );
 
 				*keyword = '\0';
 
@@ -474,7 +470,7 @@ int32_t main()
 				// Esta madrola hace lo básico del EXPORTATE y diréctamente modifica
 				// el command para que el while saque a la chingada el programa
 				dBase[COMBINATIONS].save_to_json( config_directory + "/catalog.json" );
-				//combinaciones.escribir( config_directory + "/combinaciones.json" );
+				//programming.escribir( config_directory + "/programming.json" );
 
 				command = EXIT;
 
@@ -659,7 +655,7 @@ int32_t main()
 			print_search(searchWindow, keyword);
 
 		if (updateWindow[LCD] == true)
-			print_lcd( lcdWindow, performance_ptr );
+			print_lcd( lcdWindow, buffer_performance );
 
 		if ( updateWindow[ MIDI_STATE ] )
 			print_MIDI_state( MIDI_state_window, x50.get_MIDI_state() );
@@ -682,7 +678,7 @@ int32_t main()
 			 *
 			 * Por lo pronto reservamos esta funcionalidad para el comando FAVOURITE*/
 			if ( command == FAVOURITE and x50.is_connected() )
-				x50.set_program( *performance_ptr );/*}}}*/
+				x50.set_program( *buffer_performance );/*}}}*/
 
 		if ( command != EXIT ) // Que no eche a perder el :w
 			command = get_command(caracter = getch(), mode, winMode, keyword, charIndex, dIndex);
@@ -698,7 +694,7 @@ int32_t main()
 	delete playlist;
 
 	delete [] displayTable;
-	performance_ptr = NULL;
+	buffer_performance = NULL;
 
 	delete [] dBase;
 
