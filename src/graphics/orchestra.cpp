@@ -122,14 +122,15 @@ void KeyboardScheme::auto_draw() noexcept/*{{{*/
 		}
 }/*}}}*/
 
-void Orchestra::update() noexcept/*{{{*/
-{
+void Orchestra::update() noexcept/*{{{*/ {
+	/* This method actually is the responsable of updating the fields with the true values */
+
 	scene_text_box.set_text( "Variacion " + std::to_string( current_scene + 1 ) +
 								" de " + std::to_string( info->n_scenes ) );
 	vi_field.set_content( std::to_string( info->initial_scene ) );
 	etiqueta_field.set_content( info->scenes[ current_scene ].label );
 
-	for ( int32_t i = 0; i < 8; ++i ) {
+	for ( int32_t i = 0; i < static_cast<std::int32_t>(comb_ptr->channels_per_combi); ++i ) {
 
 		// Preparando las dobles barras
 		int16_t &l_Value = info->scenes[ current_scene ].tracks[ i ].lower_key;
@@ -163,10 +164,8 @@ void Orchestra::update() noexcept/*{{{*/
 			double_X_slider[ i ].off();
 		}
 
-		instrument_field[ i ].set_text( comb_ptr->get_instrument_name(	info->patch.bnk,
-																		info->patch.num, i ) );
-		volume_field[i].set_text(
-				std::to_string( info->scenes[ current_scene ].tracks[ i ].volume ) );
+		instrument_field[i].set_text(comb_ptr->get_instrument_name(info->patch.bnk, info->patch.num,i));
+		volume_field[i].set_text(std::to_string( info->scenes[ current_scene ].tracks[ i ].volume ) );
 		transposition_field[ i ].set_text(
 				std::to_string( info->scenes[ current_scene ].tracks[ i ].transposition ) );
 	}

@@ -28,7 +28,7 @@ void Combinations::load_from_json( const std::string &_Path )/*{{{*/
 		std::cerr << "Failed to open " + _Path + " in Combinations::load_from_json()\n";
 		exit(EXIT_FAILURE);
 	}
-	nlohmann::json json_object;
+	nlohmann::ordered_json json_object;
 	json_file >> json_object;
 	json_object.get_to(combinations);
 
