@@ -30,6 +30,7 @@ class Keyboard {
 public:
 	Keyboard();
 	Keyboard(const std::string& _Path);
+	auto initialize() noexcept -> void;
 	auto load_prog_from_json( const std::string & ) -> void;
 	auto save_prog_to_json(const std::string& ) noexcept -> void;
 	std::string get_instrument_name(const char &_Banco, const int16_t &_Num, const int16_t &_Track) noexcept;

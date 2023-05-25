@@ -1,5 +1,6 @@
 #include <bits/stdint-intn.h>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,19 +19,24 @@
 #include "utilities/src/files.hpp"
 
 int32_t value;
-Keyboard::Keyboard() :/*{{{*/
-	device( NULL ),
-	port( "hw:1,0,0" ),
-	MIDI( Switch::OFF )
-{
-	*name = '\0';
-	activeMode = false;
-	passiveMode = false;
-}/*}}}*/
+
+Keyboard::Keyboard()/*{{{*/
+{}/*}}}*/
 
 Keyboard::Keyboard( const std::string &_Path )/*{{{*/
 {
 	load_prog_from_json( _Path );
+	initialize();
+
+}/*}}}*/
+
+auto Keyboard::initialize() noexcept -> void {/*{{{*/
+	device = NULL;
+	strcpy(port, "hw:1,0,0");
+	MIDI = Switch::OFF;
+	*name = '\0';
+	activeMode = false;
+	passiveMode = false;
 }/*}}}*/
 
 void Keyboard::load_prog_from_json( const std::string &_Path )/*{{{*/
