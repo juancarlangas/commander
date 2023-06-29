@@ -19,16 +19,15 @@ int32_t main()
     const std::string config_directory{ config_directory_c };/*}}}*/
 
 	// Data{{{
-	Catalog *dBase = new Catalog [] {{config_directory + "/catalog.json"}};
+	Catalog* dBase = new Catalog [] {{config_directory + "/catalog.json"}};
 	Catalog& catalog {dBase[COMBINATIONS]};
 
-	std::int32_t dbRows[1] { dBase[COMBINATIONS].get_activeRows() };
-	std::int32_t& n_performances {dbRows[0]};
+	std::int32_t n_performances {catalog.get_activeRows()};
 /*}}}*/
 
 	// Variables{{{
-	Performance **displayTable = new Performance *[n_performances](); // arreglo de apuntadores
-	Performance* orch_clipboard_ptr, *performance_buffer; // apuntadores simple
+	Performance** displayTable = new Performance* [n_performances](); // arreglo de apuntadores
+	Performance *orch_clipboard_ptr, *performance_buffer; // apuntadores simple
 
 	Playlist *playlist = new Playlist( &catalog );
 
@@ -95,7 +94,7 @@ int32_t main()
 					mode = COMBINATOR;
 
 				llenado_displayTable(
-						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
+						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;
@@ -115,7 +114,7 @@ int32_t main()
 					keyword[k] = '\0';
 
 				llenado_displayTable(
-						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
+						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
 
 				charIndex = 0;
 				dTop = 0;
@@ -146,7 +145,7 @@ int32_t main()
 					// keyword[ charIndex - 1 ] = std::tolower( keyword[ charIndex - 1 ] );
 
 					llenado_displayTable(	displayTable, dBase[mode].performances,
-											dbRows[mode], keyword, &n_matches	);
+											n_performances, keyword, &n_matches	);
 
 					if (winMode == MODE_PLAYLIST) {
 						winMode = MODE_DISPLAY;
@@ -170,7 +169,7 @@ int32_t main()
 				keyword[charIndex] = '\0';
 
 				llenado_displayTable(
-						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
+						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
 				
 				dTop = 0;
 				dIndex = 0;
@@ -325,9 +324,9 @@ int32_t main()
 					performance_buffer = &catalog.performances[0]; // Actualizamos después del cambio
 				}
 
-				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
+				n_performances = dBase[ COMBINATIONS ].get_activeRows();
 				llenado_displayTable(
-						displayTable, catalog.performances, dbRows[mode], keyword, &n_matches );
+						displayTable, catalog.performances, n_performances, keyword, &n_matches );
 
 				draw_windows();
 				updateWindow[LCD]		= true;
@@ -352,7 +351,7 @@ int32_t main()
 
 
 				llenado_displayTable(
-						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches );
+						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches );
 
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;
@@ -361,7 +360,7 @@ int32_t main()
 				updateWindow[DIGITS]	= true;
 				updateWindow[ZOOM]		= true;	
 
-				dbRows[ COMBINATIONS ] = dBase[ COMBINATIONS ].get_activeRows();
+				n_performances = dBase[ COMBINATIONS ].get_activeRows();
 
 				break;
 			}/*}}}*/
@@ -379,7 +378,7 @@ int32_t main()
 					dBase[mode].ordenate();
 				}
 
-				llenado_displayTable(displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
+				llenado_displayTable(displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
 
 				draw_windows();
 				updateWindow[LCD]		= true;
@@ -451,7 +450,7 @@ int32_t main()
 				*keyword = '\0';
 
 				llenado_displayTable(
-						displayTable, dBase[mode].performances,dbRows[mode],  keyword, &n_matches);
+						displayTable, dBase[mode].performances, n_performances,  keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;
@@ -513,7 +512,7 @@ int32_t main()
 					keyword[k] = '\0';
 
 				llenado_displayTable(
-						displayTable, dBase[mode].performances, dbRows[mode], keyword, &n_matches);
+						displayTable, dBase[mode].performances,  n_performances, keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;
@@ -565,7 +564,7 @@ int32_t main()
 					keyword[k] = '\0';
 
 				llenado_displayTable(
-						displayTable, dBase[mode].performances, dbRows[mode],  keyword, &n_matches);
+						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
 
 				if (winMode == MODE_PLAYLIST)
 					winMode = MODE_DISPLAY;
@@ -619,7 +618,7 @@ int32_t main()
 					keyword[k] = '\0';
 
 				llenado_displayTable(
-						displayTable, dBase[mode].performances, dbRows[mode],  keyword, &n_matches);
+						displayTable, dBase[mode].performances, n_performances,  keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;
