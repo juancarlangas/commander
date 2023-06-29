@@ -26,7 +26,7 @@ int32_t main()
 /*}}}*/
 
 	// Variables{{{
-	Performance** displayTable = new Performance* [n_performances](); // arreglo de apuntadores
+	Performance** displayTable = new Performance* [1000](); // arreglo de apuntadores
 	Performance *orch_clipboard_ptr, *performance_buffer; // apuntadores simple
 
 	Playlist *playlist = new Playlist( &catalog );
