@@ -23,9 +23,9 @@ int32_t value;
 Keyboard::Keyboard()/*{{{*/
 {}/*}}}*/
 
-Keyboard::Keyboard( const std::string &_Path )/*{{{*/
+Keyboard::Keyboard( [[maybe_unused]]const std::string &_Path )/*{{{*/
 {
-	load_prog_from_json( _Path );
+	load_combs_from_json( _Path );
 	initialize();
 
 }/*}}}*/
@@ -39,7 +39,7 @@ auto Keyboard::initialize() noexcept -> void {/*{{{*/
 	passiveMode = false;
 }/*}}}*/
 
-void Keyboard::load_prog_from_json( const std::string &_Path )/*{{{*/
+void Keyboard::load_combs_from_json( const std::string &_Path )/*{{{*/
 {
 	// LOAD DATA
 	std::ifstream json_file{ _Path };
@@ -69,6 +69,31 @@ void Keyboard::load_prog_from_json( const std::string &_Path )/*{{{*/
 	else
 		throw std::runtime_error( "combinations is empty" );
 }/*}}}*/
+
+auto Keyboard::save_combs_to_json(const std::string& _Path) noexcept -> void {
+	/*
+	for (std::int32_t i = 0; i < 3; ++i) {
+		combinations.push_back(std::array<Combination, 128> {});
+		for (std::int32_t j = 0; j < 128; ++j) {
+			for (std::int32_t k = 0; k < 8; ++k) {
+				combinations[i][j].instruments.push_back("Piano");
+			}
+		}
+	}
+	*/
+
+    // Create a JSON object and fill it with the data from combinations vector
+    nlohmann::ordered_json json_object = combinations;
+
+    // Open a file and write the JSON object to it
+    std::ofstream json_file{ _Path };
+    if (json_file.fail()) {
+        std::cerr << "Failed to open " + _Path + " in Keyboards::save_combs_to_json()\n";
+        exit(EXIT_FAILURE);
+    }
+    json_file << std::setfill('\t') << std::setw(1) << json_object << std::endl;
+    json_file.close();
+}
 
 std::string Keyboard::get_instrument_name(/*{{{*/
 		const char &_Banco, const int16_t &_Numero, const int16_t &_Track ) noexcept
@@ -336,8 +361,10 @@ void Keyboard::set_song(const char song)/*{{{*/
 		snd_rawmidi_write(device, songSelect, 2);	
 }/*}}}*/
 
-void from_json( const nlohmann::json &_JSONobject, struct Combi &_Combination ) {/*{{{*/
-    _JSONobject.at( "name").get_to( _Combination.name );
+void from_json( const nlohmann::json &_JSONobject, Combination &_Combination ) {/*{{{*/
     _JSONobject.at( "instruments" ).get_to( _Combination.instruments );
 }/*}}}*/
 
+void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
+	_J = nlohmann::json{{"instruments", _C.instruments}};
+}/*}}}*/

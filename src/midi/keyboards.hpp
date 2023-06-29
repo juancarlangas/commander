@@ -16,8 +16,7 @@
 
 static const size_t &PATCHES_PER_BANK{ 128 };
 
-struct Combi {
-	std::string name;
+struct Combination {
 	std::vector<std::string> instruments;
 };
 
@@ -31,8 +30,8 @@ public:
 	Keyboard();
 	Keyboard(const std::string& _Path);
 	auto initialize() noexcept -> void;
-	auto load_prog_from_json( const std::string & ) -> void;
-	auto save_prog_to_json(const std::string& ) noexcept -> void;
+	auto load_combs_from_json( const std::string & ) -> void;
+	auto save_combs_to_json(const std::string& ) noexcept -> void;
 	std::string get_instrument_name(const char &_Banco, const int16_t &_Num, const int16_t &_Track) noexcept;
 	void set_instrument_name(const char &, const int16_t &, const int16_t &, const std::string_view) noexcept;
 	size_t channels_per_combi;
@@ -55,7 +54,7 @@ public:
 	void dump_performance( const Performance &_Performance) noexcept;
 	void set_song(const char);
 private:
-	std::vector<std::array<struct Combi, PATCHES_PER_BANK>> combinations;
+	std::vector<std::array<struct Combination, PATCHES_PER_BANK>> combinations;
 	Performance performance_buffer;
 	size_t n_bancos;
 	int16_t scene;
@@ -67,6 +66,7 @@ private:
 	enum Switch MIDI;
 };
 
-void from_json( const nlohmann::json &_JSONobject, struct Combi &_Combination );
+void from_json( const nlohmann::json &_JSONobject, struct Combination &_Combination );
+void to_json(nlohmann::ordered_json& _J, const Combination& _C);
 
 #endif

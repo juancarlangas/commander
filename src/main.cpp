@@ -445,8 +445,8 @@ int32_t main()
 				break;/*}}}*/
 
 			case EXPORTATE:/*{{{*/
-				dBase[COMBINATIONS].save_to_json( config_directory + "/catalog.json" );
-				//programming.( config_directory + "/programming.json" );
+				catalog.save_to_json( config_directory + "/catalog.json" );
+				x50.save_combs_to_json(config_directory + "/combinations.json");
 
 				*keyword = '\0';
 
@@ -468,8 +468,8 @@ int32_t main()
 			case EXPORTATE_AND_QUIT :/*{{{*/
 				// Esta madrola hace lo básico del EXPORTATE y diréctamente modifica
 				// el command para que el while saque a la chingada el programa
-				dBase[COMBINATIONS].save_to_json( config_directory + "/catalog.json" );
-				//programming.escribir( config_directory + "/programming.json" );
+				catalog.save_to_json( config_directory + "/catalog.json" );
+				x50.save_combs_to_json(config_directory + "/combinations.json");
 
 				command = EXIT;
 
