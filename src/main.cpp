@@ -344,9 +344,11 @@ int32_t main()
 			case DELETE_VALUE:/*{{{*/
 			{
 				// obtenemos el índice real en dBase al cual displayTable[dIndex] apunta
-				int real_index = displayTable[dIndex] - &(dBase[mode].performances[0]);
+				std::size_t real_index
+					{static_cast<std::size_t>(displayTable[dIndex] - &catalog.performances[0])};
 
-				dBase[mode].delete_value( real_index );
+				catalog.delete_value(real_index);
+				n_performances = catalog.get_activeRows();
 				performance_buffer = &catalog.performances[0]; // Actualizamos después del cambio
 
 
@@ -360,7 +362,12 @@ int32_t main()
 				updateWindow[DIGITS]	= true;
 				updateWindow[ZOOM]		= true;	
 
-				n_performances = dBase[ COMBINATIONS ].get_activeRows();
+				n_performances = catalog.get_activeRows();
+
+				// We procurate the indexed element dont get in the air like the Coyote when deleting
+				// the last element
+				if (dIndex > n_performances - 1)
+					--dIndex;
 
 				break;
 			}/*}}}*/
