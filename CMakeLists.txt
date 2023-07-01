@@ -39,7 +39,7 @@ target_include_directories( Commander
 	PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/data"
 	PRIVATE	"/home/juancarlangas/Programming/lib/" )
 
-target_link_libraries( Commander ncurses panel asound )
+target_link_libraries( Commander ncurses panel asound jack)
 
 target_compile_features( Commander PUBLIC cxx_std_20 )
 

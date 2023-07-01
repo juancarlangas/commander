@@ -20,23 +20,10 @@
 
 int32_t value;
 
-Keyboard::Keyboard()/*{{{*/
-{}/*}}}*/
-
-Keyboard::Keyboard( [[maybe_unused]]const std::string &_Path )/*{{{*/
+Keyboard::Keyboard( const std::string &_Path )/*{{{*/
 {
 	load_combs_from_json( _Path );
-	initialize();
-
-}/*}}}*/
-
-auto Keyboard::initialize() noexcept -> void {/*{{{*/
-	device = NULL;
-	strcpy(port, "hw:1,0,0");
 	MIDI = Switch::OFF;
-	*name = '\0';
-	activeMode = false;
-	passiveMode = false;
 }/*}}}*/
 
 void Keyboard::load_combs_from_json( const std::string &_Path )/*{{{*/
@@ -70,7 +57,7 @@ void Keyboard::load_combs_from_json( const std::string &_Path )/*{{{*/
 		throw std::runtime_error( "combinations is empty" );
 }/*}}}*/
 
-auto Keyboard::save_combs_to_json(const std::string& _Path) noexcept -> void {
+auto Keyboard::save_combs_to_json(const std::string& _Path) noexcept -> void {/*{{{*/
 	/*
 	for (std::int32_t i = 0; i < 3; ++i) {
 		combinations.push_back(std::array<Combination, 128> {});
@@ -93,7 +80,7 @@ auto Keyboard::save_combs_to_json(const std::string& _Path) noexcept -> void {
     }
     json_file << std::setfill('\t') << std::setw(1) << json_object << std::endl;
     json_file.close();
-}
+}/*}}}*/
 
 std::string Keyboard::get_instrument_name(/*{{{*/
 		const char &_Banco, const int16_t &_Numero, const int16_t &_Track ) noexcept
@@ -109,21 +96,76 @@ void Keyboard::set_instrument_name(/*{{{*/
 	combinations[_Banco][_Numero].instruments[ _Pista ] = _Nombre;
 }/*}}}*/
 
+auto Keyboard::process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg) -> int {/*{{{*/
+	return 0;
+}/*}}}*/
+
+auto Keyboard::jackShutdown() -> void {}
+
 void Keyboard::connect() noexcept/*{{{*/
 {
-	if ( snd_rawmidi_open( NULL, &device, port, SND_RAWMIDI_SYNC ) ) {
-		endwin();
-		std::cerr << "No se pudo abir " << port << " en Keyboad::connect()" << std::endl;
-		exit( EXIT_FAILURE );
+	client = jack_client_open(client_name, options, &status, server_name);
+	if (client == NULL) {
+		std::cerr << "No se pudo abrir " << client_name << " en Keyboard::connect() ALV\n";
+		std::exit(EXIT_FAILURE);
 	}
+
+	// Activate the JACK client
+	if (jack_activate(client)) {
+		std::cerr << "No se pudo activar " << client_name << " en Keyboard::connect() ALV\n";
+		std::exit(EXIT_FAILURE);
+	}
+
+	// Register the process callback function
+	jack_set_process_callback(client, [](jack_nframes_t nframes, void* arg) -> int {
+    Keyboard* handler = static_cast<Keyboard*>(arg);
+
+    // Retrieve the input and output MIDI buffers
+    [[maybe_unused]]void* inputBuffer = jack_port_get_buffer(handler->inputPort, nframes);
+    [[maybe_unused]]void* outputBuffer = jack_port_get_buffer(handler->outputPort, nframes);
+
+    // Process MIDI data
+    // Example: Simply copy the input MIDI data to the output MIDI data
+    // jack_midi_copy_buffer(outputBuffer, inputBuffer);
+
+    return 0;
+}, this);
+
+	// Register the shutdown callback function
+	jack_on_shutdown(client, [](void* arg) {
+		Keyboard* handler = static_cast<Keyboard*>(arg);
+		handler->jackShutdown();
+	}, this);
+
+	// Register the input/output ports
+	jack_port_t* inputPort = jack_port_register(client, "input", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
+	jack_port_t* outputPort = jack_port_register(client, "output", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+    if (inputPort == NULL || outputPort == NULL) {
+        std::cerr << "Failed to register input/output ports in Keyboard::connect()\n";
+        std::exit(EXIT_FAILURE);
+    }
+
 	MIDI = Switch::ON;
 }/*}}}*/
 
-void Keyboard::disconnect() noexcept/*{{{*/
-{
-	snd_rawmidi_close( device );
-	device = NULL;
-	MIDI = Switch::OFF;
+void Keyboard::disconnect() noexcept {/*{{{*/
+	// Disconnect input port
+    if (inputPort != nullptr) {
+        jack_port_disconnect(client, inputPort);
+        inputPort = nullptr;
+    }
+
+    // Disconnect output port
+    if (outputPort != nullptr) {
+        jack_port_disconnect(client, outputPort);
+        outputPort = nullptr;
+    }
+
+    // Close the JACK client
+    jack_client_close(client);
+
+    // Set MIDI switch to OFF or perform any necessary cleanup
+    MIDI = Switch::OFF;
 }/*}}}*/
 
 void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
