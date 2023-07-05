@@ -52,7 +52,6 @@ public:
 	void dump_scene() noexcept;
 	void dump_scene( const Performance &_Performance, const int16_t & ) noexcept;
 	void set_name(const char *);
-	void set_modality(const short);
 	void dump_performance( const Performance &_Performance) noexcept;
 
 private:

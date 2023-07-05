@@ -22,6 +22,34 @@
 
 int32_t value;
 
+// CLIENT DATA {{{
+const char* client_name {"Commander"};
+jack_client_t* client {NULL};
+jack_port_t* output_port {NULL};
+jack_nframes_t local_nframes = {0};/*}}}*/
+
+// Control{{{
+volatile bool should_send_prev_SysExEs {FALSE};
+volatile bool should_send_PatchChange {FALSE};
+volatile bool should_send_GM_messages {FALSE};
+volatile bool should_send_next_SysExEs {FALSE};/*}}}*/
+
+// GENERIC MESSAGES{{{
+static const std::size_t& MAX_SYSEX {128};
+static const std::size_t& SYSEX_LENGTH {7};
+
+jack_midi_data_t prev_SysExEs[MAX_SYSEX][SYSEX_LENGTH];
+std::int16_t n_prev_SysExEs {0};
+
+struct PatchChangeT {
+	jack_midi_data_t msb[3] {0xB0, 0x00, 0x3F};
+    jack_midi_data_t lsb[3] {0xB0, 0x20, 0x00};
+    jack_midi_data_t pc[2]  {0xC0, 0x00};
+} PatchChange;
+
+jack_midi_data_t next_SysExEs[MAX_SYSEX][SYSEX_LENGTH];
+std::int16_t n_next_SysExEs {0};/*}}}*/
+
 Keyboard::Keyboard( const std::string &_Path )/*{{{*/
 {
 	load_combs_from_json( _Path );
@@ -155,34 +183,6 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 }/*}}}*/
 
 /****************************************** JACK *********************************************************/
-// GENERIC MESSAGES{{{
-static const std::size_t& MAX_SYSEX {128};
-static const std::size_t& SYSEX_LENGTH {7};
-
-jack_midi_data_t prev_SysExEs[MAX_SYSEX][SYSEX_LENGTH];
-std::int16_t n_prev_SysExEs {0};
-
-struct PatchChangeT {
-	jack_midi_data_t msb[3] {0xB0, 0x00, 0x3F};
-    jack_midi_data_t lsb[3] {0xB0, 0x20, 0x00};
-    jack_midi_data_t pc[2]  {0xC0, 0x00};
-} PatchChange;
-
-jack_midi_data_t next_SysExEs[MAX_SYSEX][SYSEX_LENGTH];
-std::int16_t n_next_SysExEs {0};/*}}}*/
-
-// Client {{{
-const char* client_name {"Commander"};
-jack_client_t* client {NULL};
-jack_port_t* output_port {NULL};
-jack_nframes_t local_nframes = {0};/*}}}*/
-
-// Control{{{
-volatile bool should_send_prev_SysExEs {FALSE};
-volatile bool should_send_PatchChange {FALSE};
-volatile bool should_send_GM_messages {FALSE};
-volatile bool should_send_next_SysExEs {FALSE};/*}}}*/
-
 int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*{{{*/
 {
 	void* port_buffer = jack_port_get_buffer(output_port, nframes);
@@ -403,28 +403,3 @@ void Keyboard::select_page(const enum Page& _Pagina) noexcept {/*{{{*/
 
     set_scene(performance_buffer.default_scene);
 }/*}}}*/
-
-void Keyboard::set_modality(short toMode) {/*{{{*/
-    // Create the sysex message
-    unsigned char sysex[7] = {0xF0, 0x42, 0x00, 0x7A, 0x4E, 0x00, 0xF7}; // Ch = sysex[2] (LSB)
-
-    if (toMode == MULTI)
-        sysex[5] = 0x04;
-
-    // Create a JACK MIDI event
-    jack_midi_data_t sysexBuffer[7];
-    for (int i = 0; i < 7; ++i) {
-        sysexBuffer[i] = sysex[i];
-    }
-
-    jack_midi_event_t event;
-    jack_midi_clear_buffer(event.buffer);
-    jack_midi_data_t* buffer = jack_midi_event_reserve(event.buffer, 0, 7);
-    memcpy(buffer, sysexBuffer, 7);
-
-    // Write the MIDI event to the output port
-    if (output_port != nullptr) {
-        jack_midi_event_write(output_port, event.time, event.buffer, 7);
-    }
-}/*}}}*/
-
