@@ -53,8 +53,6 @@ int32_t main()
 	// Keyboard{{{
 	Keyboard x50 {config_directory + "/combinations.json"};
 
-	x50.set_name("X50");
-
 	orquestacion.link_MIDI_device( &x50 );/*}}}*/
 
 	// Engine{{{
@@ -224,7 +222,7 @@ int32_t main()
 				}
 
 				if ( x50.is_connected() )
-					x50.set_performance_buffer( *performance_buffer );
+					x50.dump_performance( *performance_buffer );
 				else
 					// solo actualizamos el buffer para poder trabajar online
 					x50.set_performance_buffer( *performance_buffer );

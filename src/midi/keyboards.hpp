@@ -54,32 +54,18 @@ public:
 	void set_name(const char *);
 	void set_modality(const short);
 	void dump_performance( const Performance &_Performance) noexcept;
-	void set_song(const char);
-
-	auto process(jack_nframes_t nframes, void* arg) -> int;
-    auto jackShutdown() -> void;
 
 private:
 	std::vector<std::array<struct Combination, PATCHES_PER_BANK>> combinations;
 	Performance performance_buffer;
 	size_t n_bancos;
 	int16_t scene;
-	char name[20];
 	bool activeMode;
 	bool passiveMode;
-	snd_rawmidi_t *device;
-	char port[9];
 	enum Switch MIDI;
-
-	jack_client_t* client;
-    const char* client_name = "Commander";
-    const char* server_name = nullptr;
-    jack_options_t options = JackNullOption;
-    jack_status_t status;
-    jack_port_t* inputPort;
-    jack_port_t* outputPort;
 };
 
+// JSON
 void from_json( const nlohmann::json &_JSONobject, struct Combination &_Combination );
 void to_json(nlohmann::ordered_json& _J, const Combination& _C);
 
