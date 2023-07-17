@@ -5,7 +5,7 @@ PROJECT( Commander
 	DESCRIPTION "Programa para manipular combinaciones y performances en sintetizadores musicales"
 	LANGUAGES C CXX )
 
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+#set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
@@ -31,13 +31,13 @@ ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/tables.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/playlist.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/math.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/string.cpp"
-	"/home/juancarlangas/Programming/lib/utilities/src/files.cpp" )
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/string.cpp" )
+	#"/home/juancarlangas/Programming/lib/utilities/src/files.cpp" )
 	
 target_include_directories( Commander
 	PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src"
-	PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/data"
-	PRIVATE	"/home/juancarlangas/Programming/lib/" )
+	PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/data" )
+	#PRIVATE	"/home/juancarlangas/Programming/lib/" )
 
 target_link_libraries( Commander ncurses panel asound jack)
 

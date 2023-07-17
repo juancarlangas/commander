@@ -18,8 +18,6 @@
 #include <string>
 #include <algorithm>
 
-#include "utilities/src/files.hpp"
-
 int32_t value;
 
 // CLIENT DATA {{{
@@ -185,13 +183,19 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 /****************************************** JACK *********************************************************/
 int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*{{{*/
 {
+	// sleep
+	 [[maybe_unused]]static struct timespec keyboardTimer;
+		keyboardTimer.tv_sec 	= 0;
+		keyboardTimer.tv_nsec	= 200000000;
+
 	void* port_buffer = jack_port_get_buffer(output_port, nframes);
 	jack_midi_clear_buffer(port_buffer);
 
 	// Previous SysEx
 	if (should_send_prev_SysExEs)
-		for (std::int32_t i {0}; i < n_prev_SysExEs; ++i)
+		for (std::int32_t i {0}; i < n_prev_SysExEs; ++i) {
 			jack_midi_event_write(port_buffer, 0, prev_SysExEs[i], sizeof(prev_SysExEs[i]));
+		}
 	
 	if (should_send_PatchChange) {
 		jack_midi_event_write(port_buffer, 0, PatchChange.msb, sizeof(PatchChange.msb));
@@ -201,8 +205,9 @@ int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*
 
 	// Previous SysEx
 	if (should_send_next_SysExEs)
-		for (std::int32_t i {0}; i < n_next_SysExEs; ++i)
+		for (std::int32_t i {0}; i < n_next_SysExEs; ++i) {
 			jack_midi_event_write(port_buffer, 0, next_SysExEs[i], sizeof(next_SysExEs[i]));
+		}
 	
 
 	should_send_prev_SysExEs = false;
@@ -254,7 +259,7 @@ void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{
 	PatchChange.lsb[2] = performance_buffer.patch.bnk - 65;
 	PatchChange.pc[1] = performance_buffer.patch.num;
 
-	should_send_prev_SysExEs = true;
+	//should_send_prev_SysExEs = true;
 	should_send_PatchChange = true;
 
 	scene = 0;
@@ -264,7 +269,7 @@ void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{
 void Keyboard::dump_scene() noexcept/*{{{*/
 {
 	// sleep
-	 static struct timespec keyboardTimer;
+	 [[maybe_unused]]static struct timespec keyboardTimer;
 		keyboardTimer.tv_sec 	= 0;
 		keyboardTimer.tv_nsec	= 200000000;
 	

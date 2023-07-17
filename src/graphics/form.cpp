@@ -63,7 +63,7 @@ bool Form::capture_value()/*{{{*/
 		field[SECTION].set_string(performance.metadata.mood);
 		field[TYPE].set_string(performance.type);
 		field[KEYWORDS].set_string(performance.metadata.keyword);
-		field[BNK].set_string(static_cast<const char>(performance.patch.bnk));
+		field[BNK].set_string(static_cast<char>(performance.patch.bnk));
 		field[NUM].set_string(std::int32_t{ performance.patch.num });
 		
 		bool success = capture();

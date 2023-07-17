@@ -1,7 +1,7 @@
 lib
-bin/
-build/
-Debug/
+bin
+build
+Debug
 compile_commands.json
-.vscode/
-.cache/
+.vscode
+.cache

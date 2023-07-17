@@ -24,7 +24,6 @@
 #include "data/tables.hpp"
 #include "data/catalog.hpp"
 #include "data/playlist.hpp"
-#include "utilities/src/files.hpp"
 #include "graphics/colors.hpp"
 
 enum HotKeysMode { VARIATIONS, FAVOURITES };

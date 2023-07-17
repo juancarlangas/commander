@@ -18,7 +18,6 @@
 #include "graphics/form.hpp"
 #include "common/string.hpp"
 #include "nlohmann/json.hpp"
-#include "utilities/src/files.hpp"
 #include "graphics/ncurses.hpp"
 
 Catalog::Catalog() :/*{{{*/
