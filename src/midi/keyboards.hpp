@@ -12,11 +12,18 @@
 #include <string_view>
 #include <vector>
 
+
 #include "data/nlohmann/json.hpp"
 #include "midi/midi.hpp"
 #include "data/catalog.hpp"
+#include "utilities/timer.hpp"
 
-static const size_t &PATCHES_PER_BANK{ 128 };
+static const size_t& PATCHES_PER_BANK {128};
+
+static const size_t& PAGE_SYSEX_WORD_SIZE {7};
+static const size_t& SCENE_SYSEX_PACK_SIZE {5};
+static const size_t& NUMBER_OF_PARTS {8};
+static const size_t& PARAM_SYSEX_WORD_SIZE {13};
 
 struct Combination {
 	std::vector<std::string> instruments;
@@ -25,9 +32,8 @@ struct Combination {
 enum Section { COMBI, GLOBAL, MULTI };
 enum Page { PLAY = 0, TIMBRE };
 
-#define NUMBER_OF_PARTS 8
-
 class Keyboard {
+
 public:
 	Keyboard();
 	Keyboard(const std::string& _Path);
@@ -53,6 +59,9 @@ public:
 	void dump_scene( const Performance &_Performance, const int16_t & ) noexcept;
 	void set_name(const char *);
 	void dump_performance( const Performance &_Performance) noexcept;
+	auto send_page_SysEx(jack_midi_data_t _SysEx[PAGE_SYSEX_WORD_SIZE]) -> void;
+	auto send_scene_SysEx(jack_midi_data_t _SysEx[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE]) -> void;
+	auto send_PC(const jack_midi_data_t& _Bank, const jack_midi_data_t& _Program) noexcept -> void;
 
 private:
 	std::vector<std::array<struct Combination, PATCHES_PER_BANK>> combinations;
@@ -62,6 +71,7 @@ private:
 	bool activeMode;
 	bool passiveMode;
 	enum Switch MIDI;
+	Juanca::Timer timer;
 };
 
 // JSON

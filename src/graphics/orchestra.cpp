@@ -3,8 +3,10 @@
 #include "elements/windows/popups/orchestra_elements/double_X_slider.hpp"
 #include "graphics/colors.hpp"
 #include "graphics/ncurses.hpp"
+#include "midi/keyboards.hpp"
 #include "printing.hpp"
 #include "windows.hpp"
+#include "utilities/timer.hpp"
 #include <ncurses.h>
 #include <panel.h>
 #include <string>
@@ -12,6 +14,8 @@
 
 using Coordinates::X;
 using Coordinates::Y;
+
+Juanca::Timer timer;
 
 Orchestra::Orchestra() : // Sets colors /*{{{*/
 	native_font { { { GREEN_DEFAULT, "Bold" },
@@ -45,14 +49,14 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 	base.update();
 
 	// Indicador de variación
-	scene_text_box.Popup::init( 3, 20, _Ypos + 1, _Xpos + 92 );
+	scene_text_box.Popup::init( 3, 20, _Ypos + 1, _Xpos + 120 );
 	scene_text_box.set_font_color( GRAY_DEFAULT );
 	scene_text_box.set_font_width( "Bold" );
 	scene_text_box.update();
 
 	// keyboard_ptr_text_box
 	keyboard_scheme.Popup::init(
-			5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 90 / 200 ) );
+			5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 66 / 200 ) );
 	keyboard_scheme.set_font_color( WHITE_DEFAULT );
 	keyboard_scheme.set_font_width( "Bold" );
 	keyboard_scheme.auto_draw();
@@ -316,7 +320,11 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						}
 
 					if ( keyboard_ptr->get_MIDI_state() == Switch::ON ) {
-						keyboard_ptr->select_page( Page::TIMBRE );
+						// TO EDIT
+						jack_midi_data_t to_edit_SysEx[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
+						keyboard_ptr->send_page_SysEx(to_edit_SysEx);
+						timer.sleep(2e8);
+	
 						keyboard_ptr->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
@@ -375,7 +383,11 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								break;
 						}
 					if ( keyboard_ptr->get_MIDI_state() == Switch::ON ) {
-						keyboard_ptr->select_page( Page::TIMBRE );
+						// TO EDIT
+						jack_midi_data_t to_edit_SysEx[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
+						keyboard_ptr->send_page_SysEx(to_edit_SysEx);
+						timer.sleep(2e8);
+
 						keyboard_ptr->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
@@ -695,7 +707,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 				break;/*}}}*/
 
-			case 546 : // CTRL-KEY_LEFT{{{
+			case '-' : // CTRL-KEY_LEFT{{{
 				if ( cursor[Y] > -1 ) { // Zona de controles
 					if ( cursor[X] == 4 ) { // left slider
 						if ( double_X_slider[ cursor[Y] ].decrease_left_slider() == Moved::YES )
@@ -711,7 +723,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			// CTRL-KEY_RIGHT{{{
-			case 561 :
+			case '+' :
 				if ( cursor[Y] > -1 ) {
 					if ( cursor[X] == 4 ) {
 						if ( double_X_slider[ cursor[Y] ].increase_left_slider() == Moved::YES )
@@ -750,7 +762,10 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 				// Dumpeamos sí o sí
 				if ( keyboard_ptr->get_MIDI_state() == Switch::ON ) {
-					keyboard_ptr->select_page( Page::TIMBRE );
+						jack_midi_data_t to_edit_SysEx[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
+						keyboard_ptr->send_page_SysEx(to_edit_SysEx);
+						timer.sleep(2e8);
+
 					keyboard_ptr->dump_scene( *info, current_scene );
 				}
 
@@ -814,7 +829,10 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								break;
 						}
 					if ( keyboard_ptr->get_MIDI_state() == Switch::ON ) {
-						keyboard_ptr->select_page( Page::TIMBRE );
+						jack_midi_data_t to_edit_SysEx[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
+						keyboard_ptr->send_page_SysEx(to_edit_SysEx);
+						timer.sleep(2e8);
+
 						keyboard_ptr->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
@@ -870,7 +888,10 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								break;
 						}
 					if ( keyboard_ptr->get_MIDI_state() == Switch::ON ) {
-						keyboard_ptr->select_page( Page::TIMBRE );
+						jack_midi_data_t to_edit_SysEx[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
+						keyboard_ptr->send_page_SysEx(to_edit_SysEx);
+						timer.sleep(2e8);
+
 						keyboard_ptr->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
@@ -943,7 +964,10 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								break;
 						}
 					if ( keyboard_ptr->get_MIDI_state() == Switch::ON ) {
-						keyboard_ptr->select_page( Page::TIMBRE );
+						jack_midi_data_t to_edit_SysEx[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
+						keyboard_ptr->send_page_SysEx(to_edit_SysEx);
+						timer.sleep(2e8);
+
 						keyboard_ptr->dump_scene( *info, current_scene );
 					}
 					will_dump = false;

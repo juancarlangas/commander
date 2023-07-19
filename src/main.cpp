@@ -433,7 +433,7 @@ int32_t main()
 				for ( i = 0; i < orch_clipboard_ptr->n_scenes; ++i ) {
 					displayTable[ dIndex ]->scenes[ i ].label =
 						orch_clipboard_ptr->scenes[ i ].label;
-					for ( j = 0; j < NUMBER_OF_PARTS; ++j ) {
+					for ( j = 0; j < static_cast<int>(NUMBER_OF_PARTS); ++j ) {
 						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].state =
 							orch_clipboard_ptr->scenes[ i ].tracks[ j ].state;
 						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].volume =
