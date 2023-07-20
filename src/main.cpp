@@ -235,6 +235,9 @@ int32_t main()
 				int32_t caracter_a_numero = caracter == 48 ? 9 : ( caracter - 49 );
 				performance_buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
 
+				if ( x50.is_connected() )
+					x50.dump_performance(*performance_buffer);
+
 				updateWindow[LCD] 	  = true;
 
 				/* Toda la siguiente parte reinicializa displayTable y coloca el índice

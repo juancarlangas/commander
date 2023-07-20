@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <jack/midiport.h>
+#include <jack/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
@@ -155,16 +156,19 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 }/*}}}*/
 
 /****************************************** JACK *********************************************************/
-// CLIENT DATA {{{
+// CLIENT DATA{{{
 const char* client_name {"Commander"};
 jack_client_t* client {NULL};
 jack_port_t* output_port {NULL};
 jack_nframes_t local_nframes = {0};/*}}}*/
 
+// TARGET DATA{{{
+const char** all_ports_C_String;/*}}}*/
+
 // Control{{{
 volatile bool should_send_PC {FALSE};
 volatile bool should_send_page_SysEx {FALSE};
-volatile bool should_send_scene_SysEx {FALSE};
+volatile bool should_send_scene_SysEx {FALSE};/*}}}*/
 
 // CALLBACK MESSAGES{{{
 struct PatchChangeT {
@@ -204,6 +208,11 @@ int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*
     return 0;
 }/*}}}*/
 
+bool isMidiPort(jack_port_t* port) {
+    const char* type = jack_port_type(port);
+    return (strcmp(type, JACK_DEFAULT_MIDI_TYPE) == 0);
+}
+
 void Keyboard::connect() noexcept {/*{{{*/
 	// Connect to the JACK server
     if ((client = jack_client_open(client_name, JackNullOption, NULL)) == NULL) {
@@ -227,6 +236,29 @@ void Keyboard::connect() noexcept {/*{{{*/
     	std::exit(EXIT_FAILURE); 
     }
 
+	std::ofstream file {"/home/juancarlangas/Desktop/output.txt"};
+
+	// Get the available ports
+    all_ports_C_String = jack_get_ports(client, NULL, NULL, JackPortIsInput);
+	const char* desired_port_C_String {"a2j:X50 [20] (playback): X50 X50 _ SOUND"};
+
+	// Try each of them and connect to it
+    for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
+        jack_port_t* possible_port = jack_port_by_name(client, all_ports_C_String[i]);
+        if (possible_port != NULL && isMidiPort(possible_port)) {
+            if (strcmp(all_ports_C_String[i], desired_port_C_String) == 0) {
+				if (jack_connect(client, jack_port_name(output_port), desired_port_C_String) != 0) {
+					file << "Failed to connect client to MIDI port." << std::endl;
+					jack_free(all_ports_C_String);
+					jack_client_close(client);
+					std::exit(EXIT_FAILURE);
+					break;
+				}
+			}
+		}
+    }
+
+	file.close();
 	MIDI = Switch::ON;
 }
 /*}}}*/
@@ -328,6 +360,8 @@ void Keyboard::dump_scene( const Performance &_Performance, const int16_t &_Scen
 
 void Keyboard::disconnect() noexcept {/*{{{*/
     // Deactivate, unregister, and close the client
+	jack_free(all_ports_C_String);	
+
     jack_deactivate(client);
     jack_port_unregister(client, output_port);
     jack_client_close(client);

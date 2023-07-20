@@ -42,12 +42,12 @@ void end_screen() noexcept/*{{{*/
 	endwin();
 }/*}}}*/
 
-short int init_ncurses(void)
-{/*{{{*/
+short int init_ncurses(void)/*{{{*/
+{
 	init_screen();
 
 	getmaxyx(stdscr, y, x);
-	displayShowResults  = y * 56 / 100 - 4;
+	displayShowResults  = y * 24;
 	playlistShowResults = y * 70 / 100 - 4;
 
 

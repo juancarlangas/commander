@@ -51,6 +51,6 @@ set_target_properties( Commander
 			PROPERTIES
 			CXX_STANDARD 20
 			RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin" 
-			OUTPUT_NAME "commander" )
+			OUTPUT_NAME "commander-beta" )
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )

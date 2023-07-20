@@ -1,4 +1,5 @@
 #include <bits/stdint-intn.h>
+#include <cstddef>
 #include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,6 +65,17 @@ void Catalog::load_from_json( const std::string &_Path)/*{{{*/
 	json_file.close();
 
 	activeRows = n_canciones = performances.size();
+
+	ordenate();
+}/*}}}*/
+
+auto Catalog::fill_favourites() noexcept -> void {/*{{{*/
+	for (std::size_t i {0}; i < performances.size(); ++i)
+		if (performances[i].metadata.keyword.starts_with("Favourite"))
+			favourites[
+				std::stoi(
+					performances[i].metadata.keyword.substr(
+						performances[i].metadata.keyword.find_first_of('_') + 1, std::string::npos)) - 1] = &performances[i];
 }/*}}}*/
 
 int32_t Catalog::get_activeRows() noexcept/*{{{*/
@@ -90,17 +102,23 @@ void Catalog::add_value( const Performance& _Performance )/*{{{*/
 	performances.push_back(_Performance);
 
 	n_canciones = ++activeRows;
+
+	ordenate();
 }/*}}}*/
 
 void Catalog::edit_value(const std::int32_t line, const Performance& _Performance)/*{{{*/
 {
 	performances[ line ] = _Performance;
+
+	ordenate();
 }/*}}}*/
 
 void Catalog::delete_value( int line )/*{{{*/
 {
 	performances.erase(std::begin(performances) + line);
 	n_canciones = --activeRows;
+
+	ordenate();
 }/*}}}*/
 
 void Catalog::ordenate()/*{{{*/
@@ -115,11 +133,11 @@ void Catalog::ordenate()/*{{{*/
 		a = 0;
 		b = a + 1;
 		while (a < activeRows - 1 and b < activeRows) {	
-			if (performances[a].metadata.mood != "Sound") {
-				b = a + 1;
+			if (performances[a].metadata.mood != "Sound") { // If actual is not "Sound"
+				b = a + 1; // Start searching from next
 				success = false;
 				while (success == false && b < activeRows) {
-					if (performances[b].metadata.mood == "Sound")
+					if (performances[b].metadata.mood != "Sound")
 						b++;
 					else {
 						aux = performances[a];
@@ -140,7 +158,7 @@ void Catalog::ordenate()/*{{{*/
 				b = a + 1;
 				success = false;
 				while (success == false && b <= activeRows - 1) {
-					if (performances[b].metadata.mood == "Lobby")
+					if (performances[b].metadata.mood != "Lobby")
 						b++;
 					else {
 						aux = performances[a];
@@ -161,7 +179,7 @@ void Catalog::ordenate()/*{{{*/
 				b = a + 1;
 				success = false;
 				while (success == false && b <= activeRows - 1) {
-					if (performances[b].metadata.mood == "Cena")
+					if (performances[b].metadata.mood != "Cena")
 						b++;
 					else {
 						aux = performances[a];
@@ -182,7 +200,7 @@ void Catalog::ordenate()/*{{{*/
 				b = a + 1;
 				success = false;
 				while (success == false && b <= activeRows - 1) {
-					if (performances[b].metadata.mood == "Baile")
+					if (performances[b].metadata.mood != "Baile")
 						b++;
 					else {
 						aux = performances[a];
@@ -214,6 +232,8 @@ void Catalog::ordenate()/*{{{*/
 				}
 			}
 	}
+
+	fill_favourites();
 }/*}}}*/
 
 void Catalog::delete_duplicated() noexcept/*{{{*/
@@ -226,6 +246,7 @@ void Catalog::delete_duplicated() noexcept/*{{{*/
 				delete_value( j );
 				--n_canciones;
 			}
+	ordenate();
 }/*}}}*/
 
 Performance Catalog::get_cancion( const int _Index ) noexcept/*{{{*/
@@ -240,7 +261,7 @@ Performance *Catalog::get_cancion_ptr( const int32_t &_Index ) noexcept/*{{{*/
 
 Performance *Catalog::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
 {
-	return favorito[ _FavNumber ];
+	return favourites[ _FavNumber ];
 }/*}}}*/
 
 /************************************* from_json **************************************************/
