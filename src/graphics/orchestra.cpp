@@ -707,7 +707,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 				break;/*}}}*/
 
-			case '-' : // CTRL-KEY_LEFT{{{
+			case '<' : // CTRL-KEY_LEFT{{{
 				if ( cursor[Y] > -1 ) { // Zona de controles
 					if ( cursor[X] == 4 ) { // left slider
 						if ( double_X_slider[ cursor[Y] ].decrease_left_slider() == Moved::YES )
@@ -723,7 +723,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			// CTRL-KEY_RIGHT{{{
-			case '+' :
+			case '>' :
 				if ( cursor[Y] > -1 ) {
 					if ( cursor[X] == 4 ) {
 						if ( double_X_slider[ cursor[Y] ].increase_left_slider() == Moved::YES )
