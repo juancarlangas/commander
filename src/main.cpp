@@ -345,8 +345,7 @@ int32_t main()
 			case DELETE_VALUE:/*{{{*/
 			{
 				// obtenemos el índice real en dBase al cual displayTable[dIndex] apunta
-				std::size_t real_index
-					{static_cast<std::size_t>(displayTable[dIndex] - &catalog.performances[0])};
+				std::size_t real_index {static_cast<std::size_t>(displayTable[dIndex] - &catalog.performances[0])};
 
 				catalog.delete_value(real_index);
 				n_performances = catalog.get_activeRows();
