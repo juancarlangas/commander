@@ -123,27 +123,27 @@ void Catalog::delete_value( int line )/*{{{*/
 
 void Catalog::ordenate()/*{{{*/
 {
-	int32_t a, b;
+	std::size_t a, b;
 	int32_t k;
-	bool success;
-	Performance aux;
+	bool found_keyword;
+	Performance aux_performance;
 
+	a = 0;
 	if (activeRows > 1) {
 		// Mood: Sound
 		a = 0;
-		b = a + 1;
-		while (a < activeRows - 1 and b < activeRows) {	
+		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
 			if (performances[a].metadata.mood != "Sound") { // If actual is not "Sound"
 				b = a + 1; // Start searching from next
-				success = false;
-				while (success == false && b < activeRows) {
+				found_keyword = false;
+				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
 					if (performances[b].metadata.mood != "Sound")
-						b++;
+						++b; //continue searching
 					else {
-						aux = performances[a];
+						aux_performance = performances[a];
 						performances[a] = performances[b];
-						performances[b] = aux;
-						success = true;
+						performances[b] = aux_performance;
+						found_keyword = true;
 					}
 				}
 			}
@@ -153,18 +153,18 @@ void Catalog::ordenate()/*{{{*/
 		// mood: Lobby
 		a--;
 		b = a + 1;
-		while (a < activeRows - 1 and b < activeRows) {	
+		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
 			if (performances[a].metadata.mood != "Lobby") {
 				b = a + 1;
-				success = false;
-				while (success == false && b <= activeRows - 1) {
+				found_keyword = false;
+				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
 					if (performances[b].metadata.mood != "Lobby")
 						b++;
 					else {
-						aux = performances[a];
+						aux_performance = performances[a];
 						performances[a] = performances[b];
-						performances[b] = aux;
-						success = true;
+						performances[b] = aux_performance;
+						found_keyword = true;
 					}
 				}
 			}
@@ -174,18 +174,18 @@ void Catalog::ordenate()/*{{{*/
 		// mood: "Cena"
 		a--;
 		b = a + 1;
-		while (a < activeRows - 1 && b < activeRows) {	
+		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
 			if (performances[a].metadata.mood != "Cena") {
 				b = a + 1;
-				success = false;
-				while (success == false && b <= activeRows - 1) {
+				found_keyword = false;
+				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
 					if (performances[b].metadata.mood != "Cena")
 						b++;
 					else {
-						aux = performances[a];
+						aux_performance = performances[a];
 						performances[a] = performances[b];
-						performances[b] = aux;
-						success = true;
+						performances[b] = aux_performance;
+						found_keyword = true;
 					}
 				}
 			}
@@ -195,18 +195,18 @@ void Catalog::ordenate()/*{{{*/
 		//Baile
 		a--;
 		b = a + 1;
-		while (a < activeRows - 1 && b < activeRows) {	
+		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
 			if (performances[a].metadata.mood != "Baile") {
 				b = a + 1;
-				success = false;
-				while (success == false && b <= activeRows - 1) {
+				found_keyword = false;
+				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
 					if (performances[b].metadata.mood != "Baile")
 						b++;
 					else {
-						aux = performances[a];
+						aux_performance = performances[a];
 						performances[a] = performances[b];
-						performances[b] = aux;
-						success = true;
+						performances[b] = aux_performance;
+						found_keyword = true;
 					}
 				}
 			}
@@ -214,19 +214,19 @@ void Catalog::ordenate()/*{{{*/
 		}
 
 		// ALphabet
-		for (a = 0; a < activeRows - 1; a++)
-			for (b = a + 1; b < activeRows; b++) {
+		for (a = 0; a < static_cast<std::size_t>(activeRows - 1); a++)
+			for (b = a + 1; b < static_cast<std::size_t>(activeRows); b++) {
 				if (performances[a].metadata.mood == performances[b].metadata.mood) {
 					k = 0;
-					success = false;
-					while (success == false && k < LONG_STRING) {
+					found_keyword = false;
+					while (found_keyword == false && k < LONG_STRING) {
 						if (performances[a].metadata.title[k] > performances[b].metadata.title[k]) {
-							aux = performances[a];
+							aux_performance = performances[a];
 							performances[a] = performances[b];
-							performances[b] = aux;
-							success = true;
+							performances[b] = aux_performance;
+							found_keyword = true;
 						} else if (performances[a].metadata.title[k] < performances[b].metadata.title[k])
-							success = true;
+							found_keyword = true;
 						k++;
 					}
 				}
