@@ -34,9 +34,9 @@ struct Patch {
 
 struct Settings {
 	enum Switch state{ Switch::OFF };
-	std::int16_t volume{ 0 };
+	std::int16_t volume{ 100 };
 	std::int16_t lower_key{ 24 };
-	std::int16_t upper_key{ 24 };
+	std::int16_t upper_key{ 72 };
 	std::int16_t transposition{ 0 };
 };
 
