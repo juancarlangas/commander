@@ -71,7 +71,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case KEY_RIGHT:	comando = TO_NEXT_SCENE; break;
 		case 566: comando = DRAG_UP; break;
 		case 525: comando = DRAG_DOWN; break;
-		case KEY_DC:
+		case 520:
 			if (windowMode == MODE_DISPLAY)
 				comando = DELETE_VALUE;
 			else
