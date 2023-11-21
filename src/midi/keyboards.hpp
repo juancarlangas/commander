@@ -70,7 +70,7 @@ private:
 	int16_t scene;
 	bool activeMode;
 	bool passiveMode;
-	enum Switch MIDI;
+	enum Switch MIDI_STATE;
 	Juanca::Timer timer;
 };
 

@@ -25,7 +25,7 @@ int32_t value;
 Keyboard::Keyboard( const std::string &_Path )/*{{{*/
 {
 	load_combs_from_json( _Path );
-	MIDI = Switch::OFF;
+	MIDI_STATE = Switch::OFF;
 }/*}}}*/
 
 void Keyboard::load_combs_from_json( const std::string &_Path )/*{{{*/
@@ -98,19 +98,19 @@ void Keyboard::set_instrument_name(/*{{{*/
 	combinations[_Banco][_Numero].instruments[ _Pista ] = _Nombre;
 }/*}}}*/
 
-void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
+void Keyboard::toggle_MIDI_STATE_state() noexcept/*{{{*/
 {
-	MIDI == Switch::OFF ? connect() : disconnect();
+	MIDI_STATE == Switch::OFF ? connect() : disconnect();
 }/*}}}*/
 
-enum Switch Keyboard::get_MIDI_state() noexcept/*{{{*/
+enum Switch Keyboard::get_MIDI_STATE_state() noexcept/*{{{*/
 {
-	return MIDI;
+	return MIDI_STATE;
 }/*}}}*/
 
 bool Keyboard::is_connected() noexcept/*{{{*/
 {
-	return MIDI == Switch::ON ? true : false;
+	return MIDI_STATE == Switch::ON ? true : false;
 }/*}}}*/
 
 void Keyboard::set_performance_buffer( const Performance &_Performance ) noexcept/*{{{*/
@@ -214,9 +214,9 @@ void Keyboard::connect() noexcept {/*{{{*/
 	// Register the process callback
     jack_set_process_callback(client, process, 0);
 
-    // Create the MIDI output port
+    // Create the MIDI_STATE output port
     if ((output_port = 
-			jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
+			jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_STATE_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr << "Failed to register JACK port midi_out at Keyboard::connect()\n";
     	std::exit(EXIT_FAILURE); 
     }
@@ -227,7 +227,7 @@ void Keyboard::connect() noexcept {/*{{{*/
     	std::exit(EXIT_FAILURE); 
     }
 
-	MIDI = Switch::ON;
+	MIDI_STATE = Switch::ON;
 }
 /*}}}*/
 
@@ -332,8 +332,8 @@ void Keyboard::disconnect() noexcept {/*{{{*/
     jack_port_unregister(client, output_port);
     jack_client_close(client);
 
-    // Set MIDI switch to OFF or perform any necessary cleanup
-    MIDI = Switch::OFF;
+    // Set MIDI_STATE switch to OFF or perform any necessary cleanup
+    MIDI_STATE = Switch::OFF;
 }/*}}}*/
 
 auto Keyboard::send_page_SysEx(jack_midi_data_t _SysEx[PAGE_SYSEX_WORD_SIZE]) -> void {/*{{{*/
