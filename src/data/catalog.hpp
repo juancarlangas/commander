@@ -34,9 +34,9 @@ struct Patch {
 
 struct Settings {
 	enum Switch state{ Switch::OFF };
-	std::int16_t volume{ 0 };
+	std::int16_t volume{ 100 };
 	std::int16_t lower_key{ 24 };
-	std::int16_t upper_key{ 24 };
+	std::int16_t upper_key{ 72 };
 	std::int16_t transposition{ 0 };
 };
 
@@ -70,15 +70,13 @@ class Catalog {/*{{{*/
 		Performance *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		Performance *get_favourite_row( const int32_t & ) noexcept;
 		std::vector<Performance> performances;
-		[[deprecated]]void load_csv( const std::string &_Path ) noexcept;
-		[[deprecated]]void write_csv( const std::string &_Path ) noexcept;
 	private:
 		std::int32_t activeRows;
 		std::int32_t n_canciones;
 		void clean_row(int);
 		const char *homedir;
-		struct Performance *favorito[ N_FAVORITOS ];
-		void fill_favourites() noexcept;
+		std::array<Performance*, N_FAVORITOS>favourites;
+		auto fill_favourites() noexcept -> void;
 
 		friend class Playlist;
 	};/*}}}*/
@@ -97,5 +95,6 @@ void to_json(nlohmann::ordered_json& j, const Switch& s);
 void to_json(nlohmann::ordered_json& j, const Settings& s);
 void to_json(nlohmann::ordered_json& j, const Scene& sc);
 void to_json(nlohmann::ordered_json& j, const Performance& p);/*}}}*/
+
 
 #endif

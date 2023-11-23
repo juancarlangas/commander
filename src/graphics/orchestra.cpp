@@ -707,7 +707,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 				break;/*}}}*/
 
-			case '-' : // CTRL-KEY_LEFT{{{
+			case '<' : // CTRL-KEY_LEFT{{{
 				if ( cursor[Y] > -1 ) { // Zona de controles
 					if ( cursor[X] == 4 ) { // left slider
 						if ( double_X_slider[ cursor[Y] ].decrease_left_slider() == Moved::YES )
@@ -723,7 +723,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			// CTRL-KEY_RIGHT{{{
-			case '+' :
+			case '>' :
 				if ( cursor[Y] > -1 ) {
 					if ( cursor[X] == 4 ) {
 						if ( double_X_slider[ cursor[Y] ].increase_left_slider() == Moved::YES )
@@ -783,15 +783,23 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 			case 1 : // DUplicate{{{
 				if ( info->n_scenes < MAX_VARIATIONS ) {
+					info->scenes.push_back(Scene {});
 					for ( int32_t i = info->n_scenes - 1; i >= current_scene; --i )
 						info->scenes[ i + 1 ] = info->scenes[ i ];
 					++info->n_scenes;
-					++current_scene;
 					update();
+
 					if ( cursor[Y] == -1 ) { // si está hasta arriba
-						info->scenes[ current_scene + 1 ].label = temp_word; // guardamos
-						temp_word = info->scenes[ current_scene ].label; // copiamos nuevo
-						etiqueta_field.set_cursor();
+						if ( cursor[X] <= 1 ) {
+							info->default_scene = std::stoi( temp_word );
+							vi_field.set_content( std::to_string( info->default_scene ) );
+							vi_field.set_cursor();
+						}
+						else {
+							info->scenes[ current_scene - 1 ].label = temp_word; // guardamos
+							temp_word = info->scenes[ current_scene ].label; // copiamos nuevo
+							etiqueta_field.set_cursor();
+						}
 					}
 					else
 						switch ( cursor[X] ) {
@@ -836,7 +844,9 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						keyboard_ptr->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
+					++current_scene;
 				}
+
 				break;/*}}}*/
 
 			case 18 : // Eliminate{{{
@@ -848,9 +858,16 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					--info->n_scenes;
 					update();
 					if ( cursor[Y] == -1 ) { // si está hasta arriba
-						info->scenes[ current_scene + 1 ].label = temp_word; // guardamos
-						temp_word = info->scenes[ current_scene ].label; // copiamos nuevo
-						etiqueta_field.set_cursor();
+						if ( cursor[X] <= 1 ) {
+							info->default_scene = std::stoi( temp_word );
+							vi_field.set_content( std::to_string( info->default_scene ) );
+							vi_field.set_cursor();
+						}
+						else {
+							info->scenes[ current_scene - 1 ].label = temp_word; // guardamos
+							temp_word = info->scenes[ current_scene ].label; // copiamos nuevo
+							etiqueta_field.set_cursor();
+						}
 					}
 					else
 						switch ( cursor[X] ) {
@@ -895,6 +912,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						keyboard_ptr->dump_scene( *info, current_scene );
 					}
 					will_dump = false;
+					info->scenes.pop_back();
 				}
 				break;/*}}}*/
 

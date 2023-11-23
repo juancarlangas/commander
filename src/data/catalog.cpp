@@ -1,4 +1,5 @@
 #include <bits/stdint-intn.h>
+#include <cstddef>
 #include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,6 +65,17 @@ void Catalog::load_from_json( const std::string &_Path)/*{{{*/
 	json_file.close();
 
 	activeRows = n_canciones = performances.size();
+
+	ordenate();
+}/*}}}*/
+
+auto Catalog::fill_favourites() noexcept -> void {/*{{{*/
+	for (std::size_t i {0}; i < performances.size(); ++i)
+		if (performances[i].metadata.keyword.starts_with("Favourite"))
+			favourites[
+				std::stoi(
+					performances[i].metadata.keyword.substr(
+						performances[i].metadata.keyword.find_first_of('_') + 1, std::string::npos)) - 1] = &performances[i];
 }/*}}}*/
 
 int32_t Catalog::get_activeRows() noexcept/*{{{*/
@@ -90,42 +102,48 @@ void Catalog::add_value( const Performance& _Performance )/*{{{*/
 	performances.push_back(_Performance);
 
 	n_canciones = ++activeRows;
+
+	ordenate();
 }/*}}}*/
 
 void Catalog::edit_value(const std::int32_t line, const Performance& _Performance)/*{{{*/
 {
 	performances[ line ] = _Performance;
+
+	ordenate();
 }/*}}}*/
 
 void Catalog::delete_value( int line )/*{{{*/
 {
 	performances.erase(std::begin(performances) + line);
 	n_canciones = --activeRows;
+
+	ordenate();
 }/*}}}*/
 
 void Catalog::ordenate()/*{{{*/
 {
-	int32_t a, b;
+	std::size_t a, b;
 	int32_t k;
-	bool success;
-	Performance aux;
+	bool found_keyword;
+	Performance aux_performance;
 
+	a = 0;
 	if (activeRows > 1) {
 		// Mood: Sound
 		a = 0;
-		b = a + 1;
-		while (a < activeRows - 1 and b < activeRows) {	
-			if (performances[a].metadata.mood != "Sound") {
-				b = a + 1;
-				success = false;
-				while (success == false && b < activeRows) {
-					if (performances[b].metadata.mood == "Sound")
-						b++;
+		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
+			if (performances[a].metadata.mood != "Sound") { // If actual is not "Sound"
+				b = a + 1; // Start searching from next
+				found_keyword = false;
+				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
+					if (performances[b].metadata.mood != "Sound")
+						++b; //continue searching
 					else {
-						aux = performances[a];
+						aux_performance = performances[a];
 						performances[a] = performances[b];
-						performances[b] = aux;
-						success = true;
+						performances[b] = aux_performance;
+						found_keyword = true;
 					}
 				}
 			}
@@ -135,18 +153,18 @@ void Catalog::ordenate()/*{{{*/
 		// mood: Lobby
 		a--;
 		b = a + 1;
-		while (a < activeRows - 1 and b < activeRows) {	
+		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
 			if (performances[a].metadata.mood != "Lobby") {
 				b = a + 1;
-				success = false;
-				while (success == false && b <= activeRows - 1) {
-					if (performances[b].metadata.mood == "Lobby")
+				found_keyword = false;
+				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
+					if (performances[b].metadata.mood != "Lobby")
 						b++;
 					else {
-						aux = performances[a];
+						aux_performance = performances[a];
 						performances[a] = performances[b];
-						performances[b] = aux;
-						success = true;
+						performances[b] = aux_performance;
+						found_keyword = true;
 					}
 				}
 			}
@@ -156,18 +174,18 @@ void Catalog::ordenate()/*{{{*/
 		// mood: "Cena"
 		a--;
 		b = a + 1;
-		while (a < activeRows - 1 && b < activeRows) {	
+		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
 			if (performances[a].metadata.mood != "Cena") {
 				b = a + 1;
-				success = false;
-				while (success == false && b <= activeRows - 1) {
-					if (performances[b].metadata.mood == "Cena")
+				found_keyword = false;
+				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
+					if (performances[b].metadata.mood != "Cena")
 						b++;
 					else {
-						aux = performances[a];
+						aux_performance = performances[a];
 						performances[a] = performances[b];
-						performances[b] = aux;
-						success = true;
+						performances[b] = aux_performance;
+						found_keyword = true;
 					}
 				}
 			}
@@ -177,18 +195,18 @@ void Catalog::ordenate()/*{{{*/
 		//Baile
 		a--;
 		b = a + 1;
-		while (a < activeRows - 1 && b < activeRows) {	
+		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
 			if (performances[a].metadata.mood != "Baile") {
 				b = a + 1;
-				success = false;
-				while (success == false && b <= activeRows - 1) {
-					if (performances[b].metadata.mood == "Baile")
+				found_keyword = false;
+				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
+					if (performances[b].metadata.mood != "Baile")
 						b++;
 					else {
-						aux = performances[a];
+						aux_performance = performances[a];
 						performances[a] = performances[b];
-						performances[b] = aux;
-						success = true;
+						performances[b] = aux_performance;
+						found_keyword = true;
 					}
 				}
 			}
@@ -196,24 +214,26 @@ void Catalog::ordenate()/*{{{*/
 		}
 
 		// ALphabet
-		for (a = 0; a < activeRows - 1; a++)
-			for (b = a + 1; b < activeRows; b++) {
+		for (a = 0; a < static_cast<std::size_t>(activeRows - 1); a++)
+			for (b = a + 1; b < static_cast<std::size_t>(activeRows); b++) {
 				if (performances[a].metadata.mood == performances[b].metadata.mood) {
 					k = 0;
-					success = false;
-					while (success == false && k < LONG_STRING) {
+					found_keyword = false;
+					while (found_keyword == false && k < LONG_STRING) {
 						if (performances[a].metadata.title[k] > performances[b].metadata.title[k]) {
-							aux = performances[a];
+							aux_performance = performances[a];
 							performances[a] = performances[b];
-							performances[b] = aux;
-							success = true;
+							performances[b] = aux_performance;
+							found_keyword = true;
 						} else if (performances[a].metadata.title[k] < performances[b].metadata.title[k])
-							success = true;
+							found_keyword = true;
 						k++;
 					}
 				}
 			}
 	}
+
+	fill_favourites();
 }/*}}}*/
 
 void Catalog::delete_duplicated() noexcept/*{{{*/
@@ -226,6 +246,7 @@ void Catalog::delete_duplicated() noexcept/*{{{*/
 				delete_value( j );
 				--n_canciones;
 			}
+	ordenate();
 }/*}}}*/
 
 Performance Catalog::get_cancion( const int _Index ) noexcept/*{{{*/
@@ -240,7 +261,7 @@ Performance *Catalog::get_cancion_ptr( const int32_t &_Index ) noexcept/*{{{*/
 
 Performance *Catalog::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
 {
-	return favorito[ _FavNumber ];
+	return favourites[ _FavNumber ];
 }/*}}}*/
 
 /************************************* from_json **************************************************/

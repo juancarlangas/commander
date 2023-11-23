@@ -42,12 +42,12 @@ void end_screen() noexcept/*{{{*/
 	endwin();
 }/*}}}*/
 
-short int init_ncurses(void)
-{/*{{{*/
+short int init_ncurses(void)/*{{{*/
+{
 	init_screen();
 
 	getmaxyx(stdscr, y, x);
-	displayShowResults  = y * 56 / 100 - 4;
+	displayShowResults  = y * 24;
 	playlistShowResults = y * 70 / 100 - 4;
 
 
@@ -74,7 +74,7 @@ short int init_ncurses(void)
 	searchWindow 	= newwin(3, 				x * 140 / 200 - 2, 	y * 90 / 100 + 1, 	x * 0 / 200 + 1	);
 
 	// lcdBox		= newwin(y * 38 / 200,	 	x * 98 / 200,     	y * 36 / 200,		x * 102 / 200	);
-	lcdWindow 		= newwin(y * 30 / 200 - 2, 	x * 98 / 200 - 2, 	y * 20 / 200 + 1,	x * 102 / 200 + 1);
+	lcdWindow 		= newwin(y * 30 / 200 - 2, 	x * 98 / 200 - 2, 	y * 20 / 200 + 1,	x * 98 / 200 + 1);
 	
 	playlistBox		= newwin(33, 		x * 60 / 200, 		9,	   	x * 141 / 200  	);
 	playlistWindow 	= newwin(33 - 3, 	x * 60 / 200 - 2, 	9 + 2, 	x * 141 / 200 + 1);

@@ -16,6 +16,12 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 				//if (cadena[0] == '\0'); // Se garantiza que no hay búsquedas
 					comando = ADD_VALUE;
 
+			else if (strcmp(":del", cadena) == 0) {
+				//if (cadena[0] == '\0'); // Se garantiza que no hay búsquedas
+				if (windowMode == MODE_DISPLAY)
+					comando = DELETE_VALUE;
+			}
+
 			else if (strstr(":seq", cadena) != NULL && strstr(cadena, ":seq") != NULL) {
 				if (mode == COMBINATOR)
 					comando = SET_MODE;
@@ -55,7 +61,6 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 11: comando = TOGGLE_MIDI_STATE; break; //<C-K>
 		case 20: if (windowMode == MODE_DISPLAY) comando = EDIT_VALUE; break; //<C-T>
 		case 15: if ( windowMode == MODE_DISPLAY ) comando = EDIT_ORCHESTRATION; break; //<C-O>
-		case 520: if (windowMode == MODE_DISPLAY) comando = DELETE_VALUE; break; //<C-Supr>
 		case 3: if ( windowMode == MODE_DISPLAY ) comando = COPY_ORCHESTRATION; break; // <C-C>
 		case 22: if ( windowMode == MODE_DISPLAY ) comando = PASTE_ORCHESTRATION; break; // <C-P>
 		case '+': if (windowMode == MODE_DISPLAY && dIndex >= 0) comando = ADD_TO_PLAYLIST; break;
@@ -66,7 +71,13 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case KEY_RIGHT:	comando = TO_NEXT_SCENE; break;
 		case 566: comando = DRAG_UP; break;
 		case 525: comando = DRAG_DOWN; break;
-		case KEY_DC: if (windowMode == MODE_PLAYLIST) comando = DEL_FROM_PLAYLIST; break;
+		case 520:
+			if (windowMode == MODE_DISPLAY)
+				comando = DELETE_VALUE;
+			else
+				comando = DEL_FROM_PLAYLIST;
+			break;
+
 		case KEY_BACKSPACE: case 8: if (ci > 0) comando = DEL; break; // BACKSPACE
 		case 17: comando = EXIT; break;
 

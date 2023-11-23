@@ -235,6 +235,9 @@ int32_t main()
 				int32_t caracter_a_numero = caracter == 48 ? 9 : ( caracter - 49 );
 				performance_buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
 
+				if ( x50.is_connected() )
+					x50.dump_performance(*performance_buffer);
+
 				updateWindow[LCD] 	  = true;
 
 				/* Toda la siguiente parte reinicializa displayTable y coloca el índice
@@ -342,8 +345,7 @@ int32_t main()
 			case DELETE_VALUE:/*{{{*/
 			{
 				// obtenemos el índice real en dBase al cual displayTable[dIndex] apunta
-				std::size_t real_index
-					{static_cast<std::size_t>(displayTable[dIndex] - &catalog.performances[0])};
+				std::size_t real_index {static_cast<std::size_t>(displayTable[dIndex] - &catalog.performances[0])};
 
 				catalog.delete_value(real_index);
 				n_performances = catalog.get_activeRows();

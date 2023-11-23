@@ -118,7 +118,7 @@ void lcd(	WINDOW *window, /*{{{*/
 void print_search(WINDOW *window, char cadena[])/*{{{*/
 {
 	wclear(window);
-	lcd(window, 0, 2, 11, TRUE, cadena);
+	lcd(window, 0, 2, 16, TRUE, cadena);
 	wrefresh(window);
 
 	return;	
@@ -132,25 +132,8 @@ void print_lcd(WINDOW *window, Performance *linea )/*{{{*/
 	wattron(window, COLOR_PAIR(GREEN_DEFAULT));
 	wattron(window, A_BOLD);
 
-
-	//if ((linea->bnk1 >= 'A' && linea->bnk1 <= 'C') || linea->bnk1 == 'M')
-	//	for (yPos = 0; yPos <= 2; yPos++) {
-	//		/*bnk*/
-	//		mvwprintw(window, 0 + yPos, x / 34, "%s", 
-	//			var == VAR1 ? get_digit(linea->bnk1, yPos) : get_digit(linea->bnk2, yPos));
-	//		/*-*/
-	//		mvwprintw(window, 0 + yPos, x / 34 + 3, "%s", get_digit('-', yPos));
-	//		/*num*/
-	//		if (var == VAR1)
-	//			sprintf(num, "%03d", linea->num1);
-	//		else
-	//			sprintf(num, "%03d", linea->num2);
-	//		for (k = 0; k <= 2; k++)
-	//			mvwprintw(window, 0 + yPos, x / 34 + 6 + k * 4, "%s", get_digit(num[k], yPos));
-	//	}
-
 	k = 0;
-	while (linea->metadata.title[k] != '\0' && k <= 11) {
+	while (linea->metadata.title[k] != '\0' && k <= 19) {
 		for (yPos = 0; yPos <= 2; yPos++)
 			mvwprintw(window, yPos, 2 + k * 4, "%s", get_digit(toupper(linea->metadata.title[k]), yPos));
 		k++;
@@ -244,7 +227,7 @@ void print_zoom(WINDOW *window, Performance *linea)/*{{{*/
 		
 		//sprintf(message, "%c-%03hd %s", linea->bnk2, linea->num2, linea->title);
 
-		lcd(window, 1, 2, 13, FALSE, linea->metadata.title.c_str());
+		lcd(window, 1, 2, 18, FALSE, linea->metadata.title.c_str());
 
 		mvwprintw(window, 0, 2, "%c-%03d", linea->patch.bnk + 65, linea->patch.num);
 		wrefresh(window);

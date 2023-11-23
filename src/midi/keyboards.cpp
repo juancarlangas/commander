@@ -4,6 +4,7 @@
 #include <cstring>
 #include <iostream>
 #include <jack/midiport.h>
+#include <jack/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
@@ -155,16 +156,19 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 }/*}}}*/
 
 /****************************************** JACK *********************************************************/
-// CLIENT DATA {{{
+// CLIENT DATA{{{
 const char* client_name {"Commander"};
 jack_client_t* client {NULL};
 jack_port_t* output_port {NULL};
 jack_nframes_t local_nframes = {0};/*}}}*/
 
+// TARGET DATA{{{
+const char** all_ports_C_String;/*}}}*/
+
 // Control{{{
 volatile bool should_send_PC {FALSE};
 volatile bool should_send_page_SysEx {FALSE};
-volatile bool should_send_scene_SysEx {FALSE};
+volatile bool should_send_scene_SysEx {FALSE};/*}}}*/
 
 // CALLBACK MESSAGES{{{
 struct PatchChangeT {
@@ -204,6 +208,11 @@ int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*
     return 0;
 }/*}}}*/
 
+bool isMidiPort(jack_port_t* port) {/*{{{*/
+    const char* type = jack_port_type(port);
+    return (strcmp(type, JACK_DEFAULT_MIDI_TYPE) == 0);
+}/*}}}*/
+
 void Keyboard::connect() noexcept {/*{{{*/
 	// Connect to the JACK server
     if ((client = jack_client_open(client_name, JackNullOption, NULL)) == NULL) {
@@ -227,6 +236,32 @@ void Keyboard::connect() noexcept {/*{{{*/
     	std::exit(EXIT_FAILURE); 
     }
 
+<<<<<<< HEAD
+=======
+	std::ofstream file {"/home/juancarlangas/Desktop/output.txt"};
+
+	// Get the available ports
+    all_ports_C_String = jack_get_ports(client, NULL, NULL, JackPortIsInput);
+	const char* desired_port_keyword {"(playback): X50 X50 _ SOUND"};
+
+	// Try each of them and connect to it
+    for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
+        jack_port_t* possible_port = jack_port_by_name(client, all_ports_C_String[i]);
+        if (possible_port != NULL && isMidiPort(possible_port)) {
+            if (strstr(all_ports_C_String[i], desired_port_keyword) != NULL) {
+				if (jack_connect(client, jack_port_name(output_port), all_ports_C_String[i]) != 0) {
+					file << "Failed to connect client to MIDI_STATE port." << std::endl;
+					jack_free(all_ports_C_String);
+					jack_client_close(client);
+					std::exit(EXIT_FAILURE);
+					break;
+				}
+			}
+		}
+    }
+
+	file.close();
+>>>>>>> testing
 	MIDI_STATE = Switch::ON;
 }
 /*}}}*/
@@ -243,8 +278,11 @@ void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{
 	// Patch Change
 	send_PC(performance_buffer.patch.bnk - 65, performance_buffer.patch.num);
 
-	scene = 0;
+	jack_midi_data_t to_edit_SysSex[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
+	send_page_SysEx(to_edit_SysSex);
+	timer.sleep(2e8);
 
+	scene = 0;
 	dump_scene();
 }/*}}}*/
 
@@ -301,6 +339,7 @@ void Keyboard::dump_scene() noexcept/*{{{*/
 				{0xF0, 0x42, 0x30, 0x7A, 0x41, 0x01, 0x00, 0x07, 0x00, 0x0A, 0x00, 0x00, 0xF7},
 				{0xF0, 0x42, 0x30, 0x7A, 0x41, 0x01, 0x00, 0x08, 0x00, 0x0A, 0x00, 0x00, 0xF7}	}	};
 
+	// ADJUST
 	for ( std::size_t i = 0; i < NUMBER_OF_PARTS; ++i ) {
 		if ( performance_buffer.scenes[scene].tracks[i].state == ON )
 			param_SysExEs[0][i][11] = 0x00; // -> ON
@@ -314,7 +353,6 @@ void Keyboard::dump_scene() noexcept/*{{{*/
 		else
 			param_SysExEs[4][i][11] = performance_buffer.scenes[scene].tracks[i].transposition;
 	}
-
 	send_scene_SysEx(param_SysExEs);
 }/*}}}*/
 
@@ -328,6 +366,8 @@ void Keyboard::dump_scene( const Performance &_Performance, const int16_t &_Scen
 
 void Keyboard::disconnect() noexcept {/*{{{*/
     // Deactivate, unregister, and close the client
+	jack_free(all_ports_C_String);	
+
     jack_deactivate(client);
     jack_port_unregister(client, output_port);
     jack_client_close(client);
