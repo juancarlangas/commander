@@ -26,7 +26,7 @@ int32_t value;
 Keyboard::Keyboard( const std::string &_Path )/*{{{*/
 {
 	load_combs_from_json( _Path );
-	MIDI = Switch::OFF;
+	MIDI_STATE = Switch::OFF;
 }/*}}}*/
 
 void Keyboard::load_combs_from_json( const std::string &_Path )/*{{{*/
@@ -101,7 +101,7 @@ void Keyboard::set_instrument_name(/*{{{*/
 
 void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
 {
-	MIDI == Switch::OFF ? connect() : disconnect();
+	MIDI_STATE == Switch::OFF ? connect() : disconnect();
 }/*}}}*/
 
 enum Switch Keyboard::get_MIDI_state() noexcept/*{{{*/
@@ -111,7 +111,7 @@ enum Switch Keyboard::get_MIDI_state() noexcept/*{{{*/
 
 bool Keyboard::is_connected() noexcept/*{{{*/
 {
-	return MIDI == Switch::ON ? true : false;
+	return MIDI_STATE == Switch::ON ? true : false;
 }/*}}}*/
 
 void Keyboard::set_performance_buffer( const Performance &_Performance ) noexcept/*{{{*/
@@ -223,7 +223,7 @@ void Keyboard::connect() noexcept {/*{{{*/
 	// Register the process callback
     jack_set_process_callback(client, process, 0);
 
-    // Create the MIDI output port
+    // Create the MIDI_STATE output port
     if ((output_port = 
 			jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr << "Failed to register JACK port midi_out at Keyboard::connect()\n";
@@ -248,7 +248,7 @@ void Keyboard::connect() noexcept {/*{{{*/
         if (possible_port != NULL && isMidiPort(possible_port)) {
             if (strstr(all_ports_C_String[i], desired_port_keyword) != NULL) {
 				if (jack_connect(client, jack_port_name(output_port), all_ports_C_String[i]) != 0) {
-					file << "Failed to connect client to MIDI port." << std::endl;
+					file << "Failed to connect client to MIDI_STATE port." << std::endl;
 					jack_free(all_ports_C_String);
 					jack_client_close(client);
 					std::exit(EXIT_FAILURE);
@@ -259,7 +259,7 @@ void Keyboard::connect() noexcept {/*{{{*/
     }
 
 	file.close();
-	MIDI = Switch::ON;
+	MIDI_STATE = Switch::ON;
 }
 /*}}}*/
 
@@ -369,8 +369,8 @@ void Keyboard::disconnect() noexcept {/*{{{*/
     jack_port_unregister(client, output_port);
     jack_client_close(client);
 
-    // Set MIDI switch to OFF or perform any necessary cleanup
-    MIDI = Switch::OFF;
+    // Set MIDI_STATE switch to OFF or perform any necessary cleanup
+    MIDI_STATE = Switch::OFF;
 }/*}}}*/
 
 auto Keyboard::send_page_SysEx(jack_midi_data_t _SysEx[PAGE_SYSEX_WORD_SIZE]) -> void {/*{{{*/
