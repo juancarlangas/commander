@@ -16,17 +16,15 @@
 #include <cstring>
 #include <fstream>
 #include <iomanip>
-#include <math.h>
 #include <stdexcept>
 #include <string>
-#include <algorithm>
 
 int32_t value;
 
 Keyboard::Keyboard( const std::string &_Path )/*{{{*/
 {
 	load_combs_from_json( _Path );
-	MIDI_STATE = Switch::OFF;
+	MIDI_state = Switch::OFF;
 }/*}}}*/
 
 void Keyboard::load_combs_from_json( const std::string &_Path )/*{{{*/
@@ -99,14 +97,14 @@ void Keyboard::set_instrument_name(/*{{{*/
 	combinations[_Banco][_Numero].instruments[ _Pista ] = _Nombre;
 }/*}}}*/
 
-void Keyboard::toggle_MIDI_STATE_state() noexcept/*{{{*/
+void Keyboard::toggle_MIDI_state() noexcept/*{{{*/
 {
 	MIDI_STATE == Switch::OFF ? connect() : disconnect();
 }/*}}}*/
 
-enum Switch Keyboard::get_MIDI_STATE_state() noexcept/*{{{*/
+enum Switch Keyboard::get_MIDI_state() noexcept/*{{{*/
 {
-	return MIDI_STATE;
+	return MIDI_state;
 }/*}}}*/
 
 bool Keyboard::is_connected() noexcept/*{{{*/
@@ -225,7 +223,7 @@ void Keyboard::connect() noexcept {/*{{{*/
 
     // Create the MIDI_STATE output port
     if ((output_port = 
-			jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_STATE_TYPE, JackPortIsOutput, 0)) == NULL) {
+			jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr << "Failed to register JACK port midi_out at Keyboard::connect()\n";
     	std::exit(EXIT_FAILURE); 
     }
@@ -236,8 +234,6 @@ void Keyboard::connect() noexcept {/*{{{*/
     	std::exit(EXIT_FAILURE); 
     }
 
-<<<<<<< HEAD
-=======
 	std::ofstream file {"/home/juancarlangas/Desktop/output.txt"};
 
 	// Get the available ports
@@ -261,8 +257,7 @@ void Keyboard::connect() noexcept {/*{{{*/
     }
 
 	file.close();
->>>>>>> testing
-	MIDI_STATE = Switch::ON;
+	MIDI_state = Switch::ON;
 }
 /*}}}*/
 
@@ -373,7 +368,7 @@ void Keyboard::disconnect() noexcept {/*{{{*/
     jack_client_close(client);
 
     // Set MIDI_STATE switch to OFF or perform any necessary cleanup
-    MIDI_STATE = Switch::OFF;
+    MIDI_state = Switch::OFF;
 }/*}}}*/
 
 auto Keyboard::send_page_SysEx(jack_midi_data_t _SysEx[PAGE_SYSEX_WORD_SIZE]) -> void {/*{{{*/
