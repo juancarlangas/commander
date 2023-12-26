@@ -16,10 +16,8 @@
 #include <iomanip> // zerofill
 
 #include "data/catalog.hpp"
-#include "graphics/form.hpp"
 #include "common/string.hpp"
 #include "nlohmann/json.hpp"
-#include "graphics/ncurses.hpp"
 
 Catalog::Catalog() :/*{{{*/
 		activeRows( 0 ),

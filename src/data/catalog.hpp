@@ -1,12 +1,10 @@
 #ifndef DATABASES_HPP
 #define DATABASES_HPP
 
-#include "../common/common.hpp"
 #include "../midi/midi.hpp"
 
 #include <cstdint>
 #include <string>
-#include <string_view>
 #include <array>
 #include <vector>
 
@@ -45,8 +43,7 @@ struct Scene {
 	std::array<Settings, TRACKS_PER_PERFORMANCE> tracks;
 };
 
-struct Performance {
-	Metadata metadata;
+struct Performance { Metadata metadata;
 	Patch patch;
 	std::string type;
 	std::int16_t n_scenes{ 0 };
