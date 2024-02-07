@@ -153,7 +153,7 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 	_J = nlohmann::json{{"instruments", _C.instruments}};
 }/*}}}*/
 
-/****************************************** JACK *********************************************************/
+/***************************** JACK **********************************/
 // CLIENT DATA{{{
 const char* client_name {"Commander"};
 jack_client_t* client {NULL};

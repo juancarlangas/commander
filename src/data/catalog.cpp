@@ -18,6 +18,7 @@
 #include "data/catalog.hpp"
 #include "common/string.hpp"
 #include "nlohmann/json.hpp"
+#include "common/common.hpp"
 
 Catalog::Catalog() :/*{{{*/
 		activeRows( 0 ),

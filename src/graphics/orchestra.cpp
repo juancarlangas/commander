@@ -10,7 +10,6 @@
 #include <ncurses.h>
 #include <panel.h>
 #include <string>
-#include <iostream>
 
 using Coordinates::X;
 using Coordinates::Y;

@@ -118,11 +118,11 @@ void Playlist::sincronizar() noexcept/*{{{*/
 	int32_t i; // iterador para Playlist
 	int32_t j; // iterador para Catalog
 
-	for ( i = 0; i < n_pistas; ++i ) {
+	for (i = 0; i < n_pistas; ++i) {
 		j = 0;
-		while ( j < database_ptr->get_activeRows() and
-				( pista[i].titulo != database_ptr->get_cancion(j).metadata.title or
-				pista[i].artista != database_ptr->get_cancion(j).metadata.title ) )
+		while (j < database_ptr->get_activeRows() and
+				(pista[i].titulo != database_ptr->get_cancion(j).metadata.title or
+				pista[i].artista != database_ptr->get_cancion(j).metadata.artist))
 			++j;
 		if ( j < database_ptr->get_activeRows() ) // lo encontró -> anéxale el (nuevo) apuntador
 			pista[i].row_ptr = database_ptr->get_cancion_ptr(j);
