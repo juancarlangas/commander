@@ -3,6 +3,7 @@
 
 #include "../common/common.hpp"
 #include <string>
+#include <cstdint>
 
 enum Type {STRING, BANK, VALUE};
 

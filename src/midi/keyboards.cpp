@@ -153,7 +153,7 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 	_J = nlohmann::json{{"instruments", _C.instruments}};
 }/*}}}*/
 
-/****************************************** JACK *********************************************************/
+/***************************** JACK **********************************/
 // CLIENT DATA{{{
 const char* client_name {"Commander"};
 jack_client_t* client {NULL};
@@ -223,7 +223,7 @@ void Keyboard::connect() noexcept {/*{{{*/
 
     // Create the MIDI_state output port
     if ((output_port = 
-			jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_state_TYPE, JackPortIsOutput, 0)) == NULL) {
+			jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr << "Failed to register JACK port midi_out at Keyboard::connect()\n";
     	std::exit(EXIT_FAILURE); 
     }
@@ -234,8 +234,6 @@ void Keyboard::connect() noexcept {/*{{{*/
     	std::exit(EXIT_FAILURE); 
     }
 
-<<<<<<< HEAD
-=======
 	std::ofstream file {"/home/juancarlangas/Desktop/output.txt"};
 
 	// Get the available ports
@@ -259,6 +257,9 @@ void Keyboard::connect() noexcept {/*{{{*/
     }
 
 	file.close();
+<<<<<<< HEAD
+>>>>>>> testing
+=======
 >>>>>>> testing
 	MIDI_state = Switch::ON;
 }

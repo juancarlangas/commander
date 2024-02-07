@@ -144,7 +144,7 @@ void print_lcd(WINDOW *window, Performance *linea )/*{{{*/
 	return;
 }/*}}}*/
 
-void print_computer(WINDOW *window, const short int oxygen, const short int mode, const Variation var)
+void print_computer(WINDOW *window, const short int oxygen, const short int mode)
 {/*{{{*/
 	wattron(window, A_BOLD);
 
@@ -175,6 +175,7 @@ void print_computer(WINDOW *window, const short int oxygen, const short int mode
 			break;
 	}
 
+	/*
 	switch (var) {
 		case VAR1:
 			wattron(window, COLOR_PAIR(RED_DEFAULT));
@@ -191,6 +192,7 @@ void print_computer(WINDOW *window, const short int oxygen, const short int mode
 	}
 	
 	wrefresh(window);
+	*/
 
 	return;
 }/*}}}*/

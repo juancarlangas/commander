@@ -24,7 +24,7 @@ void print_search(WINDOW *window, char cadena[]);
 
 void print_lcd(WINDOW *window, Performance *linea );
 
-void print_computer(WINDOW *window, const short int oxygen, const short int mode, const Variation var);
+void print_computer(WINDOW *window, const short int oxygen, const short int mode);
 
 void print_zoom(WINDOW *window, Performance *linea);
 

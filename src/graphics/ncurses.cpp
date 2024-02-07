@@ -76,11 +76,11 @@ short int init_ncurses(void)/*{{{*/
 	// lcdBox		= newwin(y * 38 / 200,	 	x * 98 / 200,     	y * 36 / 200,		x * 102 / 200	);
 	lcdWindow 		= newwin(y * 30 / 200 - 2, 	x * 98 / 200 - 2, 	y * 20 / 200 + 1,	x * 98 / 200 + 1);
 	
-	playlistBox		= newwin(33, 		x * 60 / 200, 		9,	   	x * 141 / 200  	);
-	playlistWindow 	= newwin(33 - 3, 	x * 60 / 200 - 2, 	9 + 2, 	x * 141 / 200 + 1);
+	playlistBox		= newwin(34, 		x * 60 / 200, 		9,	   	x * 141 / 200  	);
+	playlistWindow 	= newwin(34 - 3, 	x * 60 / 200 - 2, 	9 + 2, 	x * 141 / 200 + 1);
 	
-	displayBox 		= newwin(28,		x * 142 / 200,     	9,     	x * 0 / 100	 	);
-	displayWindow 	= newwin(28 - 3,	x * 142 / 200 - 2, 	9 + 2, 	x * 0 / 100 + 1	);
+	displayBox 		= newwin(29,		x * 142 / 200,     	9,     	x * 0 / 100	 	);
+	displayWindow 	= newwin(29 - 3,	x * 142 / 200 - 2, 	9 + 2, 	x * 0 / 100 + 1	);
 
 	zoomBox 		= newwin(7, 		x * 98 / 200, 		3, 		x * 0 / 200	);		
 	zoomWindow 		= newwin(7 - 2, 	x * 98 / 200 - 2, 	3 + 1, 	x * 0 / 200 + 1	);
@@ -104,8 +104,8 @@ short int init_ncurses(void)/*{{{*/
 	return y;
 }/*}}}*/
 	
-void draw_windows(void)
-{/*{{{*/
+void draw_windows(void)/*{{{*/
+{
 	/* playlistBox */
 		wattron(playlistBox, COLOR_PAIR(GRAY_DEFAULT));
 		wattron(playlistBox, A_BOLD);

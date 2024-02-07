@@ -1,7 +1,6 @@
 #ifndef ORCHESTRA_HPP
 #define ORCHESTRA_HPP
 
-#include "graphics/ncurses.hpp"
 #include "graphics/elements/window.hpp"
 #include "graphics/fields.hpp"
 #include "midi/keyboards.hpp"

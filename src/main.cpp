@@ -69,7 +69,7 @@ int32_t main()
 
 				x50.set_performance_buffer( *performance_buffer );
 
-				playlist->cargar( "/home/juancarlangas/.config/commander/Playlists/default.csv" );
+				playlist->cargar("/home/juancarlangas/.config/commander/Playlists/default.csv");
 
 				updateWindow[LCD]		= true;
 				updateWindow[SEARCH] 	= true;
@@ -500,7 +500,7 @@ int32_t main()
 					wscanw(ventana[INPUT_BOX], "%s", file_name);
 					std::string cpp_file_name{ file_name };
 					playlist->cargar(
-							"/home/juancarlangas/.commander/Playlists/" + cpp_file_name + ".csv" );
+							"/home/juancarlangas/.config/commander/Playlists/" + cpp_file_name + ".csv" );
 				}
 				noecho();
 				wclear(ventana[INPUT_BOX]);
@@ -539,7 +539,7 @@ int32_t main()
 				if ( playlist->get_n_pistas() > plTop + playlistShowResults )
 					++plTop;
 
-				playlist->guardar( home_directory + "/.commander/Playlists/default.csv" );
+				playlist->guardar(home_directory + "/.config/commander/Playlists/default.csv" );
 
 				updateWindow[PLAYLIST] = true;
 
@@ -547,7 +547,7 @@ int32_t main()
 
 			case DEL_FROM_PLAYLIST:/*{{{*/
 				playlist->eliminar( pl_index );
-				playlist->guardar( home_directory + "/.commander/Playlists/default.csv" );
+				playlist->guardar( home_directory + "/.config/commander/Playlists/default.csv" );
 
 				if ( pl_index == playlist->get_n_pistas() ) {//fin de lista
 					decrease_index( &plTop, &pl_index );
@@ -608,7 +608,7 @@ int32_t main()
 				wscanw(ventana[INPUT_BOX], "%s", file_name);
 				std::string cpp_file_name{ file_name };
 				playlist->guardar(
-						"/home/juancarlangas/.commander/Playlists/" + cpp_file_name + ".csv" );
+						"/home/juancarlangas/.config/commander/Playlists/" + cpp_file_name + ".csv" );
 				}
 
 				noecho();
