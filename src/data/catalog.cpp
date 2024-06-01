@@ -323,6 +323,7 @@ void from_json(const nlohmann::json& j, Performance& p) {
 		p.scenes.push_back(sc);
 	}
 	p.default_scene = j.at("default_scene").get<std::int16_t>();
+	p.sfz_filename = j.at("sfz_path").get<std::string>();
 
 	p.tagging = p.metadata;
 	p.program = p.patch;
@@ -379,5 +380,6 @@ void to_json(nlohmann::ordered_json& j, const Performance& p) {
 							   {"type", p.type},
 							   {"n_scenes", p.n_scenes },
 							   {"scenes", p.scenes},
-							   {"default_scene", p.default_scene}};
+							   {"default_scene", p.default_scene},
+							   {"sfz_path", p.sfz_filename}};
 }/*}}}*/

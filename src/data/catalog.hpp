@@ -52,6 +52,7 @@ struct Performance {
 	std::int16_t n_scenes {0};
 	std::vector<Scene> scenes;
 	std::int16_t default_scene {0};
+	std::string sfz_filename;
 };/*}}}*/
 
 class Catalog {/*{{{*/
