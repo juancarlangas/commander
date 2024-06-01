@@ -323,6 +323,9 @@ void from_json(const nlohmann::json& j, Performance& p) {
 		p.scenes.push_back(sc);
 	}
 	p.default_scene = j.at("default_scene").get<std::int16_t>();
+
+	p.tagging = p.metadata;
+	p.program = p.patch;
 }/*}}}*/
 
 /*************************************** to_json ****************************************************/

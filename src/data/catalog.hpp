@@ -16,7 +16,6 @@
 static const std::int16_t &TRACKS_PER_PERFORMANCE{ 8 };
 
 
-// NEW STRUCT TYPE{{{
 struct Metadata {
 	std::string title;
 	std::string artist;
@@ -24,31 +23,35 @@ struct Metadata {
 	std::string mood;
 	std::string keyword;
 };
+typedef Metadata Tagging;
 
 struct Patch {
-	std::int32_t bnk{ 0 };
-	std::int32_t num{ 0 };
+	std::int32_t bnk {0};
+	std::int32_t num {0};
 };
+typedef Patch Program;
 
 struct Settings {
-	enum Switch state{ Switch::OFF };
-	std::int16_t volume{ 100 };
-	std::int16_t lower_key{ 24 };
-	std::int16_t upper_key{ 72 };
-	std::int16_t transposition{ 0 };
+	enum Switch state {Switch::OFF};
+	std::int16_t volume {100};
+	std::int16_t lower_key {24};
+	std::int16_t upper_key {72};
+	std::int16_t transposition {0};
 };
+typedef Settings Track;
 
 struct Scene {
 	std::string label;
-	std::array<Settings, TRACKS_PER_PERFORMANCE> tracks;
+	std::array<Track, TRACKS_PER_PERFORMANCE> tracks;
 };
 
-struct Performance { Metadata metadata;
-	Patch patch;
+struct Performance {
+	Metadata metadata; Tagging tagging;
+	Patch patch; Program program;
 	std::string type;
-	std::int16_t n_scenes{ 0 };
+	std::int16_t n_scenes {0};
 	std::vector<Scene> scenes;
-	std::int16_t default_scene{ 0 };
+	std::int16_t default_scene {0};
 };/*}}}*/
 
 class Catalog {/*{{{*/
