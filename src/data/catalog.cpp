@@ -263,6 +263,12 @@ Performance *Catalog::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{
 	return favourites[ _FavNumber ];
 }/*}}}*/
 
+auto Catalog::set_sfz_path(const std::filesystem::path& _Path) noexcept -> void {/*{{{*/
+	for (auto& performance : performances) {
+		performance.sfz_filename = _Path;
+	}
+}/*}}}*/
+
 /************************************* from_json **************************************************/
 // Overload for Metadata struct{{{
 void from_json(const nlohmann::json& j, Metadata& m) {

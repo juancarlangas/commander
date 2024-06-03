@@ -21,6 +21,7 @@ int32_t main()
 	// Data{{{
 	Catalog* dBase = new Catalog [] {{config_directory + "/catalog.json"}};
 	Catalog& catalog {dBase[COMBINATIONS]};
+	catalog.set_sfz_path(static_cast<std::filesystem::path>(config_directory)/"sfz");
 
 	std::int32_t n_performances {catalog.get_activeRows()};
 /*}}}*/

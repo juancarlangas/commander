@@ -53,7 +53,7 @@ struct Performance {
 	std::vector<Scene> scenes;
 	std::int16_t default_scene {0};
 	std::string sfz_filename;
-};/*}}}*/
+};
 
 class Catalog {/*{{{*/
 	public:
@@ -71,6 +71,7 @@ class Catalog {/*{{{*/
 		Performance *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		Performance *get_favourite_row( const int32_t & ) noexcept;
 		std::vector<Performance> performances;
+		auto set_sfz_path(const std::filesystem::path& _Path) noexcept -> void;
 	private:
 		std::int32_t activeRows;
 		std::int32_t n_canciones;
