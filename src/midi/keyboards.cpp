@@ -144,6 +144,21 @@ void Keyboard::set_scene( const int16_t _Variacion ) noexcept/*{{{*/
 		scene = _Variacion;
 }/*}}}*/
 
+auto Keyboard::write_sfz_file(const std::filesystem::path& _SFZfolder, const std::string& _TargetSFZ, const std::string& _OriginSFZ) const noexcept -> void {/*{{{*/
+	std::ofstream sfz_file {_SFZfolder/_TargetSFZ};
+	if (sfz_file.fail()) {
+		std::cerr << _SFZfolder/_TargetSFZ << " could not be opened in Keyboard::write_sfz_file()" << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+
+	sfz_file << "<control>\n";
+	sfz_file << "default_path=./\n";
+	sfz_file << '\n';
+	sfz_file << "#include \"" << _OriginSFZ << "\"";
+
+	sfz_file.close();
+}/*}}}*/
+
 /**************************************** JSON ***********************************************************/
 void from_json( const nlohmann::json &_JSONobject, Combination &_Combination ) {/*{{{*/
     _JSONobject.at( "instruments" ).get_to( _Combination.instruments );
@@ -202,7 +217,6 @@ int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*
 		should_send_scene_SysEx = false;
 	}
 	
-
     return 0;
 }/*}}}*/
 

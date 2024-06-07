@@ -71,7 +71,8 @@ class Catalog {/*{{{*/
 		Performance *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		Performance *get_favourite_row( const int32_t & ) noexcept;
 		std::vector<Performance> performances;
-		auto set_sfz_path(const std::filesystem::path& _Path) noexcept -> void;
+		auto set_sfz_folder(const std::filesystem::path& _Path) noexcept -> void;
+		auto get_sfz_folder() const noexcept -> std::filesystem::path;
 	private:
 		std::int32_t activeRows;
 		std::int32_t n_canciones;
@@ -79,6 +80,7 @@ class Catalog {/*{{{*/
 		const char *homedir;
 		std::array<Performance*, N_FAVORITOS>favourites;
 		auto fill_favourites() noexcept -> void;
+		std::filesystem::path sfz_folder;
 
 		friend class Playlist;
 	};/*}}}*/

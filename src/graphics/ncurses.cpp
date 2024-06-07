@@ -7,7 +7,7 @@
 #include <ncurses.h>
 #include <stdlib.h>
 
-short int x, y;
+int screen_width, screen_height;
 short displayShowResults, playlistShowResults;	
 
 WINDOW 	*searchBox,		*searchWindow,
@@ -22,7 +22,7 @@ PANEL 	*panel[2];
 
 Orchestra orquestacion;
 
-void init_screen() noexcept/*{{{*/
+void ncurses_start_sequence() noexcept/*{{{*/
 {
 	initscr();
 	raw();
@@ -32,23 +32,22 @@ void init_screen() noexcept/*{{{*/
 	set_escdelay(3);
 }/*}}}*/
 
-void end_screen() noexcept/*{{{*/
-{
-	set_escdelay( 0 );
-	curs_set( TRUE );
-	keypad( stdscr, FALSE );
+void ncurses_end_sequence() noexcept/*{{{*/ {
+	set_escdelay(0);
+	curs_set(TRUE);
+	keypad(stdscr, FALSE);
 	echo();
 	noraw();
 	endwin();
 }/*}}}*/
 
-short int init_ncurses(void)/*{{{*/
+auto set_windows(void) noexcept -> void/*{{{*/
 {
-	init_screen();
+	ncurses_start_sequence();
 
-	getmaxyx(stdscr, y, x);
-	displayShowResults  = y * 24;
-	playlistShowResults = y * 70 / 100 - 4;
+	getmaxyx(stdscr, screen_height, screen_width);
+	displayShowResults  = screen_height * 24;
+	playlistShowResults = screen_height * 70 / 100 - 4;
 
 
 	if (has_colors() == TRUE) {
@@ -70,26 +69,26 @@ short int init_ncurses(void)/*{{{*/
 	
 	refresh();
 
-	searchBox 		= newwin(5, 				x * 140 / 200,     	y * 90 / 100,     	x * 0 / 200	 	);
-	searchWindow 	= newwin(3, 				x * 140 / 200 - 2, 	y * 90 / 100 + 1, 	x * 0 / 200 + 1	);
+	searchBox 		= newwin(5, screen_width * 140 / 200,	  screen_height * 90 / 100,		screen_width * 0 / 200);
+	searchWindow 	= newwin(3, screen_width * 140 / 200 - 2, screen_height * 90 / 100 + 1, screen_width * 0 / 200 + 1);
 
-	// lcdBox		= newwin(y * 38 / 200,	 	x * 98 / 200,     	y * 36 / 200,		x * 102 / 200	);
-	lcdWindow 		= newwin(y * 30 / 200 - 2, 	x * 98 / 200 - 2, 	y * 20 / 200 + 1,	x * 98 / 200 + 1);
+	// lcdBox		= newwin(y * 38 / 200, x * 98 / 200, y * 36 / 200, x * 102 / 200);
+	lcdWindow 		= newwin(screen_height * 30 / 200 - 2, screen_width * 98 / 200 - 2, screen_height * 20 / 200 + 1,	screen_width * 98 / 200 + 1);
 	
-	playlistBox		= newwin(34, 		x * 60 / 200, 		9,	   	x * 141 / 200  	);
-	playlistWindow 	= newwin(34 - 3, 	x * 60 / 200 - 2, 	9 + 2, 	x * 141 / 200 + 1);
+	playlistBox		= newwin(34,	 screen_width * 60 / 200,	   9,	 screen_width * 141 / 200);
+	playlistWindow 	= newwin(34 - 3, screen_width * 60 / 200 - 2, 9 + 2, screen_width * 141 / 200 + 1);
 	
-	displayBox 		= newwin(29,		x * 142 / 200,     	9,     	x * 0 / 100	 	);
-	displayWindow 	= newwin(29 - 3,	x * 142 / 200 - 2, 	9 + 2, 	x * 0 / 100 + 1	);
+	displayBox 		= newwin(29,	 screen_width * 142 / 200,		9,	  screen_width * 0 / 100);
+	displayWindow 	= newwin(29 - 3, screen_width * 142 / 200 - 2, 9 + 2, screen_width * 0 / 100 + 1);
 
-	zoomBox 		= newwin(7, 		x * 98 / 200, 		3, 		x * 0 / 200	);		
-	zoomWindow 		= newwin(7 - 2, 	x * 98 / 200 - 2, 	3 + 1, 	x * 0 / 200 + 1	);
+	zoomBox 		= newwin(7,		screen_width * 98 / 200,	  3,	screen_width * 0 / 200);		
+	zoomWindow 		= newwin(7 - 2, screen_width * 98 / 200 - 2, 3 + 1, screen_width * 0 / 200 + 1);
 	
-	MIDI_state_window = newwin( 1, 4, 2, x * 180 / 200 );
+	MIDI_state_window = newwin(1, 4, 2, screen_width * 180 / 200);
 
 	// Salvar / cargar playlist
-	ventana[DIALOG_WINDOW]	= newwin(3,			x * 40 / 100,		y * 40 / 100,		x * 30 / 100	);
-	ventana[INPUT_BOX]		= newwin(1,			x * 40 / 100 - 2,	y * 40 / 100 + 1,	x * 30 / 100 + 1);
+	ventana[DIALOG_WINDOW]	= newwin(3,	screen_width * 40 / 100,	 screen_height * 40 / 100,		screen_width * 30 / 100	);
+	ventana[INPUT_BOX]		= newwin(1,	screen_width * 40 / 100 - 2, screen_height * 40 / 100 + 1,	screen_width * 30 / 100 + 1);
 
 	panel[DIALOG_WINDOW]	= new_panel(ventana[DIALOG_WINDOW]);
 	panel[INPUT_BOX] 		= new_panel(ventana[INPUT_BOX]);
@@ -97,11 +96,9 @@ short int init_ncurses(void)/*{{{*/
 	hide_panel(panel[DIALOG_WINDOW]);
 	hide_panel(panel[INPUT_BOX]);
 
-	orquestacion.init( y * 180 / 200, x * 180 / 200, y * 20 / 200, x * 10 / 200 );
+	orquestacion.init(screen_height * 180 / 200, screen_width * 180 / 200, screen_height * 20 / 200, screen_width * 10 / 200 );
 
 	refresh();
-
-	return y;
 }/*}}}*/
 	
 void draw_windows(void)/*{{{*/
@@ -154,8 +151,7 @@ void draw_windows(void)/*{{{*/
 	return;
 }/*}}}*/
 
-void tint_lcd(const short int mode)
-{/*{{{*/
+void tint_lcd(const short int mode) {/*{{{*/
 	switch(mode) {
 		case COMBINATION:
 			wattron(lcdWindow, COLOR_PAIR(5));
@@ -169,8 +165,11 @@ void tint_lcd(const short int mode)
 	return;
 }/*}}}*/
 
-void update_popups() noexcept
-{/*{{{*/
+void update_popups() noexcept {/*{{{*/
 	update_panels();
 	doupdate();
+}/*}}}*/
+
+auto get_y_pixels() noexcept -> std::int16_t {/*{{{*/
+	return screen_height;
 }/*}}}*/

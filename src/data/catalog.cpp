@@ -263,10 +263,12 @@ Performance *Catalog::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{
 	return favourites[ _FavNumber ];
 }/*}}}*/
 
-auto Catalog::set_sfz_path(const std::filesystem::path& _Path) noexcept -> void {/*{{{*/
-	for (auto& performance : performances) {
-		performance.sfz_filename = _Path;
-	}
+auto Catalog::set_sfz_folder(const std::filesystem::path& _Folder) noexcept -> void {/*{{{*/
+	sfz_folder = _Folder;
+}/*}}}*/
+
+auto Catalog::get_sfz_folder() const noexcept -> std::filesystem::path {/*{{{*/
+	return sfz_folder;
 }/*}}}*/
 
 /************************************* from_json **************************************************/
@@ -329,7 +331,7 @@ void from_json(const nlohmann::json& j, Performance& p) {
 		p.scenes.push_back(sc);
 	}
 	p.default_scene = j.at("default_scene").get<std::int16_t>();
-	p.sfz_filename = j.at("sfz_path").get<std::string>();
+	p.sfz_filename = j.at("sfz_file").get<std::string>();
 
 	p.tagging = p.metadata;
 	p.program = p.patch;
@@ -387,5 +389,6 @@ void to_json(nlohmann::ordered_json& j, const Performance& p) {
 							   {"n_scenes", p.n_scenes },
 							   {"scenes", p.scenes},
 							   {"default_scene", p.default_scene},
-							   {"sfz_path", p.sfz_filename}};
+							   {"sfz_file", p.sfz_filename.empty() ? "empty.sfz" : p.sfz_filename}};
+							   //{"sfz_file", ""}};
 }/*}}}*/

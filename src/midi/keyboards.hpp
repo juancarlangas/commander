@@ -3,6 +3,7 @@
 
 #include <bits/stdint-intn.h>
 #include <alsa/asoundlib.h>
+#include <filesystem>
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #include <array>
@@ -62,6 +63,7 @@ public:
 	auto send_page_SysEx(jack_midi_data_t _SysEx[PAGE_SYSEX_WORD_SIZE]) -> void;
 	auto send_scene_SysEx(jack_midi_data_t _SysEx[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE]) -> void;
 	auto send_PC(const jack_midi_data_t& _Bank, const jack_midi_data_t& _Program) noexcept -> void;
+	auto write_sfz_file(const std::filesystem::path& _SFZfolder, const std::string& _TargetSFZ, const std::string& _OriginSFZ) const noexcept -> void;
 
 private:
 	std::vector<std::array<struct Combination, PATCHES_PER_BANK>> combinations;

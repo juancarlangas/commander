@@ -1,27 +1,52 @@
-#include "main.hpp"
+#include <cstdint>
+#include <stdio.h>/*{{{*/
+#include <stdlib.h>
+#include <pwd.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <cstdlib>
+#include <panel.h>/*}}}*/
+
+#include "common/common.hpp"/*{{{*/
+#include "common/matroska.hpp"
+#include "graphics/orchestra.hpp"
+#include "midi/keyboards.hpp"
+#include "graphics/form.hpp"
+#include "graphics/ncurses.hpp"
+#include "graphics/screen.hpp"
+#include "common/common.hpp"
+#include "common/string.hpp"
+#include "common/matroska.hpp"
+#include "data/tables.hpp"
+#include "data/catalog.hpp"
+#include "data/playlist.hpp"
+/*}}}*/
+
+enum HotKeysMode {VARIATIONS, FAVOURITES};
 
 int32_t main()
 {
 	// Graphics{{{
-	y = init_ncurses();
+	set_windows();
 	draw_windows();
 	short int updateWindow[8] = {0};/*}}}*/
 
 	// Folders{{{
 	const char *home_directory_c;
 	if ( ( home_directory_c = getenv("HOME") ) == NULL )
-		home_directory_c = getpwuid( getuid() )->pw_dir;
-	const std::string home_directory { home_directory_c };
+		home_directory_c = getpwuid(getuid())->pw_dir;
+	const std::string home_directory {home_directory_c};
 
    	char config_directory_c[50];
-   	sprintf( config_directory_c, "%s/.config/commander", home_directory_c );
+   	sprintf(config_directory_c, "%s/.config/commander", home_directory_c);
 	std::string generic_path;
-    const std::string config_directory{ config_directory_c };/*}}}*/
+    const std::string config_directory {config_directory_c};/*}}}*/
 
 	// Data{{{
 	Catalog* dBase = new Catalog [] {{config_directory + "/catalog.json"}};
 	Catalog& catalog {dBase[COMBINATIONS]};
-	catalog.set_sfz_path(static_cast<std::filesystem::path>(config_directory)/"sfz");
+	catalog.set_sfz_folder(static_cast<std::filesystem::path>(home_directory)/".sounds"/"sfz"/"commander");
 
 	std::int32_t n_performances {catalog.get_activeRows()};
 /*}}}*/
@@ -29,6 +54,7 @@ int32_t main()
 	// Variables{{{
 	Performance** displayTable = new Performance* [1000](); // arreglo de apuntadores
 	Performance *orch_clipboard_ptr, *performance_buffer; // apuntadores simple
+	Orchestra orquestacion;
 
 	Playlist *playlist = new Playlist( &catalog );
 
@@ -227,6 +253,8 @@ int32_t main()
 				else
 					// solo actualizamos el buffer para poder trabajar online
 					x50.set_performance_buffer( *performance_buffer );
+
+				x50.write_sfz_file(catalog.get_sfz_folder(), "commander.sfz", performance_buffer->sfz_filename);
 
 				updateWindow[LCD] = true;
 
