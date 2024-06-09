@@ -1,10 +1,7 @@
 #include "common/common.hpp"
 #include "graphics/colors.hpp"
-#include "graphics/windows.hpp"
 #include "graphics/ncurses.hpp"
-#include "graphics/orchestra.hpp"
 
-#include <ncurses.h>
 #include <stdlib.h>
 
 int screen_width, screen_height;

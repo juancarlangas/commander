@@ -5,6 +5,25 @@
 #define X_PIXELS 127
 
 #include <cstdint>
+#include <ncurses.h>
+#include <panel.h>
+
+#include "graphics/orchestra.hpp"
+
+extern int screen_width, screen_height;
+extern short displayShowResults, playlistShowResults;	
+
+extern WINDOW 	*searchBox,		*searchWindow,
+				*lcdWindow,
+				*zoomBox,		*zoomWindow,
+				*displayBox,	*displayWindow,
+				*playlistBox,	*playlistWindow,
+				*MIDI_state_window;
+
+extern WINDOW 	*ventana[2];
+extern PANEL 	*panel[2];
+
+extern Orchestra orquestacion;
 
 void ncurses_start_sequence() noexcept;
 void ncurses_end_sequence() noexcept;

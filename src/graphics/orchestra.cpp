@@ -5,7 +5,6 @@
 #include "graphics/ncurses.hpp"
 #include "midi/keyboards.hpp"
 #include "printing.hpp"
-#include "windows.hpp"
 #include "utilities/timer.hpp"
 #include <ncurses.h>
 #include <panel.h>

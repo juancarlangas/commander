@@ -2,9 +2,9 @@
 #define WINDOW_HPP
 
 #include <bits/stdint-intn.h>
-#include <panel.h>
 #include <string_view>
 #include <ncurses.h>
+#include <panel.h>
 #include <string>
 #include <array>
 
