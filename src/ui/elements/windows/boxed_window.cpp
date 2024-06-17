@@ -1,4 +1,4 @@
-#include "graphics/elements/windows/boxed_window.hpp"
+#include "ui/elements/windows/boxed_window.hpp"
 #include <iostream>
 
 void BoxedWindow::init(	const int32_t _Ysize, const int32_t _Xsize,

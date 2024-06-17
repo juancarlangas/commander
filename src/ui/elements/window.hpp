@@ -6,7 +6,6 @@
 #include <ncurses.h>
 #include <panel.h>
 #include <string>
-#include <array>
 
 struct Font {
 	int32_t color;

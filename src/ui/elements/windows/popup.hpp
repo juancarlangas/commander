@@ -1,7 +1,7 @@
 #ifndef POPUP_HPP
 #define POPUP_HPP
 
-#include "graphics/elements/window.hpp"
+#include "ui/elements/window.hpp"
 
 class Popup : public Window {
 	public:

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <ncurses.h>
 
-#include "graphics/colors.hpp"
+#include "ui/colors.hpp"
 
 DoubleXslider::DoubleXslider() :/*{{{*/
 	focused_slider { 0 }

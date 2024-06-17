@@ -1,11 +1,11 @@
 #ifndef ORCHESTRA_HPP
 #define ORCHESTRA_HPP
 
-#include "graphics/elements/window.hpp"
-#include "graphics/fields.hpp"
+#include "ui/elements/window.hpp"
+#include "ui/fields.hpp"
 #include "midi/keyboards.hpp"
 #include "data/catalog.hpp"
-#include "graphics/elements/windows/boxed_windows/boxed_popup.hpp"
+#include "ui/elements/windows/boxed_windows/boxed_popup.hpp"
 #include "elements/windows/popups/orchestra_elements/check_popup.hpp"
 #include "elements/windows/popups/orchestra_elements/text_popups/field_popup.hpp"
 #include "elements/windows/popups/orchestra_elements/double_X_slider.hpp"

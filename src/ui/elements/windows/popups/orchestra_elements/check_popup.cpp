@@ -1,5 +1,5 @@
 #include "check_popup.hpp"
-#include "graphics/colors.hpp"
+#include "ui/colors.hpp"
 #include <ncurses.h>
 
 void CheckPopup::init( const int32_t &_Ypos, const int32_t &_Xpos, const struct Font &_ActiveFont,/*{{{*/

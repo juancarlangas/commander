@@ -1,7 +1,7 @@
 #ifndef FIELDS_H
 #define FIELDS_H
 
-#include "../common/common.hpp"
+#include "common/common.hpp"
 #include <string>
 #include <cstdint>
 

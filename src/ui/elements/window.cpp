@@ -1,4 +1,4 @@
-#include "graphics/elements/window.hpp"
+#include "ui/elements/window.hpp"
 #include <bits/stdint-intn.h>
 #include <cstdlib>
 #include <curses.h>

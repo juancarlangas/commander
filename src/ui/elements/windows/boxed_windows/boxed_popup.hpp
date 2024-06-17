@@ -1,7 +1,7 @@
 #ifndef FRAMED_POPUP_HPP
 #define FRAMED_POPUP_HPP
 
-#include "graphics/elements/windows/boxed_window.hpp"
+#include "ui/elements/windows/boxed_window.hpp"
 
 class BoxedPopup : public BoxedWindow {
 	public:

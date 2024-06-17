@@ -1,4 +1,3 @@
-#include <cstdint>
 #include <stdio.h>/*{{{*/
 #include <stdlib.h>
 #include <pwd.h>
@@ -10,28 +9,29 @@
 
 #include "common/common.hpp"/*{{{*/
 #include "common/matroska.hpp"
-#include "graphics/orchestra.hpp"
+#include "ui/orchestra.hpp"
 #include "midi/keyboards.hpp"
-#include "graphics/form.hpp"
-#include "graphics/ncurses.hpp"
-#include "graphics/screen.hpp"
+#include "ui/form.hpp"
+#include "ui/ncurses.hpp"
+#include "ui/screen.hpp"
 #include "common/common.hpp"
 #include "common/string.hpp"
 #include "common/matroska.hpp"
 #include "data/tables.hpp"
 #include "data/catalog.hpp"
 #include "data/playlist.hpp"
-#include "graphics/printing.hpp"
+#include "ui/printing.hpp"
 /*}}}*/
 
-enum HotKeysMode {VARIATIONS, FAVOURITES};
+enum HotKeysMode {
+	Variations,
+	Favourites};
 
-int32_t main()
-{
-	// Graphics{{{
+std::int32_t main() {
+	// Graphics
 	set_windows();
 	draw_windows();
-	short int updateWindow[8] = {0};/*}}}*/
+	std::array<std::int16_t,8> update_window {0};
 
 	// Folders{{{
 	const char *home_directory_c;
@@ -85,7 +85,7 @@ int32_t main()
 	// Engine{{{
 	do {
 		for ( i = LCD; i <= ZOOM; i++ )
-			updateWindow[i] = false;
+			update_window[i] = false;
 
 		switch (command) {
 			case BEGIN:/*{{{*/
@@ -98,14 +98,14 @@ int32_t main()
 
 				playlist->cargar("/home/juancarlangas/.config/commander/Playlists/default.csv");
 
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[MIDI_STATE] = true;
+				update_window[LCD]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[PLAYLIST] 	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;
+				update_window[MIDI_STATE] = true;
 
 				break;/*}}}*/
 
@@ -126,11 +126,11 @@ int32_t main()
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;
 
 				break;/*}}}*/
 
@@ -147,12 +147,12 @@ int32_t main()
 
 				if (winMode == MODE_PLAYLIST) {
 					winMode = MODE_DISPLAY;
-					updateWindow[PLAYLIST] = true;
+					update_window[PLAYLIST] = true;
 				}
-				updateWindow[LCD] 	  = true;
-				updateWindow[SEARCH]  = true;
-				updateWindow[DISPLAY] = true;
-				updateWindow[ZOOM]	  = true;
+				update_window[LCD] 	  = true;
+				update_window[SEARCH]  = true;
+				update_window[DISPLAY] = true;
+				update_window[ZOOM]	  = true;
 
 				break;/*}}}*/
 
@@ -174,16 +174,16 @@ int32_t main()
 
 					if (winMode == MODE_PLAYLIST) {
 						winMode = MODE_DISPLAY;
-						updateWindow[PLAYLIST] = true;
+						update_window[PLAYLIST] = true;
 					}
 
 					if (keyword[0] != ':' || charIndex == 1)
-						updateWindow[ZOOM] = true;
+						update_window[ZOOM] = true;
 
 
-					updateWindow[LCD] 	  = true;
-					updateWindow[SEARCH]  = true;
-					updateWindow[DISPLAY] = true;
+					update_window[LCD] 	  = true;
+					update_window[SEARCH]  = true;
+					update_window[DISPLAY] = true;
 
 				}
 				break;/*}}}*/
@@ -199,10 +199,10 @@ int32_t main()
 				dTop = 0;
 				dIndex = 0;
 
-				updateWindow[0] = 1;
-				updateWindow[1] = 1;
-				updateWindow[2] = 1;
-				updateWindow[ZOOM] = true;
+				update_window[0] = 1;
+				update_window[1] = 1;
+				update_window[2] = 1;
+				update_window[ZOOM] = true;
 
 				if (winMode == MODE_PLAYLIST)
 					winMode = MODE_DISPLAY;
@@ -242,8 +242,8 @@ int32_t main()
 							plIndexB++;
 							pl_index = plIndexB;
 						}
-						updateWindow[PLAYLIST] = true;
-						updateWindow[ZOOM] = true;
+						update_window[PLAYLIST] = true;
+						update_window[ZOOM] = true;
 
 						break;
 				}
@@ -256,7 +256,7 @@ int32_t main()
 
 				x50.write_sfz_file(catalog.get_sfz_folder(), "commander.sfz", performance_buffer->sfz_filename);
 
-				updateWindow[LCD] = true;
+				update_window[LCD] = true;
 
 				break;/*}}}*/
 
@@ -267,7 +267,7 @@ int32_t main()
 				if ( x50.is_connected() )
 					x50.dump_performance(*performance_buffer);
 
-				updateWindow[LCD] 	  = true;
+				update_window[LCD] 	  = true;
 
 				/* Toda la siguiente parte reinicializa displayTable y coloca el índice
 				 * en el favorito, pero esta es una característica poco conveniente.
@@ -283,11 +283,11 @@ int32_t main()
 
 				if (winMode == MODE_PLAYLIST) {
 					winMode = MODE_DISPLAY;
-					updateWindow[PLAYLIST] = true;
+					update_window[PLAYLIST] = true;
 				}
-				updateWindow[SEARCH]  = true;
-				updateWindow[DISPLAY] = true;
-				updateWindow[ZOOM]	  = true;
+				update_window[SEARCH]  = true;
+				update_window[DISPLAY] = true;
+				update_window[ZOOM]	  = true;
 				*/
 
 				break;
@@ -305,9 +305,9 @@ int32_t main()
 				else if (winMode == MODE_PLAYLIST)
 					winMode = MODE_DISPLAY;
 
-				updateWindow[DISPLAY] 	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[ZOOM]		= true;
+				update_window[DISPLAY] 	= true;
+				update_window[PLAYLIST] 	= true;
+				update_window[ZOOM]		= true;
 
 				break;/*}}}*/
 
@@ -317,12 +317,12 @@ int32_t main()
 					switch ( winMode ) {
 						case MODE_DISPLAY:
 							decrease_index( &dTop, &dIndex );
-							updateWindow[DISPLAY] = true;
+							update_window[DISPLAY] = true;
 							break;
 						case MODE_PLAYLIST:
 							decrease_index(&plTop, &plIndexB );
 							pl_index = plIndexB;
-							updateWindow[PLAYLIST] = true;
+							update_window[PLAYLIST] = true;
 							break;
 					}
 
@@ -330,17 +330,17 @@ int32_t main()
 					switch (winMode) {
 						case MODE_DISPLAY:
 							increase_index(&dTop, n_matches, &dIndex, winMode);
-							updateWindow[DISPLAY] = true;
+							update_window[DISPLAY] = true;
 							break;
 						case MODE_PLAYLIST:
 							increase_index(&plTop, playlist->get_n_pistas(), &plIndexB, winMode);
 							pl_index = plIndexB;
-							updateWindow[PLAYLIST] = true;
+							update_window[PLAYLIST] = true;
 							break;
 					}
 
-				updateWindow[DIGITS] = true;
-				updateWindow[ZOOM]	= true;
+				update_window[DIGITS] = true;
+				update_window[ZOOM]	= true;
 
 				break;/*}}}*/
 
@@ -359,13 +359,13 @@ int32_t main()
 						displayTable, catalog.performances, n_performances, keyword, &n_matches );
 
 				draw_windows();
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;	
+				update_window[LCD]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[PLAYLIST] 	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;	
 
 
 				break;
@@ -384,12 +384,12 @@ int32_t main()
 				llenado_displayTable(
 						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches );
 
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;	
+				update_window[LCD]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;	
 
 				n_performances = catalog.get_activeRows();
 
@@ -417,13 +417,13 @@ int32_t main()
 				llenado_displayTable(displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
 
 				draw_windows();
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;	
+				update_window[LCD]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[PLAYLIST] 	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;	
 
 				break;
 			}/*}}}*/
@@ -443,13 +443,13 @@ int32_t main()
 					update_popups();
 					draw_windows();
 
-					updateWindow[LCD]		= true;
-					updateWindow[SEARCH] 	= true;
-					updateWindow[DISPLAY]	= true;
-					updateWindow[PLAYLIST] 	= true;
-					updateWindow[COMPUTER] 	= true;
-					updateWindow[DIGITS]	= true;
-					updateWindow[ZOOM]		= true;	
+					update_window[LCD]		= true;
+					update_window[SEARCH] 	= true;
+					update_window[DISPLAY]	= true;
+					update_window[PLAYLIST] 	= true;
+					update_window[COMPUTER] 	= true;
+					update_window[DIGITS]	= true;
+					update_window[ZOOM]		= true;	
 				}
 
 				break;/*}}}*/
@@ -493,10 +493,10 @@ int32_t main()
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[ZOOM]		= true;
+				update_window[PLAYLIST]	= true;
 
 				break;/*}}}*/
 
@@ -555,10 +555,10 @@ int32_t main()
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[ZOOM]		= true;
+				update_window[PLAYLIST]	= true;
 
 				break;/*}}}*/
 
@@ -570,7 +570,7 @@ int32_t main()
 
 				playlist->guardar(home_directory + "/.config/commander/Playlists/default.csv" );
 
-				updateWindow[PLAYLIST] = true;
+				update_window[PLAYLIST] = true;
 
 				break;/*}}}*/
 
@@ -585,11 +585,11 @@ int32_t main()
 
 				if ( playlist->get_n_pistas() == 0 ) { //cambio
 					winMode = MODE_DISPLAY;
-					updateWindow[DISPLAY] = true;
+					update_window[DISPLAY] = true;
 				}
-				updateWindow[LCD] 	   = true;
-				updateWindow[PLAYLIST] = true;
-				updateWindow[ZOOM]	= true;
+				update_window[LCD] 	   = true;
+				update_window[PLAYLIST] = true;
+				update_window[ZOOM]	= true;
 
 				break;/*}}}*/
 
@@ -610,10 +610,10 @@ int32_t main()
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[ZOOM]		= true;
+				update_window[PLAYLIST]	= true;
 
 				break;/*}}}*/
 
@@ -661,40 +661,40 @@ int32_t main()
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[ZOOM]		= true;
+				update_window[PLAYLIST]	= true;
 
 				break;/*}}}*/
 
 			case TOGGLE_MIDI_STATE:/*{{{*/
 				x50.toggle_MIDI_state();
-				updateWindow[ MIDI_STATE ] = true;
+				update_window[ MIDI_STATE ] = true;
 				break;/*}}}*/
 		}
 
 		// Printing{{{
-		if (updateWindow[DISPLAY] == true)
+		if (update_window[DISPLAY] == true)
 			print_displayTable(	displayWindow, 	displayTable,
 								dTop, 	n_matches, 	dIndex, winMode);
 
-		if (updateWindow[PLAYLIST] == true) {
+		if (update_window[PLAYLIST] == true) {
 			//print_playlist(	playlistWindow, playlistTable,
 			//				plTop, 	plRows, pl_index, plIndexB, winMode);
 			print_playlist(	playlistWindow, plTop, pl_index, *playlist, winMode);
 		}
 
-		if (updateWindow[SEARCH] == true)
+		if (update_window[SEARCH] == true)
 			print_search(searchWindow, keyword);
 
-		if (updateWindow[LCD] == true)
+		if (update_window[LCD] == true)
 			print_lcd( lcdWindow, performance_buffer );
 
-		if ( updateWindow[ MIDI_STATE ] )
+		if ( update_window[ MIDI_STATE ] )
 			print_MIDI_state( MIDI_state_window, x50.get_MIDI_state() );
 
-		if (updateWindow[ZOOM] == true) {
+		if (update_window[ZOOM] == true) {
 			if (winMode == MODE_PLAYLIST)
 				print_zoom(zoomWindow, playlist->get_pointer( pl_index ) );
 			else if ( keyword[0] != ':' and dIndex >= 0 )

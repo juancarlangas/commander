@@ -1,8 +1,7 @@
 #ifndef FORM_H
 #define FORM_H
 
-#include "graphics/fields.hpp"
-#include "common/common.hpp"
+#include "ui/fields.hpp"
 #include "data/catalog.hpp"
 
 // Encuadre

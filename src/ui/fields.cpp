@@ -1,7 +1,6 @@
 #include "fields.hpp"
-#include "../common/common.hpp"
-#include "../graphics/colors.hpp"
-#include "../common/string.hpp"
+#include "ui/colors.hpp"
+#include "common/string.hpp"
 #include <curses.h>
 #include <iostream>
 #include <string_view>

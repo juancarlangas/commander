@@ -1,9 +1,6 @@
 #include "text_popup.hpp"
 #include <ncurses.h>
 #include <string>
-#include <string.h>
-
-#include "graphics/colors.hpp"
 
 TextPopup::TextPopup()/*{{{*/
 {}/*}}}*/

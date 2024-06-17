@@ -1,4 +1,4 @@
-#include "graphics/elements/windows/boxed_windows/boxed_popup.hpp"
+#include "ui/elements/windows/boxed_windows/boxed_popup.hpp"
 
 
 void BoxedPopup::init(	const int32_t _Ysize, const int32_t _Xsize,

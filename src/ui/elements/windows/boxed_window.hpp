@@ -1,7 +1,7 @@
 #ifndef BOXED_WINDOW_HPP
 #define BOXED_WINDOW_HPP
 
-#include "graphics/elements/window.hpp"
+#include "ui/elements/window.hpp"
 
 class BoxedWindow : public Window {
 	public:

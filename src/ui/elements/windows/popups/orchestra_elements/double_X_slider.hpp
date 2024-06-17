@@ -1,7 +1,7 @@
 #ifndef DOUBLE_X_SLIDER_HPP
 #define DOUBLE_X_SLIDER_HPP
 
-#include "graphics/elements/windows/popups/orchestra_element.hpp"
+#include "ui/elements/windows/popups/orchestra_element.hpp"
 #include <bits/stdint-intn.h>
 
 #define MIN_KEY 36

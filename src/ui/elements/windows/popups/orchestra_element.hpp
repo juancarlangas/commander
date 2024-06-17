@@ -1,7 +1,7 @@
 #ifndef ORCHESTRA_ELEMENT_HPP
 #define ORCHESTRA_ELEMENT_HPP
 
-#include "graphics/elements/windows/popup.hpp"
+#include "ui/elements/windows/popup.hpp"
 #include <bits/stdint-intn.h>
 
 class OrchestraElement : public Popup {

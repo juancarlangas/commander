@@ -1,6 +1,6 @@
 #include "common/common.hpp"
-#include "graphics/colors.hpp"
-#include "graphics/ncurses.hpp"
+#include "ui/colors.hpp"
+#include "ui/ncurses.hpp"
 
 #include <stdlib.h>
 

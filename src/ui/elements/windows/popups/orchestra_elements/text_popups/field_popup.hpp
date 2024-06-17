@@ -1,7 +1,7 @@
 #ifndef FIELD_POPUP_HPP
 #define FIELD_POPUP_HPP
 
-#include "graphics/elements/windows/popups/orchestra_elements/text_popup.hpp"
+#include "ui/elements/windows/popups/orchestra_elements/text_popup.hpp"
 
 class FieldPopup : public TextPopup {
 	public:

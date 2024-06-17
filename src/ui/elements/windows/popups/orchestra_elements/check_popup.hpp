@@ -1,7 +1,7 @@
 #ifndef CHECK_POPUP_HPP
 #define CHECK_POPUP_HPP
 
-#include "graphics/elements/windows/popups/orchestra_element.hpp"
+#include "ui/elements/windows/popups/orchestra_element.hpp"
 
 class CheckPopup : public OrchestraElement {
 	public:
