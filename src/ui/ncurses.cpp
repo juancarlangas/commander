@@ -43,8 +43,8 @@ auto set_windows(void) noexcept -> void/*{{{*/
 	ncurses_start_sequence();
 
 	getmaxyx(stdscr, screen_height, screen_width);
-	displayShowResults  = screen_height * 24;
-	playlistShowResults = screen_height * 70 / 100 - 4;
+	displayShowResults  = 25;
+	playlistShowResults = 30;
 
 
 	if (has_colors() == TRUE) {

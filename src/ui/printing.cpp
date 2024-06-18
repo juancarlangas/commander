@@ -12,12 +12,11 @@ extern WINDOW *debugWindow;
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
 
-void print_displayTable(	WINDOW *window,/*{{{*/
-							Performance *displayTable[],
-							const int32_t top, const short resultRows, 
-							const int index,
-							short int winMode)
-{
+void print_displayTable(WINDOW *window,/*{{{*/
+						Performance *displayTable[],
+						const int32_t top, const short resultRows, 
+						const int index,
+						short int winMode) {
 	int32_t i;
 	short int row = 0;
 
@@ -144,8 +143,7 @@ void print_lcd(WINDOW *window, Performance *linea )/*{{{*/
 	return;
 }/*}}}*/
 
-void print_computer(WINDOW *window, const short int oxygen, const short int mode)
-{/*{{{*/
+void print_computer(WINDOW *window, const short int oxygen, const short int mode) {/*{{{*/
 	wattron(window, A_BOLD);
 
 	switch (oxygen) {
@@ -237,8 +235,7 @@ void print_zoom(WINDOW *window, Performance *linea)/*{{{*/
 	return;
 }/*}}}*/
 
-void print_MIDI_state( WINDOW *&_Ventana, const enum Switch &_State ) noexcept
-{/*{{{*/
+void print_MIDI_state( WINDOW *&_Ventana, const enum Switch &_State ) noexcept {/*{{{*/
 	wclear( _Ventana );
 
 	if ( _State == Switch::OFF ) {

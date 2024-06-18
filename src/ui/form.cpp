@@ -5,7 +5,6 @@
 #include "form.hpp"
 
 #include "../common/common.hpp"
-#include "colors.hpp"
 
 Form::Form()/*{{{*/
 {
@@ -18,29 +17,32 @@ Form::Form()/*{{{*/
 	box(window, 0, 0);
 	mvwprintw(window, 0, 20, " Editar song ");
 
-	field = new Field[ 10 ]();
+	// We create all the fields
+	field = new Field[9]();
 
-	field[TITLE].create(	"Title", 3, x * 110 / 200, y * 40 / 200, x * 45 / 200, 
-								STRING, LONG_STRING);
-	field[ARTIST].create(	"Artist", 3, x * 110 / 200, y * 65 / 200, x * 45 / 200,
-								STRING, LONG_STRING);
-	field[GENRE].create(	"Genre", 3, x * 50 / 200, y * 90 / 200, x * 45 / 200,
-								STRING, 35);
-	field[SECTION].create(	"Section", 3, x * 38 / 200, y * 90 / 200, x * 96 / 200,
-									STRING, 35);
-	field[TYPE].create(		"Type", 3, x * 20 / 200, y * 90 / 200, x * 135 / 200,
-									STRING, 35);
-	field[KEYWORDS].create(	"Keywords", 5, x * 110 / 200, y * 110 / 200, x * 45 / 200,
-									STRING, LONG_STRING);
-	field[BNK].create(		"Bnk1", 3, x * 10 / 200, y * 144 / 200, x * 130 / 200,
-									BANK, 1);
-	field[NUM].create(		"Num1", 3, x * 12 / 200, y * 144 / 200, x * 142 / 200,
-									VALUE, 3);
+	field[TITLE].create("Title", 3, x * 110 / 200, y * 40 / 200, x * 45 / 200, 
+			STRING, LONG_STRING);
+	field[ARTIST].create("Artist", 3, x * 110 / 200, y * 65 / 200, x * 45 / 200, 
+			STRING, LONG_STRING);
+	field[GENRE].create("Genre", 3, x * 50 / 200, y * 90 / 200, x * 45 / 200, 
+			STRING, 35);
+	field[SECTION].create("Section", 3, x * 38 / 200, y * 90 / 200, x * 96 / 200,
+			STRING, 35);
+	field[TYPE].create("Type", 3, x * 20 / 200, y * 90 / 200, x * 135 / 200,
+			STRING, 35);
+	field[KEYWORDS].create("Keywords", 5, x * 110 / 200, y * 110 / 200, x * 45/200,
+			STRING, LONG_STRING);
+	field[BNK].create("Bnk1", 3, x * 10 / 200, y * 144 / 200, x * 130 / 200,
+			BANK, 1);
+	field[NUM].create("Num1", 3, x * 12 / 200, y * 144 / 200, x * 142 / 200,
+			VALUE, 3);
+	field[SFZ].create("SFZ", 3, x * 50 / 200, y * 160 / 200, x * 45 / 200,
+			STRING, LONG_STRING);
 	
 	wrefresh( window );
 	hide_panel( panel );
 
-	for ( int32_t i = 0; i < 8; ++i )
+	for ( int32_t i = 0; i < 9; ++i )
 		field[i].hide();
 }/*}}}*/
 
@@ -65,6 +67,7 @@ bool Form::capture_value()/*{{{*/
 		field[KEYWORDS].set_string(performance.metadata.keyword);
 		field[BNK].set_string(static_cast<char>(performance.patch.bnk));
 		field[NUM].set_string(std::int32_t{ performance.patch.num });
+		field[SFZ].set_string(performance.sfz_filename);
 		
 		bool success = capture();
 	hide();
@@ -85,6 +88,7 @@ bool Form::capture_value(Performance _Performance)/*{{{*/
 		field[TYPE].set_string(performance.type);
 		field[BNK].set_string(static_cast<char>(performance.patch.bnk)); // We dont add anything here
 		field[NUM].set_string(performance.patch.num);
+		field[SFZ].set_string(performance.sfz_filename);
 		
 		bool success = capture();
 	hide();
@@ -105,7 +109,7 @@ bool Form::capture()/*{{{*/
 	do { // ESCAPE or ENTER
 		switch (key) {
 			case 9: // JUMP_FORWARD:
-				activeField = (activeField + 1) % 8;
+				activeField = (activeField + 1) % 9;
 				field[activeField].get_cursor();
 				break;
 
@@ -156,6 +160,9 @@ bool Form::capture()/*{{{*/
 							case NUM:
 								performance.patch.num = std::stoi(word);
 								break;
+							case SFZ:
+								performance.sfz_filename = word;
+								break;
 						}
 					}
 		}
@@ -176,7 +183,7 @@ void Form::show()/*{{{*/
 	show_panel( panel );
 	curs_set(true);
 
-	for (short w = TITLE; w <= 9; w++)
+	for (short w = TITLE; w < 9; w++)
 		field[w].show();
 
 	::update_panels();
@@ -185,7 +192,7 @@ void Form::show()/*{{{*/
 
 void Form::hide()/*{{{*/
 {
-	for (short w = TITLE; w <= 9; w++)
+	for (short w = TITLE; w < 9; w++)
 		field[w].hide();
 
 	curs_set(false);

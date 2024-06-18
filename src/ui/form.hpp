@@ -4,24 +4,10 @@
 #include "ui/fields.hpp"
 #include "data/catalog.hpp"
 
-// Encuadre
-#define TITLE		0
-#define ARTIST  	1
-#define GENRE  		2
-#define SECTION 	3
-#define TYPE	 	4
-#define KEYWORDS	5
-#define BNK 		6
-#define NUM 		7
+enum Encuadre {TITLE, ARTIST, GENRE, SECTION, TYPE, KEYWORDS, BNK, NUM, SFZ};
 
-enum Action {	
-		START = 1,
-		WRITE,
-		JUMP_FORWARD,
-		JUMP_BACK,
-		ENTER_KEY,
-		SAVE_CHANGES,
-		QUIT = 0	};
+enum Action {
+	START = 1, WRITE, JUMP_FORWARD, JUMP_BACK, ENTER_KEY,SAVE_CHANGES, QUIT = 0};
 
 // class
 class Form {

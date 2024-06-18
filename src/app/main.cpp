@@ -312,9 +312,8 @@ std::int32_t main() {
 				break;/*}}}*/
 
 			case MOVE_INDEX:/*{{{*/
-
-				if ( caracter == KEY_UP || caracter == KEY_LEFT )
-					switch ( winMode ) {
+				if (caracter == KEY_UP || caracter == KEY_LEFT)
+					switch (winMode) {
 						case MODE_DISPLAY:
 							decrease_index( &dTop, &dIndex );
 							update_window[DISPLAY] = true;
@@ -325,7 +324,6 @@ std::int32_t main() {
 							update_window[PLAYLIST] = true;
 							break;
 					}
-
 				else if (caracter == KEY_DOWN || caracter == KEY_RIGHT)
 					switch (winMode) {
 						case MODE_DISPLAY:

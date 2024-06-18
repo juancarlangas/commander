@@ -1,6 +1,7 @@
 #include "../common/math.hpp"
-#include "../common/common.hpp"
 #include "../data/catalog.hpp"
+#include "common/common.hpp"
+#include <cstdint>
 
 extern short int x, y;
 extern short int displayShowResults, playlistShowResults;
@@ -14,24 +15,17 @@ void decrease_index( int *top, int *index )/*{{{*/
 	}
 }/*}}}*/
 
-void increase_index(	int *top, const int resultRows, int *index, /*{{{*/
-						const short int winMode	)
-{
-	short int showResults;
+void increase_index(int *i_top, const int total_results,
+		int *abs_index, const std::int16_t winMode) {
+	std::int16_t shown_results {winMode == MODE_DISPLAY ? displayShowResults
+														: playlistShowResults};
 
-	if ( winMode == 1 )
-		showResults = displayShowResults;
-	else
-		showResults = playlistShowResults;
-
-	if (*index < resultRows - 1) {
-		if (*index == *top + showResults - 1)
-			(*top)++;
-		(*index)++;
+	if (*abs_index < total_results - 1) {
+		if (*abs_index == *i_top + shown_results - 1)
+			++(*i_top);
+		++(*abs_index);
 	}
-
-	return;
-}/*}}}*/
+}
 
 void korg_drag(	Performance table[],/*{{{*/
 				const int rows, const int indexUP, const int indexDOWN,
