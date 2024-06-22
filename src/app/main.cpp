@@ -453,26 +453,32 @@ std::int32_t main() {
 				break;/*}}}*/
 
 			case COPY_ORCHESTRATION :/*{{{*/
-				orch_clipboard_ptr = displayTable[ dIndex ];
+				orch_clipboard_ptr = displayTable[dIndex];
 				break;/*}}}*/
 
 			case PASTE_ORCHESTRATION :/*{{{*/
-				displayTable[ dIndex ]->n_scenes = orch_clipboard_ptr->n_scenes;
-				displayTable[ dIndex]->default_scene = orch_clipboard_ptr->default_scene;
-				for ( i = 0; i < orch_clipboard_ptr->n_scenes; ++i ) {
-					displayTable[ dIndex ]->scenes[ i ].label =
-						orch_clipboard_ptr->scenes[ i ].label;
-					for ( j = 0; j < static_cast<int>(NUMBER_OF_PARTS); ++j ) {
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].state =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].state;
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].volume =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].volume;
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].lower_key =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].lower_key;
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].upper_key =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].upper_key;
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].transposition =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].transposition;
+				// Lets redim the scenes vector
+				displayTable[dIndex]->scenes.clear();
+				displayTable[dIndex]->scenes.resize(orch_clipboard_ptr->n_scenes);
+
+				// Lets copy the values
+				displayTable[dIndex]->n_scenes = orch_clipboard_ptr->n_scenes;
+				displayTable[dIndex]->default_scene = orch_clipboard_ptr->default_scene;
+
+				for (i = 0; i < orch_clipboard_ptr->n_scenes; ++i) {
+					displayTable[dIndex]->scenes[i].label =
+						orch_clipboard_ptr->scenes[i].label;
+					for (j = 0; j < static_cast<int>(NUMBER_OF_PARTS); ++j) {
+						displayTable[dIndex]->scenes[i].tracks[j].state =
+							orch_clipboard_ptr->scenes[i].tracks[j].state;
+						displayTable[dIndex]->scenes[i].tracks[j].volume =
+							orch_clipboard_ptr->scenes[i].tracks[j].volume;
+						displayTable[dIndex]->scenes[i].tracks[j].lower_key =
+							orch_clipboard_ptr->scenes[i].tracks[j].lower_key;
+						displayTable[dIndex]->scenes[i].tracks[j].upper_key =
+							orch_clipboard_ptr->scenes[i].tracks[j].upper_key;
+						displayTable[dIndex]->scenes[i].tracks[j].transposition =
+							orch_clipboard_ptr->scenes[i].tracks[j].transposition;
 					}
 				}
 				break;/*}}}*/

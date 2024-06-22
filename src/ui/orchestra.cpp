@@ -851,8 +851,8 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				if ( info->n_scenes > 1 ) {
 					if ( current_scene == info->n_scenes - 1 )
 						--current_scene;
-					for ( int32_t i = current_scene + 1; i < info->n_scenes; ++i )
-						info->scenes[ i + 1 ] = info->scenes[ i ];
+					for ( int32_t i = current_scene; i < info->n_scenes - 1; ++i )
+						info->scenes[i] = info->scenes[i + 1];
 					--info->n_scenes;
 					update();
 					if ( cursor[Y] == -1 ) { // si está hasta arriba

@@ -1,7 +1,6 @@
 #ifndef MATROSKA_HPP
 #define MATROSKA_HPP
 
-#include "common/common.hpp"
 
 enum matroska/*{{{*/
 	{	NEXT = 0,
