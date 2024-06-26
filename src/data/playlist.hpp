@@ -6,7 +6,6 @@
 #include <array>
 #include <cstdint>
 #include <string>
-#include <string_view>
 
 struct Pista {
 	std::string titulo;

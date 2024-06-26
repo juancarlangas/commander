@@ -10,12 +10,13 @@ class OrchestraElement : public Popup {
 		void init( const int32_t &_Ysize, const int32_t &_Xsize,
 				const int32_t &_Ypos, const int32_t &_Xpos,
 				const struct Font &_ActiveFont, const struct Font &_DimmedFont,
-				const struct Font &_CursorFont ) noexcept;
+				const struct Font &_CursorFont, const Font& _LightFont) noexcept;
 	protected:
 		bool is_active;
 		struct Font active_font;
 		struct Font dimmed_font;
 		struct Font cursor_font;
+		struct Font light_font;
 };
 
 #endif

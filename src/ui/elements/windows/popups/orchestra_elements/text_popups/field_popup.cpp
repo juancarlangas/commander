@@ -17,6 +17,14 @@ void FieldPopup::off() noexcept/*{{{*/
 	dimmed_font.width == "Bold" ? wattron( area, A_BOLD ) : wattroff( area, A_BOLD );
 }/*}}}*/
 
+auto FieldPopup::light() noexcept -> void/*{{{*/
+{
+	is_active = true;
+
+	wattron(area, COLOR_PAIR(light_font.color));
+	wattron(area, A_BOLD);
+}/*}}}*/
+
 void FieldPopup::set_cursor() noexcept/*{{{*/
 {
 	// Ponemos el color del cursor

@@ -1,6 +1,7 @@
 #include "ui/orchestra.hpp"
 #include "elements/windows/popups/orchestra_elements/text_popup.hpp"
 #include "elements/windows/popups/orchestra_elements/double_X_slider.hpp"
+#include "midi/midi.hpp"
 #include "ui/colors.hpp"
 #include "ui/ncurses.hpp"
 #include "midi/keyboards.hpp"
@@ -16,17 +17,18 @@ using Coordinates::Y;
 Juanca::Timer timer;
 
 Orchestra::Orchestra() : // Sets colors /*{{{*/
-	native_font { { { GREEN_DEFAULT, "Bold" },
-					{ BLUE_DEFAULT, "Bold" },
-					{ YELLOW_DEFAULT, "Bold" },
-					{ MAGENTA_DEFAULT, "Bold" },
-					{ CYAN_DEFAULT, "Bold" },
-					{ RED_DEFAULT, "Bold" },
-					{ YELLOW_DEFAULT, "Regular" },
-					{ CYAN_DEFAULT, "Regular" } } },
-	cursor_font { WHITE_DEFAULT, "Bold" },
-	MIDI_font { GREEN_DEFAULT, "Bold" },
-	dimmed_font { GRAY_DEFAULT, "Bold" }
+	native_font {{	{GREEN_DEFAULT, "Bold"},
+					{BLUE_DEFAULT, "Bold"},
+					{YELLOW_DEFAULT, "Bold"},
+					{MAGENTA_DEFAULT, "Bold"},
+					{CYAN_DEFAULT, "Bold"},
+					{RED_DEFAULT, "Bold"},
+					{YELLOW_DEFAULT, "Regular"},
+					{CYAN_DEFAULT, "Regular"}}},
+	cursor_font {WHITE_DEFAULT, "Bold"},
+	MIDI_font {GREEN_DEFAULT, "Bold"},
+	dimmed_font {GRAY_DEFAULT, "Bold"},
+	light_font {WHITE_DEFAULT, "Bold"}
 {}/*}}}*/
 
 void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept/*{{{*/
@@ -41,13 +43,13 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 
 	// Base
 	base.init( _Ysize, _Xsize, _Ypos, _Xpos, 1 );
-	base.set_box_color( WHITE_DEFAULT );
+	base.set_box_color(WHITE_DEFAULT);
 	base.set_box_width( "Bold" );
 	base.define_box( 0, 0, 0, 0, 0, 0, 0, 0 );
 	base.update();
 
 	// Indicador de variación
-	scene_text_box.Popup::init( 3, 20, _Ypos + 1, _Xpos + 120 );
+	scene_text_box.Popup::init(3, 20, _Ypos + 1, _Xpos + 120);
 	scene_text_box.set_font_color( GRAY_DEFAULT );
 	scene_text_box.set_font_width( "Bold" );
 	scene_text_box.update();
@@ -75,24 +77,25 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 
 	for ( int32_t i = 0; i < 8; ++i ) {
 		status_field[i].init( y_starting_point + i, _Xpos + 2,
-				native_font[ i ], dimmed_font, cursor_font, i + 49 /*ASCII*/ );
+				native_font[i], dimmed_font, cursor_font, light_font,
+				i + 49 /*ASCII*/ );
 		status_field[i].update();
 
 		instrument_field[i].init( 1, 32, y_starting_point + i, _Xpos + 5,
-				native_font[ i ], dimmed_font, cursor_font );
+				native_font[ i ], dimmed_font, cursor_font, light_font);
 		instrument_field[i].update();
 
 		volume_field[i].init( 1, 4, y_starting_point + i, _Xpos + 35,
-				native_font[ i ], dimmed_font, cursor_font );
+				native_font[ i ], dimmed_font, cursor_font, light_font);
 		volume_field[i].update();
 
 		transposition_field[i].init( 1, 4, y_starting_point + i, _Xpos + 45,
-				native_font[ i ], dimmed_font, cursor_font );
+				native_font[ i ], dimmed_font, cursor_font, light_font);
 		transposition_field[i].update();
 		
 		// invocamos su clase base porque no cuadra con su init
 		double_X_slider[i].OrchestraElement::init( 1, 62, y_starting_point + i, _Xpos + 49,
-				native_font[ i ], dimmed_font, cursor_font );
+				native_font[ i ], dimmed_font, cursor_font, light_font);
 		double_X_slider[i].update();
 	}
 
@@ -146,12 +149,19 @@ void Orchestra::update() noexcept/*{{{*/ {
 			r_Value = l_Value;
 		double_X_slider[i].set_values( l_Value, r_Value );
 
-		if ( info->scenes[current_scene].tracks[ i ].state == Switch::ON ) {
+		if (info->scenes[current_scene].tracks[i].state == State::INT) {
 			status_field[ i ].on();
 			instrument_field[ i ].on();
 			volume_field[i].on();
 			transposition_field[ i ].on();
 			double_X_slider[ i ].on();
+		}
+		else if (info->scenes[current_scene].tracks[i].state == State::EXT) {
+			status_field[i].light();
+			instrument_field[i].light();
+			volume_field[i].light();
+			transposition_field[i].light();
+			double_X_slider[i].light();
 		}
 		else {
 			status_field[ i ].off();
@@ -645,22 +655,30 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					temp_word.append(" ");
 					etiqueta_field.set_content(temp_word);
 				}
-				else if ( cursor[X] == 0 ) { // CAmbio de status: se guarda
-					if ( info->scenes[ current_scene ].tracks[ cursor[Y] ].state == ON ) {
-						info->scenes[ current_scene ].tracks[ cursor[Y] ].state = OFF;
-						status_field[ cursor[Y] ].off();
-						instrument_field[ cursor[Y] ].off();
-						volume_field[ cursor[Y] ].off();
-						transposition_field[ cursor[ Y ] ].off();
-						double_X_slider[ cursor[ Y ] ].off();
+				else if (cursor[X] == 0) { // CAmbio de status: se va ciclando
+					if (info->scenes[current_scene].tracks[cursor[Y]].state == State::INT) {
+						info->scenes[current_scene].tracks[cursor[Y]].state = State::EXT;
+						status_field[cursor[Y]].light();
+						instrument_field[cursor[Y]].light();
+						volume_field[cursor[Y]].light();
+						transposition_field[cursor[Y]].light();
+						double_X_slider[cursor[Y]].light();
+					}
+					else if (info->scenes[current_scene].tracks[cursor[Y]].state == State::EXT) {
+						info->scenes[current_scene].tracks[cursor[Y]].state = State::Off;
+						status_field[cursor[Y]].off();
+						instrument_field[ cursor[Y]].off();
+						volume_field[cursor[Y]].off();
+						transposition_field[cursor[Y]].off();
+						double_X_slider[cursor[Y]].off();
 					}
 					else {
-						info->scenes[ current_scene ].tracks[ cursor[Y] ].state = ON;
-						status_field[ cursor[Y] ].on();
-						instrument_field[ cursor[Y] ].on();
-						volume_field[ cursor[Y] ].on();
-						transposition_field[ cursor[ Y ] ].on();
-						double_X_slider[ cursor[ Y ] ].on();
+						info->scenes[current_scene].tracks[cursor[Y]].state = State::INT;
+						status_field[cursor[Y]].on();
+						instrument_field[cursor[Y]].on();
+						volume_field[cursor[Y]].on();
+						transposition_field[cursor[Y]].on();
+						double_X_slider[cursor[Y]].on();
 					}
 
 					status_field[ cursor[Y] ].set_cursor();

@@ -50,7 +50,7 @@ class Orchestra {
 				std::array<DoubleXslider, 8> double_X_slider;
 				std::array<int16_t, 2> cursor;
 		std::array<struct Font, 8> native_font;
-		struct Font cursor_font, MIDI_font, dimmed_font;
+		struct Font cursor_font, MIDI_font, dimmed_font, light_font;
 		int16_t current_scene;
 		Performance *info;
 		Keyboard *keyboard_ptr;

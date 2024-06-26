@@ -298,7 +298,7 @@ void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{
 void Keyboard::dump_scene() noexcept/*{{{*/
 {
 	jack_midi_data_t param_SysExEs[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE]
-		// Status (DEFAULT: todes en OFF)
+		// Status (DEFAULT: todes en Off)
 		{	{	{0xF0, 0x42, 0x30, 0x7A, 0x41, 0x01, 0x00, 0x01, 0x00, 0x03, 0x00, 0x01, 0xF7},
 				{0xF0, 0x42, 0x30, 0x7A, 0x41, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x01, 0xF7},
 				{0xF0, 0x42, 0x30, 0x7A, 0x41, 0x01, 0x00, 0x03, 0x00, 0x03, 0x00, 0x01, 0xF7},
@@ -350,8 +350,11 @@ void Keyboard::dump_scene() noexcept/*{{{*/
 
 	// ADJUST
 	for ( std::size_t i = 0; i < NUMBER_OF_PARTS; ++i ) {
-		if ( performance_buffer.scenes[scene].tracks[i].state == ON )
+		if (performance_buffer.scenes[scene].tracks[i].state == State::INT)
 			param_SysExEs[0][i][11] = 0x00; // -> ON
+		else if (performance_buffer.scenes[scene].tracks[i].state == State::EXT)
+			param_SysExEs[0][i][11] = 0x02; // -> EXT
+											//
 		param_SysExEs[1][i][11] = performance_buffer.scenes[scene].tracks[i].volume;
 		param_SysExEs[2][i][11] = performance_buffer.scenes[scene].tracks[i].lower_key;
 		param_SysExEs[3][i][11] = performance_buffer.scenes[scene].tracks[i].upper_key;

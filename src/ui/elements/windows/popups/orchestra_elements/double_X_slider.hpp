@@ -14,6 +14,7 @@ class DoubleXslider : public OrchestraElement {
 		void set_limits( const int16_t &_Lvalue, const int16_t &_Rvalue ) noexcept;
 		void on() noexcept;
 		void off() noexcept;
+		auto light() noexcept -> void;
 		void set_values( const int16_t &, const int16_t & ) noexcept;
 		void leave_cursor() noexcept;
 		void set_cursor_at_left() noexcept;

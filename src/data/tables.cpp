@@ -8,11 +8,11 @@
 #include <vector>
 #include "../common/string.hpp"
 
-void llenado_displayTable(	Performance *_DisplayTable[], std::vector<Performance> &_DataBase, /*{{{*/
-							const int _DBRows, const std::string_view _Cadena, int *_DisplayRows )
-{
-	switch (_Cadena.data()[0]) {
+void llenado_displayTable(
+		Performance *_DisplayTable[], std::vector<Performance> &_DataBase,
+		const int _DBRows, const std::string_view _Cadena, int *_DisplayRows ) {
 
+	switch (_Cadena.data()[0]) {
 		case '\0': // RESET_QUERY
 			*_DisplayRows = _DBRows; // reiniciamos
 			for ( int32_t i = 0; i < _DBRows; ++i )
@@ -28,21 +28,25 @@ void llenado_displayTable(	Performance *_DisplayTable[], std::vector<Performance
 
 			for (int32_t i = 0; i < _DBRows; ++i)
 				// Si encontró en algún campo la palabra clave
-				if (low_string(_DataBase[i].metadata.title).find(low_string(_Cadena)) != std::string::npos or
-					low_string(_DataBase[i].metadata.artist).find(low_string(_Cadena)) != std::string::npos or
-					low_string(_DataBase[i].metadata.genre).find(low_string(_Cadena)) != std::string::npos or
-					low_string(_DataBase[i].metadata.mood).find(low_string(_Cadena)) != std::string::npos or
-					low_string(_DataBase[i].metadata.keyword).find(low_string(_Cadena))	!= std::string::npos){
-
-					// Agrégala
-					_DisplayTable[*_DisplayRows] = &_DataBase[i];
-					++(*_DisplayRows);
-				}
+				if (low_string(_DataBase[i].metadata.title)
+						.find(low_string(_Cadena)) != std::string::npos or
+					low_string(_DataBase[i].metadata.artist)
+						.find(low_string(_Cadena)) != std::string::npos or
+					low_string(_DataBase[i].metadata.genre)
+						.find(low_string(_Cadena)) != std::string::npos or
+					low_string(_DataBase[i].metadata.mood)
+						.find(low_string(_Cadena)) != std::string::npos or
+					low_string(_DataBase[i].metadata.keyword)
+						.find(low_string(_Cadena)) != std::string::npos) {
+							// Agrégala
+							_DisplayTable[*_DisplayRows] = &_DataBase[i];
+							++(*_DisplayRows);
+					}
 			break;
 	}
 
 	return;
-}/*}}}*/
+}
 
 void llenado_favourite(int fav[], Performance base[], const int baseRows)/*{{{*/
 {

@@ -63,6 +63,26 @@ void DoubleXslider::on() noexcept/*{{{*/
 	wrefresh( area );
 }/*}}}*/
 
+auto DoubleXslider::light() noexcept -> void/*{{{*/
+{
+	is_active = true;
+	lPos = lValue - MIN_KEY + 1;
+	rPos = rValue - MIN_KEY + 1;
+
+	wclear(area);
+	wattron(area, COLOR_PAIR(light_font.color));
+	set_font_reverse(true);
+	mvwaddch(area, 0, lPos, ' ');
+	wattron(area, A_BOLD);
+	set_font_reverse( false );
+	for ( int16_t i = lPos + 1; i < rPos; ++i )
+		mvwaddch( area, 0, i, '-' );
+	set_font_reverse( true );
+	mvwaddch( area, 0, rPos, ' ' );
+
+	wrefresh( area );
+}/*}}}*/
+
 void DoubleXslider::set_values( const int16_t &_Lvalue, const int16_t &_Rvalue ) noexcept/*{{{*/
 {
 	// Como el control comienza con min_value, al recibir un valor absouluto obtiene la diferencia

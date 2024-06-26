@@ -25,13 +25,14 @@
 
 enum HotKeysMode {
 	Variations,
-	Favourites};
+	Favourites
+};
 
 std::int32_t main() {
-	// Graphics
+	// Graphics{{{
 	set_windows();
 	draw_windows();
-	std::array<std::int16_t,8> update_window {0};
+	std::array<std::int16_t,8> update_window {0};/*}}}*/
 
 	// Folders{{{
 	const char *home_directory_c;
@@ -89,7 +90,9 @@ std::int32_t main() {
 
 		switch (command) {
 			case BEGIN:/*{{{*/
-				llenado_displayTable(displayTable, catalog.performances, n_performances, keyword, &n_matches);
+				llenado_displayTable(
+						displayTable, catalog.performances, n_performances, 
+						keyword, &n_matches);
 
 				if (n_performances > 0) // permitimos 0 lineas
 					performance_buffer = &catalog.performances.front();

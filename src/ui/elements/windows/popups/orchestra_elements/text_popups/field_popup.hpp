@@ -7,6 +7,7 @@ class FieldPopup : public TextPopup {
 	public:
 		void on() noexcept;
 		void off() noexcept;
+		auto light() noexcept -> void;
 		void set_cursor() noexcept;
 };
 

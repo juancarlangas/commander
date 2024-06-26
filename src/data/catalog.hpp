@@ -1,7 +1,7 @@
 #ifndef DATABASES_HPP
 #define DATABASES_HPP
 
-#include "../midi/midi.hpp"
+#include "midi/midi.hpp"
 
 #include <cstdint>
 #include <string>
@@ -14,7 +14,6 @@
 #define MAXIMO_DE_CANCIONES 1000
 #define N_FAVORITOS 10
 static const std::int16_t &TRACKS_PER_PERFORMANCE{ 8 };
-
 
 struct Metadata {
 	std::string title;
@@ -32,7 +31,7 @@ struct Patch {
 typedef Patch Program;
 
 struct Settings {
-	enum Switch state {Switch::OFF};
+	enum State state {State::Off};
 	std::int16_t volume {100};
 	std::int16_t lower_key {24};
 	std::int16_t upper_key {72};
