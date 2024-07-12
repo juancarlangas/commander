@@ -75,9 +75,6 @@ int no_accent(char after[], const char prev[])/*{{{*/
 				after[j] = after[j + 1];
 			} while (after[j++] != '\0');
 		}
-
-		/*Minúsculas: <----------------------------------------------------------- OPCIONAL!! */
-		/*after[i] = tolower((int)after[i]);*/
 		
 	} while (after[i++] != '\0'); 
 

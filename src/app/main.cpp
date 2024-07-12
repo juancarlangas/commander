@@ -99,7 +99,7 @@ std::int32_t main() {
 
 				x50.set_performance_buffer( *performance_buffer );
 
-				playlist->cargar("/home/juancarlangas/.config/commander/Playlists/default.csv");
+				playlist->cargar(config_directory + "/Playlists/default.csv");
 
 				update_window[LCD]		= true;
 				update_window[SEARCH] 	= true;
@@ -112,7 +112,7 @@ std::int32_t main() {
 
 				break;/*}}}*/
 
-			case SET_MODE:/*{{{*/
+			case TOGGLE_WORK_MODE:/*{{{*/
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
@@ -121,8 +121,8 @@ std::int32_t main() {
 				else
 					mode = COMBINATOR;
 
-				llenado_displayTable(
-						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
+				llenado_displayTable(displayTable, dBase[mode].performances, 
+						n_performances, keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;
@@ -137,12 +137,12 @@ std::int32_t main() {
 
 				break;/*}}}*/
 
-			case ESCAPE:/*{{{*/
+			case RESET_QUERY:/*{{{*/
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
-				llenado_displayTable(
-						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
+				llenado_displayTable(displayTable, dBase[mode].performances,
+						n_performances, keyword, &n_matches);
 
 				charIndex = 0;
 				dTop = 0;
@@ -159,7 +159,7 @@ std::int32_t main() {
 
 				break;/*}}}*/
 
-			case READ_CHAR:/*{{{*/
+			case INCREASE_QUERY:/*{{{*/
 
 				// agregamos 1 letra al keyword
 				keyword[ charIndex++ ] = caracter;
@@ -168,9 +168,6 @@ std::int32_t main() {
 				// si es acento o tilde, quedamos a la espera del siguiente
 				if (keyword[charIndex - 1] != -61) {
 					charIndex = no_accent( keyword, keyword ); //clean
-
-					// Garantizamos que la última letra válida añadida sea minúscula
-					// keyword[ charIndex - 1 ] = std::tolower( keyword[ charIndex - 1 ] );
 
 					llenado_displayTable(	displayTable, dBase[mode].performances,
 											n_performances, keyword, &n_matches	);
@@ -191,13 +188,13 @@ std::int32_t main() {
 				}
 				break;/*}}}*/
 
-			case DEL:/*{{{*/
+			case DECREASE_QUERY:/*{{{*/
 
 				charIndex--;
 				keyword[charIndex] = '\0';
 
-				llenado_displayTable(
-						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
+				llenado_displayTable(displayTable, dBase[mode].performances,
+						n_performances, keyword, &n_matches);
 				
 				dTop = 0;
 				dIndex = 0;
@@ -212,8 +209,9 @@ std::int32_t main() {
 
 				break;/*}}}*/
 
-			case SET_SCENE: {/*{{{*/
-				// la conversión de 1 a 9 es -48, pero por indice de arreglo restamos uno más
+			case DIAL_SCENE: {/*{{{*/
+				// la conversión de 1 a 9 es -48,
+				// pero por indice de arreglo restamos uno más
 				int32_t funcion_a_variacion = caracter - KEY_F0;
 				x50.set_scene( funcion_a_variacion );
 				if ( x50.is_connected() )

@@ -11,7 +11,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 	switch (digit) {
 
 		// ENTER{{{
-		case '\n': //ESCAPE SEQUENCE*
+		case '\n': //RESET_QUERY SEQUENCE*
 			if (strstr(":add", cadena) != NULL && strstr(cadena, ":add") != NULL)
 				//if (cadena[0] == '\0'); // Se garantiza que no hay búsquedas
 					comando = ADD_VALUE;
@@ -24,15 +24,15 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 
 			else if (strstr(":seq", cadena) != NULL && strstr(cadena, ":seq") != NULL) {
 				if (mode == COMBINATOR)
-					comando = SET_MODE;
+					comando = TOGGLE_WORK_MODE;
 				else
-					comando = ESCAPE;
+					comando = RESET_QUERY;
 			}
 			else if (strstr(":cmb", cadena) != NULL && strstr(cadena, ":cmb") != NULL) { 
 				if (mode == SEQUENCER)
-					comando = SET_MODE;
+					comando = TOGGLE_WORK_MODE;
 				else
-					comando = ESCAPE;
+					comando = RESET_QUERY;
 			}
 
 			else if ( !strcmp( cadena, ":wpl" ) )
@@ -65,7 +65,7 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 22: if ( windowMode == MODE_DISPLAY ) comando = PASTE_ORCHESTRATION; break; // <C-P>
 		case '+': if (windowMode == MODE_DISPLAY && dIndex >= 0) comando = ADD_TO_PLAYLIST; break;
 		case '-': if (windowMode == MODE_PLAYLIST) comando = DEL_FROM_PLAYLIST; break;
-		case 27: comando = ESCAPE; break;
+		case 27: comando = RESET_QUERY; break;
 		case '\t': comando = CHANGE_WINDOW; break;
 		case KEY_UP: case KEY_DOWN: comando = MOVE_INDEX; break;
 		case KEY_LEFT:	comando = TO_PREV_SCENE; break;
@@ -79,16 +79,19 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 				comando = DEL_FROM_PLAYLIST;
 			break;
 
-		case KEY_BACKSPACE: case 8: if (ci > 0) comando = DEL; break; // BACKSPACE
+		case KEY_BACKSPACE: case 8:
+			if (ci > 0) comando = DECREASE_QUERY;
+			break;
+
 		case 17: comando = EXIT; break;
 
 		default:
 			if ( KEY_F(1) <= digit and digit <= KEY_F(10) )
-				comando = SET_SCENE;
+				comando = DIAL_SCENE;
 			else if (  48 <= digit and digit <= 57 )
 				comando = FAVOURITE;
 			else if ( ( 58 <= digit and digit <= 122 ) || digit == '/' )
-				comando = READ_CHAR;
+				comando = INCREASE_QUERY;
             break;
 	}
 
