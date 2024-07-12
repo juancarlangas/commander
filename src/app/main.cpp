@@ -1,26 +1,54 @@
-#include "main.hpp"
+#include <stdio.h>/*{{{*/
+#include <stdlib.h>
+#include <pwd.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <cstdlib>
+#include <panel.h>/*}}}*/
 
-int32_t main()
-{
+#include "common/common.hpp"/*{{{*/
+#include "common/matroska.hpp"
+#include "ui/orchestra.hpp"
+#include "midi/keyboards.hpp"
+#include "ui/form.hpp"
+#include "ui/ncurses.hpp"
+#include "ui/screen.hpp"
+#include "common/common.hpp"
+#include "common/string.hpp"
+#include "common/matroska.hpp"
+#include "data/tables.hpp"
+#include "data/catalog.hpp"
+#include "data/playlist.hpp"
+#include "ui/printing.hpp"
+/*}}}*/
+
+enum HotKeysMode {
+	Variations,
+	Favourites
+};
+
+std::int32_t main() {
 	// Graphics{{{
-	y = init_ncurses();
+	set_windows();
 	draw_windows();
-	short int updateWindow[8] = {0};/*}}}*/
+	std::array<std::int16_t,8> update_window {0};/*}}}*/
 
 	// Folders{{{
 	const char *home_directory_c;
 	if ( ( home_directory_c = getenv("HOME") ) == NULL )
-		home_directory_c = getpwuid( getuid() )->pw_dir;
-	const std::string home_directory { home_directory_c };
+		home_directory_c = getpwuid(getuid())->pw_dir;
+	const std::string home_directory {home_directory_c};
 
    	char config_directory_c[50];
-   	sprintf( config_directory_c, "%s/.config/commander", home_directory_c );
+   	sprintf(config_directory_c, "%s/.config/commander", home_directory_c);
 	std::string generic_path;
-    const std::string config_directory{ config_directory_c };/*}}}*/
+    const std::string config_directory {config_directory_c};/*}}}*/
 
 	// Data{{{
 	Catalog* dBase = new Catalog [] {{config_directory + "/catalog.json"}};
 	Catalog& catalog {dBase[COMBINATIONS]};
+	catalog.set_sfz_folder(static_cast<std::filesystem::path>(home_directory)/".sounds"/"sfz"/"commander");
 
 	std::int32_t n_performances {catalog.get_activeRows()};
 /*}}}*/
@@ -58,31 +86,33 @@ int32_t main()
 	// Engine{{{
 	do {
 		for ( i = LCD; i <= ZOOM; i++ )
-			updateWindow[i] = false;
+			update_window[i] = false;
 
 		switch (command) {
 			case BEGIN:/*{{{*/
-				llenado_displayTable(displayTable, catalog.performances, n_performances, keyword, &n_matches);
+				llenado_displayTable(
+						displayTable, catalog.performances, n_performances, 
+						keyword, &n_matches);
 
 				if (n_performances > 0) // permitimos 0 lineas
 					performance_buffer = &catalog.performances.front();
 
 				x50.set_performance_buffer( *performance_buffer );
 
-				playlist->cargar("/home/juancarlangas/.config/commander/Playlists/default.csv");
+				playlist->cargar(config_directory + "/Playlists/default.csv");
 
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[MIDI_STATE] = true;
+				update_window[LCD]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[PLAYLIST] 	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;
+				update_window[MIDI_STATE] = true;
 
 				break;/*}}}*/
 
-			case SET_MODE:/*{{{*/
+			case TOGGLE_WORK_MODE:/*{{{*/
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
@@ -91,28 +121,28 @@ int32_t main()
 				else
 					mode = COMBINATOR;
 
-				llenado_displayTable(
-						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
+				llenado_displayTable(displayTable, dBase[mode].performances, 
+						n_performances, keyword, &n_matches);
 
 				charIndex = 0;
 				dTop   = 0;
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;
 
 				break;/*}}}*/
 
-			case ESCAPE:/*{{{*/
+			case RESET_QUERY:/*{{{*/
 				for (k = 0; k <= LONG_STRING - 1; k++)
 					keyword[k] = '\0';
 
-				llenado_displayTable(
-						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
+				llenado_displayTable(displayTable, dBase[mode].performances,
+						n_performances, keyword, &n_matches);
 
 				charIndex = 0;
 				dTop = 0;
@@ -120,16 +150,16 @@ int32_t main()
 
 				if (winMode == MODE_PLAYLIST) {
 					winMode = MODE_DISPLAY;
-					updateWindow[PLAYLIST] = true;
+					update_window[PLAYLIST] = true;
 				}
-				updateWindow[LCD] 	  = true;
-				updateWindow[SEARCH]  = true;
-				updateWindow[DISPLAY] = true;
-				updateWindow[ZOOM]	  = true;
+				update_window[LCD] 	  = true;
+				update_window[SEARCH]  = true;
+				update_window[DISPLAY] = true;
+				update_window[ZOOM]	  = true;
 
 				break;/*}}}*/
 
-			case READ_CHAR:/*{{{*/
+			case INCREASE_QUERY:/*{{{*/
 
 				// agregamos 1 letra al keyword
 				keyword[ charIndex++ ] = caracter;
@@ -139,51 +169,49 @@ int32_t main()
 				if (keyword[charIndex - 1] != -61) {
 					charIndex = no_accent( keyword, keyword ); //clean
 
-					// Garantizamos que la última letra válida añadida sea minúscula
-					// keyword[ charIndex - 1 ] = std::tolower( keyword[ charIndex - 1 ] );
-
 					llenado_displayTable(	displayTable, dBase[mode].performances,
 											n_performances, keyword, &n_matches	);
 
 					if (winMode == MODE_PLAYLIST) {
 						winMode = MODE_DISPLAY;
-						updateWindow[PLAYLIST] = true;
+						update_window[PLAYLIST] = true;
 					}
 
 					if (keyword[0] != ':' || charIndex == 1)
-						updateWindow[ZOOM] = true;
+						update_window[ZOOM] = true;
 
 
-					updateWindow[LCD] 	  = true;
-					updateWindow[SEARCH]  = true;
-					updateWindow[DISPLAY] = true;
+					update_window[LCD] 	  = true;
+					update_window[SEARCH]  = true;
+					update_window[DISPLAY] = true;
 
 				}
 				break;/*}}}*/
 
-			case DEL:/*{{{*/
+			case DECREASE_QUERY:/*{{{*/
 
 				charIndex--;
 				keyword[charIndex] = '\0';
 
-				llenado_displayTable(
-						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
+				llenado_displayTable(displayTable, dBase[mode].performances,
+						n_performances, keyword, &n_matches);
 				
 				dTop = 0;
 				dIndex = 0;
 
-				updateWindow[0] = 1;
-				updateWindow[1] = 1;
-				updateWindow[2] = 1;
-				updateWindow[ZOOM] = true;
+				update_window[0] = 1;
+				update_window[1] = 1;
+				update_window[2] = 1;
+				update_window[ZOOM] = true;
 
 				if (winMode == MODE_PLAYLIST)
 					winMode = MODE_DISPLAY;
 
 				break;/*}}}*/
 
-			case SET_SCENE: {/*{{{*/
-				// la conversión de 1 a 9 es -48, pero por indice de arreglo restamos uno más
+			case DIAL_SCENE: {/*{{{*/
+				// la conversión de 1 a 9 es -48,
+				// pero por indice de arreglo restamos uno más
 				int32_t funcion_a_variacion = caracter - KEY_F0;
 				x50.set_scene( funcion_a_variacion );
 				if ( x50.is_connected() )
@@ -215,8 +243,8 @@ int32_t main()
 							plIndexB++;
 							pl_index = plIndexB;
 						}
-						updateWindow[PLAYLIST] = true;
-						updateWindow[ZOOM] = true;
+						update_window[PLAYLIST] = true;
+						update_window[ZOOM] = true;
 
 						break;
 				}
@@ -227,7 +255,9 @@ int32_t main()
 					// solo actualizamos el buffer para poder trabajar online
 					x50.set_performance_buffer( *performance_buffer );
 
-				updateWindow[LCD] = true;
+				x50.write_sfz_file(catalog.get_sfz_folder(), "commander.sfz", performance_buffer->sfz_filename);
+
+				update_window[LCD] = true;
 
 				break;/*}}}*/
 
@@ -238,7 +268,7 @@ int32_t main()
 				if ( x50.is_connected() )
 					x50.dump_performance(*performance_buffer);
 
-				updateWindow[LCD] 	  = true;
+				update_window[LCD] 	  = true;
 
 				/* Toda la siguiente parte reinicializa displayTable y coloca el índice
 				 * en el favorito, pero esta es una característica poco conveniente.
@@ -254,11 +284,11 @@ int32_t main()
 
 				if (winMode == MODE_PLAYLIST) {
 					winMode = MODE_DISPLAY;
-					updateWindow[PLAYLIST] = true;
+					update_window[PLAYLIST] = true;
 				}
-				updateWindow[SEARCH]  = true;
-				updateWindow[DISPLAY] = true;
-				updateWindow[ZOOM]	  = true;
+				update_window[SEARCH]  = true;
+				update_window[DISPLAY] = true;
+				update_window[ZOOM]	  = true;
 				*/
 
 				break;
@@ -276,42 +306,40 @@ int32_t main()
 				else if (winMode == MODE_PLAYLIST)
 					winMode = MODE_DISPLAY;
 
-				updateWindow[DISPLAY] 	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[ZOOM]		= true;
+				update_window[DISPLAY] 	= true;
+				update_window[PLAYLIST] 	= true;
+				update_window[ZOOM]		= true;
 
 				break;/*}}}*/
 
 			case MOVE_INDEX:/*{{{*/
-
-				if ( caracter == KEY_UP || caracter == KEY_LEFT )
-					switch ( winMode ) {
+				if (caracter == KEY_UP || caracter == KEY_LEFT)
+					switch (winMode) {
 						case MODE_DISPLAY:
 							decrease_index( &dTop, &dIndex );
-							updateWindow[DISPLAY] = true;
+							update_window[DISPLAY] = true;
 							break;
 						case MODE_PLAYLIST:
 							decrease_index(&plTop, &plIndexB );
 							pl_index = plIndexB;
-							updateWindow[PLAYLIST] = true;
+							update_window[PLAYLIST] = true;
 							break;
 					}
-
 				else if (caracter == KEY_DOWN || caracter == KEY_RIGHT)
 					switch (winMode) {
 						case MODE_DISPLAY:
 							increase_index(&dTop, n_matches, &dIndex, winMode);
-							updateWindow[DISPLAY] = true;
+							update_window[DISPLAY] = true;
 							break;
 						case MODE_PLAYLIST:
 							increase_index(&plTop, playlist->get_n_pistas(), &plIndexB, winMode);
 							pl_index = plIndexB;
-							updateWindow[PLAYLIST] = true;
+							update_window[PLAYLIST] = true;
 							break;
 					}
 
-				updateWindow[DIGITS] = true;
-				updateWindow[ZOOM]	= true;
+				update_window[DIGITS] = true;
+				update_window[ZOOM]	= true;
 
 				break;/*}}}*/
 
@@ -330,13 +358,13 @@ int32_t main()
 						displayTable, catalog.performances, n_performances, keyword, &n_matches );
 
 				draw_windows();
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;	
+				update_window[LCD]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[PLAYLIST] 	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;	
 
 
 				break;
@@ -355,12 +383,12 @@ int32_t main()
 				llenado_displayTable(
 						displayTable, dBase[mode].performances, n_performances, keyword, &n_matches );
 
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;	
+				update_window[LCD]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;	
 
 				n_performances = catalog.get_activeRows();
 
@@ -388,13 +416,13 @@ int32_t main()
 				llenado_displayTable(displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
 
 				draw_windows();
-				updateWindow[LCD]		= true;
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[PLAYLIST] 	= true;
-				updateWindow[COMPUTER] 	= true;
-				updateWindow[DIGITS]	= true;
-				updateWindow[ZOOM]		= true;	
+				update_window[LCD]		= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[PLAYLIST] 	= true;
+				update_window[COMPUTER] 	= true;
+				update_window[DIGITS]	= true;
+				update_window[ZOOM]		= true;	
 
 				break;
 			}/*}}}*/
@@ -414,38 +442,44 @@ int32_t main()
 					update_popups();
 					draw_windows();
 
-					updateWindow[LCD]		= true;
-					updateWindow[SEARCH] 	= true;
-					updateWindow[DISPLAY]	= true;
-					updateWindow[PLAYLIST] 	= true;
-					updateWindow[COMPUTER] 	= true;
-					updateWindow[DIGITS]	= true;
-					updateWindow[ZOOM]		= true;	
+					update_window[LCD]		= true;
+					update_window[SEARCH] 	= true;
+					update_window[DISPLAY]	= true;
+					update_window[PLAYLIST] 	= true;
+					update_window[COMPUTER] 	= true;
+					update_window[DIGITS]	= true;
+					update_window[ZOOM]		= true;	
 				}
 
 				break;/*}}}*/
 
 			case COPY_ORCHESTRATION :/*{{{*/
-				orch_clipboard_ptr = displayTable[ dIndex ];
+				orch_clipboard_ptr = displayTable[dIndex];
 				break;/*}}}*/
 
 			case PASTE_ORCHESTRATION :/*{{{*/
-				displayTable[ dIndex ]->n_scenes = orch_clipboard_ptr->n_scenes;
-				displayTable[ dIndex]->default_scene = orch_clipboard_ptr->default_scene;
-				for ( i = 0; i < orch_clipboard_ptr->n_scenes; ++i ) {
-					displayTable[ dIndex ]->scenes[ i ].label =
-						orch_clipboard_ptr->scenes[ i ].label;
-					for ( j = 0; j < static_cast<int>(NUMBER_OF_PARTS); ++j ) {
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].state =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].state;
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].volume =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].volume;
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].lower_key =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].lower_key;
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].upper_key =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].upper_key;
-						displayTable[ dIndex ]->scenes[ i ].tracks[ j ].transposition =
-							orch_clipboard_ptr->scenes[ i ].tracks[ j ].transposition;
+				// Lets redim the scenes vector
+				displayTable[dIndex]->scenes.clear();
+				displayTable[dIndex]->scenes.resize(orch_clipboard_ptr->n_scenes);
+
+				// Lets copy the values
+				displayTable[dIndex]->n_scenes = orch_clipboard_ptr->n_scenes;
+				displayTable[dIndex]->default_scene = orch_clipboard_ptr->default_scene;
+
+				for (i = 0; i < orch_clipboard_ptr->n_scenes; ++i) {
+					displayTable[dIndex]->scenes[i].label =
+						orch_clipboard_ptr->scenes[i].label;
+					for (j = 0; j < static_cast<int>(NUMBER_OF_PARTS); ++j) {
+						displayTable[dIndex]->scenes[i].tracks[j].state =
+							orch_clipboard_ptr->scenes[i].tracks[j].state;
+						displayTable[dIndex]->scenes[i].tracks[j].volume =
+							orch_clipboard_ptr->scenes[i].tracks[j].volume;
+						displayTable[dIndex]->scenes[i].tracks[j].lower_key =
+							orch_clipboard_ptr->scenes[i].tracks[j].lower_key;
+						displayTable[dIndex]->scenes[i].tracks[j].upper_key =
+							orch_clipboard_ptr->scenes[i].tracks[j].upper_key;
+						displayTable[dIndex]->scenes[i].tracks[j].transposition =
+							orch_clipboard_ptr->scenes[i].tracks[j].transposition;
 					}
 				}
 				break;/*}}}*/
@@ -464,10 +498,10 @@ int32_t main()
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[ZOOM]		= true;
+				update_window[PLAYLIST]	= true;
 
 				break;/*}}}*/
 
@@ -526,10 +560,10 @@ int32_t main()
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[ZOOM]		= true;
+				update_window[PLAYLIST]	= true;
 
 				break;/*}}}*/
 
@@ -541,7 +575,7 @@ int32_t main()
 
 				playlist->guardar(home_directory + "/.config/commander/Playlists/default.csv" );
 
-				updateWindow[PLAYLIST] = true;
+				update_window[PLAYLIST] = true;
 
 				break;/*}}}*/
 
@@ -556,11 +590,11 @@ int32_t main()
 
 				if ( playlist->get_n_pistas() == 0 ) { //cambio
 					winMode = MODE_DISPLAY;
-					updateWindow[DISPLAY] = true;
+					update_window[DISPLAY] = true;
 				}
-				updateWindow[LCD] 	   = true;
-				updateWindow[PLAYLIST] = true;
-				updateWindow[ZOOM]	= true;
+				update_window[LCD] 	   = true;
+				update_window[PLAYLIST] = true;
+				update_window[ZOOM]	= true;
 
 				break;/*}}}*/
 
@@ -581,10 +615,10 @@ int32_t main()
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[ZOOM]		= true;
+				update_window[PLAYLIST]	= true;
 
 				break;/*}}}*/
 
@@ -632,40 +666,40 @@ int32_t main()
 				dIndex = 0;
 				winMode = MODE_DISPLAY;
 
-				updateWindow[SEARCH] 	= true;
-				updateWindow[DISPLAY]	= true;
-				updateWindow[ZOOM]		= true;
-				updateWindow[PLAYLIST]	= true;
+				update_window[SEARCH] 	= true;
+				update_window[DISPLAY]	= true;
+				update_window[ZOOM]		= true;
+				update_window[PLAYLIST]	= true;
 
 				break;/*}}}*/
 
 			case TOGGLE_MIDI_STATE:/*{{{*/
 				x50.toggle_MIDI_state();
-				updateWindow[ MIDI_STATE ] = true;
+				update_window[ MIDI_STATE ] = true;
 				break;/*}}}*/
 		}
 
 		// Printing{{{
-		if (updateWindow[DISPLAY] == true)
+		if (update_window[DISPLAY] == true)
 			print_displayTable(	displayWindow, 	displayTable,
 								dTop, 	n_matches, 	dIndex, winMode);
 
-		if (updateWindow[PLAYLIST] == true) {
+		if (update_window[PLAYLIST] == true) {
 			//print_playlist(	playlistWindow, playlistTable,
 			//				plTop, 	plRows, pl_index, plIndexB, winMode);
 			print_playlist(	playlistWindow, plTop, pl_index, *playlist, winMode);
 		}
 
-		if (updateWindow[SEARCH] == true)
+		if (update_window[SEARCH] == true)
 			print_search(searchWindow, keyword);
 
-		if (updateWindow[LCD] == true)
+		if (update_window[LCD] == true)
 			print_lcd( lcdWindow, performance_buffer );
 
-		if ( updateWindow[ MIDI_STATE ] )
+		if ( update_window[ MIDI_STATE ] )
 			print_MIDI_state( MIDI_state_window, x50.get_MIDI_state() );
 
-		if (updateWindow[ZOOM] == true) {
+		if (update_window[ZOOM] == true) {
 			if (winMode == MODE_PLAYLIST)
 				print_zoom(zoomWindow, playlist->get_pointer( pl_index ) );
 			else if ( keyword[0] != ':' and dIndex >= 0 )

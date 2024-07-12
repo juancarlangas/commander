@@ -1,7 +1,7 @@
 #ifndef DATABASES_HPP
 #define DATABASES_HPP
 
-#include "../midi/midi.hpp"
+#include "midi/midi.hpp"
 
 #include <cstdint>
 #include <string>
@@ -15,8 +15,6 @@
 #define N_FAVORITOS 10
 static const std::int16_t &TRACKS_PER_PERFORMANCE{ 8 };
 
-
-// NEW STRUCT TYPE{{{
 struct Metadata {
 	std::string title;
 	std::string artist;
@@ -24,32 +22,37 @@ struct Metadata {
 	std::string mood;
 	std::string keyword;
 };
+typedef Metadata Tagging;
 
 struct Patch {
-	std::int32_t bnk{ 0 };
-	std::int32_t num{ 0 };
+	std::int32_t bnk {0};
+	std::int32_t num {0};
 };
+typedef Patch Program;
 
 struct Settings {
-	enum Switch state{ Switch::OFF };
-	std::int16_t volume{ 100 };
-	std::int16_t lower_key{ 24 };
-	std::int16_t upper_key{ 72 };
-	std::int16_t transposition{ 0 };
+	enum State state {State::Off};
+	std::int16_t volume {100};
+	std::int16_t lower_key {24};
+	std::int16_t upper_key {72};
+	std::int16_t transposition {0};
 };
+typedef Settings Track;
 
 struct Scene {
 	std::string label;
-	std::array<Settings, TRACKS_PER_PERFORMANCE> tracks;
+	std::array<Track, TRACKS_PER_PERFORMANCE> tracks;
 };
 
-struct Performance { Metadata metadata;
-	Patch patch;
+struct Performance {
+	Metadata metadata; Tagging tagging;
+	Patch patch; Program program;
 	std::string type;
-	std::int16_t n_scenes{ 0 };
+	std::int16_t n_scenes {0};
 	std::vector<Scene> scenes;
-	std::int16_t default_scene{ 0 };
-};/*}}}*/
+	std::int16_t default_scene {0};
+	std::string sfz_filename;
+};
 
 class Catalog {/*{{{*/
 	public:
@@ -67,6 +70,8 @@ class Catalog {/*{{{*/
 		Performance *get_cancion_ptr( const int32_t &_Index ) noexcept;
 		Performance *get_favourite_row( const int32_t & ) noexcept;
 		std::vector<Performance> performances;
+		auto set_sfz_folder(const std::filesystem::path& _Path) noexcept -> void;
+		auto get_sfz_folder() const noexcept -> std::filesystem::path;
 	private:
 		std::int32_t activeRows;
 		std::int32_t n_canciones;
@@ -74,6 +79,7 @@ class Catalog {/*{{{*/
 		const char *homedir;
 		std::array<Performance*, N_FAVORITOS>favourites;
 		auto fill_favourites() noexcept -> void;
+		std::filesystem::path sfz_folder;
 
 		friend class Playlist;
 	};/*}}}*/

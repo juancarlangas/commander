@@ -17,6 +17,7 @@
 
 #include "data/catalog.hpp"
 #include "common/string.hpp"
+#include "midi/midi.hpp"
 #include "nlohmann/json.hpp"
 #include "common/common.hpp"
 
@@ -263,6 +264,14 @@ Performance *Catalog::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{
 	return favourites[ _FavNumber ];
 }/*}}}*/
 
+auto Catalog::set_sfz_folder(const std::filesystem::path& _Folder) noexcept -> void {/*{{{*/
+	sfz_folder = _Folder;
+}/*}}}*/
+
+auto Catalog::get_sfz_folder() const noexcept -> std::filesystem::path {/*{{{*/
+	return sfz_folder;
+}/*}}}*/
+
 /************************************* from_json **************************************************/
 // Overload for Metadata struct{{{
 void from_json(const nlohmann::json& j, Metadata& m) {
@@ -280,21 +289,22 @@ void from_json(const nlohmann::json& j, Patch& p) {
 }/*}}}*/
 
 // Overload for Swith enum{{{
-void from_json(const nlohmann::json& j, Switch& s) {
-	static const std::unordered_map<std::string, Switch> switch_map = {
-		{"OFF", OFF},
-		{"ON", ON}
+void from_json(const nlohmann::json& j, State& s) {
+	static const std::unordered_map<std::string, State> state_map = {
+		{"Off", State::Off},
+		{"INT", State::INT},
+		{"EXT", State::EXT}
 	};
-	auto it = switch_map.find(j.get<std::string>());
-	if (it == switch_map.end()) {
-		throw std::invalid_argument("Invalid Switch value");
+	auto it = state_map.find(j.get<std::string>());
+	if (it == state_map.end()) {
+		throw std::invalid_argument("Invalid State value");
 	}
 	s = it->second;
 }/*}}}*/
 
 // Overload for Settings struct{{{
 void from_json(const nlohmann::json& j, Settings& s) {
-	s.state = j.at("state").get<Switch>();
+	s.state = j.at("state").get<State>();
 	s.volume = j.at("volume").get<std::int16_t>();
 	s.lower_key = j.at("lower_key").get<std::int16_t>();
 	s.upper_key = j.at("upper_key").get<std::int16_t>();
@@ -323,6 +333,10 @@ void from_json(const nlohmann::json& j, Performance& p) {
 		p.scenes.push_back(sc);
 	}
 	p.default_scene = j.at("default_scene").get<std::int16_t>();
+	p.sfz_filename = j.at("sfz_file").get<std::string>();
+
+	p.tagging = p.metadata;
+	p.program = p.patch;
 }/*}}}*/
 
 /*************************************** to_json ****************************************************/
@@ -342,14 +356,15 @@ void to_json(nlohmann::ordered_json& j, const Patch& p) {
 }/*}}}*/
 
 // Overload for Switch enum{{{
-void to_json(nlohmann::ordered_json& j, const Switch& s) {
-	static const std::unordered_map<Switch, std::string> switch_map = {
-		{OFF, "OFF"},
-		{ON, "ON"}
+void to_json(nlohmann::ordered_json& j, const State& s) {
+	static const std::unordered_map<State, std::string> state_map = {
+		{State::Off, "Off"},
+		{State::INT, "INT"},
+		{State::EXT, "EXT"}
 	};
-	auto it = switch_map.find(s);
-	if (it == switch_map.end()) {
-		throw std::invalid_argument("Invalid Switch value");
+	auto it = state_map.find(s);
+	if (it == state_map.end()) {
+		throw std::invalid_argument("Invalid State value");
 	}
 	j = it->second;
 }/*}}}*/
@@ -376,5 +391,7 @@ void to_json(nlohmann::ordered_json& j, const Performance& p) {
 							   {"type", p.type},
 							   {"n_scenes", p.n_scenes },
 							   {"scenes", p.scenes},
-							   {"default_scene", p.default_scene}};
+							   {"default_scene", p.default_scene},
+							   {"sfz_file", p.sfz_filename.empty() ? "empty.sfz" : p.sfz_filename}};
+							   //{"sfz_file", ""}};
 }/*}}}*/

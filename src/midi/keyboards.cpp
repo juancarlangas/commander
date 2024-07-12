@@ -144,6 +144,21 @@ void Keyboard::set_scene( const int16_t _Variacion ) noexcept/*{{{*/
 		scene = _Variacion;
 }/*}}}*/
 
+auto Keyboard::write_sfz_file(const std::filesystem::path& _SFZfolder, const std::string& _TargetSFZ, const std::string& _OriginSFZ) const noexcept -> void {/*{{{*/
+	std::ofstream sfz_file {_SFZfolder/_TargetSFZ};
+	if (sfz_file.fail()) {
+		std::cerr << _SFZfolder/_TargetSFZ << " could not be opened in Keyboard::write_sfz_file()" << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+
+	sfz_file << "<control>\n";
+	sfz_file << "default_path=./\n";
+	sfz_file << '\n';
+	sfz_file << "#include \"" << _OriginSFZ << "\"";
+
+	sfz_file.close();
+}/*}}}*/
+
 /**************************************** JSON ***********************************************************/
 void from_json( const nlohmann::json &_JSONobject, Combination &_Combination ) {/*{{{*/
     _JSONobject.at( "instruments" ).get_to( _Combination.instruments );
@@ -202,7 +217,6 @@ int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*
 		should_send_scene_SysEx = false;
 	}
 	
-
     return 0;
 }/*}}}*/
 
@@ -238,7 +252,7 @@ void Keyboard::connect() noexcept {/*{{{*/
 
 	// Get the available ports
     all_ports_C_String = jack_get_ports(client, NULL, NULL, JackPortIsInput);
-	const char* desired_port_keyword {"(playback): X50 X50 _ SOUND"};
+	const char* desired_port_keyword {"a2j:X50 [24] (playback): [0] X50 X50 _ SOUND"};
 
 	// Try each of them and connect to it
     for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
@@ -288,7 +302,7 @@ void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{
 void Keyboard::dump_scene() noexcept/*{{{*/
 {
 	jack_midi_data_t param_SysExEs[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE]
-		// Status (DEFAULT: todes en OFF)
+		// Status (DEFAULT: todes en Off)
 		{	{	{0xF0, 0x42, 0x30, 0x7A, 0x41, 0x01, 0x00, 0x01, 0x00, 0x03, 0x00, 0x01, 0xF7},
 				{0xF0, 0x42, 0x30, 0x7A, 0x41, 0x01, 0x00, 0x02, 0x00, 0x03, 0x00, 0x01, 0xF7},
 				{0xF0, 0x42, 0x30, 0x7A, 0x41, 0x01, 0x00, 0x03, 0x00, 0x03, 0x00, 0x01, 0xF7},
@@ -340,8 +354,11 @@ void Keyboard::dump_scene() noexcept/*{{{*/
 
 	// ADJUST
 	for ( std::size_t i = 0; i < NUMBER_OF_PARTS; ++i ) {
-		if ( performance_buffer.scenes[scene].tracks[i].state == ON )
+		if (performance_buffer.scenes[scene].tracks[i].state == State::INT)
 			param_SysExEs[0][i][11] = 0x00; // -> ON
+		else if (performance_buffer.scenes[scene].tracks[i].state == State::EXT)
+			param_SysExEs[0][i][11] = 0x02; // -> EXT
+											//
 		param_SysExEs[1][i][11] = performance_buffer.scenes[scene].tracks[i].volume;
 		param_SysExEs[2][i][11] = performance_buffer.scenes[scene].tracks[i].lower_key;
 		param_SysExEs[3][i][11] = performance_buffer.scenes[scene].tracks[i].upper_key;
