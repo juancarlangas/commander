@@ -271,10 +271,6 @@ void Keyboard::connect() noexcept {/*{{{*/
     }
 
 	file.close();
-<<<<<<< HEAD
->>>>>>> testing
-=======
->>>>>>> testing
 	MIDI_state = Switch::ON;
 }
 /*}}}*/
@@ -296,7 +292,7 @@ void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{
 	timer.sleep(2e8);
 
 	scene = 0;
-	dump_scene();
+	//dump_scene();
 }/*}}}*/
 
 void Keyboard::dump_scene() noexcept/*{{{*/
