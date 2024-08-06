@@ -10,7 +10,7 @@
 #include "common/common.hpp"/*{{{*/
 #include "common/matroska.hpp"
 #include "ui/orchestra.hpp"
-#include "midi/keyboards.hpp"
+#include "midi/Keyboard.hpp"
 #include "ui/form.hpp"
 #include "ui/ncurses.hpp"
 #include "ui/screen.hpp"
@@ -18,8 +18,8 @@
 #include "common/string.hpp"
 #include "common/matroska.hpp"
 #include "data/tables.hpp"
-#include "data/catalog.hpp"
-#include "data/playlist.hpp"
+#include "data/Catalog.hpp"
+#include "data/Playlist.hpp"
 #include "ui/printing.hpp"
 /*}}}*/
 
@@ -91,15 +91,16 @@ std::int32_t main() {
 		switch (command) {
 			case BEGIN:/*{{{*/
 				llenado_displayTable(
-						displayTable, catalog.performances, n_performances, 
-						keyword, &n_matches);
+					displayTable, catalog.performances, n_performances,
+					keyword, &n_matches);
 
 				if (n_performances > 0) // permitimos 0 lineas
 					performance_buffer = &catalog.performances.front();
 
 				x50.set_performance_buffer( *performance_buffer );
 
-				playlist->cargar(config_directory + "/Playlists/default.csv");
+				playlist->cargar(
+						config_directory + "/Playlists/default.csv");
 
 				update_window[LCD]		= true;
 				update_window[SEARCH] 	= true;
@@ -121,7 +122,8 @@ std::int32_t main() {
 				else
 					mode = COMBINATOR;
 
-				llenado_displayTable(displayTable, dBase[mode].performances, 
+				llenado_displayTable(displayTable,
+						dBase[mode].performances,
 						n_performances, keyword, &n_matches);
 
 				charIndex = 0;
@@ -214,21 +216,21 @@ std::int32_t main() {
 				// pero por indice de arreglo restamos uno más
 				int32_t funcion_a_variacion = caracter - KEY_F0;
 				x50.set_scene( funcion_a_variacion );
-				if ( x50.is_connected() )
-					x50.dump_scene();
+				//if (x50.is_connected())
+					//x50.dump_scene();
 				break;
 			}/*}}}*/
 
 			case TO_PREV_SCENE:/*{{{*/
 				x50.to_prev_scene();
-				if ( x50.is_connected() )
-					x50.dump_scene();
+				//if (x50.is_connected())
+					//x50.dump_scene();
 				break;/*}}}*/
 
 			case TO_NEXT_SCENE :/*{{{*/
 				x50.to_next_scene();
-				if ( x50.is_connected() )
-					x50.dump_scene();
+				//if ( x50.is_connected() )
+					//x50.dump_scene();
 				break;/*}}}*/
 
 			case INTRO:/*{{{*/
@@ -237,7 +239,8 @@ std::int32_t main() {
 						performance_buffer = displayTable[ dIndex ];
 						break;
 					case MODE_PLAYLIST:
-						performance_buffer = playlist->get_pointer( pl_index );
+						performance_buffer =
+							playlist->get_pointer( pl_index );
 						//avance carro
 						if ( plIndexB < playlist->get_n_pistas() - 1 ) {
 							plIndexB++;
@@ -249,24 +252,29 @@ std::int32_t main() {
 						break;
 				}
 
-				if ( x50.is_connected() )
-					x50.dump_performance( *performance_buffer );
-				else
-					// solo actualizamos el buffer para poder trabajar online
-					x50.set_performance_buffer( *performance_buffer );
+				//if ( x50.is_connected() )
+					//x50.dump_performance( *performance_buffer );
+				//else
+					//solo actualizamos buffer para poder trabajar online
+					//x50.set_performance_buffer( *performance_buffer );
 
-				x50.write_sfz_file(catalog.get_sfz_folder(), "commander.sfz", performance_buffer->sfz_filename);
+				x50.write_sfz_file(
+						catalog.get_sfz_folder(), "commander.sfz",
+						performance_buffer->sfz_filename);
 
 				update_window[LCD] = true;
 
 				break;/*}}}*/
 
 			case FAVOURITE: {/*{{{*/
-				int32_t caracter_a_numero = caracter == 48 ? 9 : ( caracter - 49 );
-				performance_buffer = dBase[ COMBINATIONS ].get_favourite_row( caracter_a_numero );
+				int32_t caracter_a_numero =
+					caracter == 48 ? 9 : ( caracter - 49 );
+				performance_buffer =
+					dBase[COMBINATIONS].
+					get_favourite_row(caracter_a_numero);
 
-				if ( x50.is_connected() )
-					x50.dump_performance(*performance_buffer);
+				//if (x50.is_connected())
+					//x50.dump_performance(*performance_buffer);
 
 				update_window[LCD] 	  = true;
 
@@ -470,16 +478,16 @@ std::int32_t main() {
 					displayTable[dIndex]->scenes[i].label =
 						orch_clipboard_ptr->scenes[i].label;
 					for (j = 0; j < static_cast<int>(NUMBER_OF_PARTS); ++j) {
-						displayTable[dIndex]->scenes[i].tracks[j].state =
-							orch_clipboard_ptr->scenes[i].tracks[j].state;
-						displayTable[dIndex]->scenes[i].tracks[j].volume =
-							orch_clipboard_ptr->scenes[i].tracks[j].volume;
-						displayTable[dIndex]->scenes[i].tracks[j].lower_key =
-							orch_clipboard_ptr->scenes[i].tracks[j].lower_key;
-						displayTable[dIndex]->scenes[i].tracks[j].upper_key =
-							orch_clipboard_ptr->scenes[i].tracks[j].upper_key;
-						displayTable[dIndex]->scenes[i].tracks[j].transposition =
-							orch_clipboard_ptr->scenes[i].tracks[j].transposition;
+						displayTable[dIndex]->scenes[i].strips[j].state =
+							orch_clipboard_ptr->scenes[i].strips[j].state;
+						displayTable[dIndex]->scenes[i].strips[j].volume =
+							orch_clipboard_ptr->scenes[i].strips[j].volume;
+						displayTable[dIndex]->scenes[i].strips[j].lower_key =
+							orch_clipboard_ptr->scenes[i].strips[j].lower_key;
+						displayTable[dIndex]->scenes[i].strips[j].upper_key =
+							orch_clipboard_ptr->scenes[i].strips[j].upper_key;
+						displayTable[dIndex]->scenes[i].strips[j].transposition =
+							orch_clipboard_ptr->scenes[i].strips[j].transposition;
 					}
 				}
 				break;/*}}}*/

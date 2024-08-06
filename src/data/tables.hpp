@@ -1,7 +1,7 @@
 #ifndef TABLES_HPP
 #define TABLES_HPP
 
-#include "catalog.hpp"
+#include "Catalog.hpp"
 
 short int compare(const char stringSystem[], const char stringUser[]);
 

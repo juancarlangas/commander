@@ -15,7 +15,7 @@
 #include <fstream>
 #include <iomanip> // zerofill
 
-#include "data/catalog.hpp"
+#include "data/Catalog.hpp"
 #include "common/string.hpp"
 #include "midi/midi.hpp"
 #include "nlohmann/json.hpp"
@@ -41,13 +41,13 @@ Catalog::Catalog( const std::string &_Path ) noexcept/*{{{*/
 
 void Catalog::clean_row(int line)/*{{{*/
 {
-	performances[line].metadata.title.clear();
-	performances[line].metadata.genre.clear();
-	performances[line].metadata.mood.clear();
-	performances[line].metadata.keyword.clear();
+	performances[line].tagging.title.clear();
+	performances[line].tagging.genre.clear();
+	performances[line].tagging.mood.clear();
+	performances[line].tagging.keyword.clear();
 	performances[line].type.clear();
-	performances[line].patch.bnk = 0;
-	performances[line].patch.num = 0;
+	performances[line].program.bnk = 0;
+	performances[line].program.num = 0;
 }/*}}}*/
 
 void Catalog::load_from_json( const std::string &_Path)/*{{{*/
@@ -71,11 +71,11 @@ void Catalog::load_from_json( const std::string &_Path)/*{{{*/
 
 auto Catalog::fill_favourites() noexcept -> void {/*{{{*/
 	for (std::size_t i {0}; i < performances.size(); ++i)
-		if (performances[i].metadata.keyword.starts_with("Favourite"))
+		if (performances[i].tagging.keyword.starts_with("Favourite"))
 			favourites[
 				std::stoi(
-					performances[i].metadata.keyword.substr(
-						performances[i].metadata.keyword.find_first_of('_') + 1, std::string::npos)) - 1] = &performances[i];
+					performances[i].tagging.keyword.substr(
+						performances[i].tagging.keyword.find_first_of('_') + 1, std::string::npos)) - 1] = &performances[i];
 }/*}}}*/
 
 int32_t Catalog::get_activeRows() noexcept/*{{{*/
@@ -133,11 +133,11 @@ void Catalog::ordenate()/*{{{*/
 		// Mood: Sound
 		a = 0;
 		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
-			if (performances[a].metadata.mood != "Sound") { // If actual is not "Sound"
+			if (performances[a].tagging.mood != "Sound") { // If actual is not "Sound"
 				b = a + 1; // Start searching from next
 				found_keyword = false;
 				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
-					if (performances[b].metadata.mood != "Sound")
+					if (performances[b].tagging.mood != "Sound")
 						++b; //continue searching
 					else {
 						aux_performance = performances[a];
@@ -154,11 +154,11 @@ void Catalog::ordenate()/*{{{*/
 		a--;
 		b = a + 1;
 		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
-			if (performances[a].metadata.mood != "Lobby") {
+			if (performances[a].tagging.mood != "Lobby") {
 				b = a + 1;
 				found_keyword = false;
 				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
-					if (performances[b].metadata.mood != "Lobby")
+					if (performances[b].tagging.mood != "Lobby")
 						b++;
 					else {
 						aux_performance = performances[a];
@@ -175,11 +175,11 @@ void Catalog::ordenate()/*{{{*/
 		a--;
 		b = a + 1;
 		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
-			if (performances[a].metadata.mood != "Cena") {
+			if (performances[a].tagging.mood != "Cena") {
 				b = a + 1;
 				found_keyword = false;
 				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
-					if (performances[b].metadata.mood != "Cena")
+					if (performances[b].tagging.mood != "Cena")
 						b++;
 					else {
 						aux_performance = performances[a];
@@ -196,11 +196,11 @@ void Catalog::ordenate()/*{{{*/
 		a--;
 		b = a + 1;
 		while (a < static_cast<std::size_t>(activeRows - 1) and b < static_cast<std::size_t>(activeRows - 1)) {	
-			if (performances[a].metadata.mood != "Baile") {
+			if (performances[a].tagging.mood != "Baile") {
 				b = a + 1;
 				found_keyword = false;
 				while (found_keyword == false && b < static_cast<std::size_t>(activeRows)) {
-					if (performances[b].metadata.mood != "Baile")
+					if (performances[b].tagging.mood != "Baile")
 						b++;
 					else {
 						aux_performance = performances[a];
@@ -216,16 +216,16 @@ void Catalog::ordenate()/*{{{*/
 		// ALphabet
 		for (a = 0; a < static_cast<std::size_t>(activeRows - 1); a++)
 			for (b = a + 1; b < static_cast<std::size_t>(activeRows); b++) {
-				if (performances[a].metadata.mood == performances[b].metadata.mood) {
+				if (performances[a].tagging.mood == performances[b].tagging.mood) {
 					k = 0;
 					found_keyword = false;
 					while (found_keyword == false && k < LONG_STRING) {
-						if (performances[a].metadata.title[k] > performances[b].metadata.title[k]) {
+						if (performances[a].tagging.title[k] > performances[b].tagging.title[k]) {
 							aux_performance = performances[a];
 							performances[a] = performances[b];
 							performances[b] = aux_performance;
 							found_keyword = true;
-						} else if (performances[a].metadata.title[k] < performances[b].metadata.title[k])
+						} else if (performances[a].tagging.title[k] < performances[b].tagging.title[k])
 							found_keyword = true;
 						k++;
 					}
@@ -241,8 +241,8 @@ void Catalog::delete_duplicated() noexcept/*{{{*/
 	int32_t i, j;
 	for ( i = 0; i < n_canciones - 1; ++i )
 		for ( j = i + 1; j < n_canciones; ++j )
-			if ((performances[i].metadata.title == performances[j].metadata.title ) and
-				(performances[i].metadata.artist == performances[j].metadata.artist ) ) {
+			if ((performances[i].tagging.title == performances[j].tagging.title ) and
+				(performances[i].tagging.artist == performances[j].tagging.artist ) ) {
 				delete_value( j );
 				--n_canciones;
 			}
@@ -273,8 +273,8 @@ auto Catalog::get_sfz_folder() const noexcept -> std::filesystem::path {/*{{{*/
 }/*}}}*/
 
 /************************************* from_json **************************************************/
-// Overload for Metadata struct{{{
-void from_json(const nlohmann::json& j, Metadata& m) {
+// Overload for Tagging struct{{{
+void from_json(const nlohmann::json& j, Tagging& m) {
 	m.title = j.at("title").get<std::string>();
 	m.artist = j.at("artist").get<std::string>();
 	m.genre = j.at("genre").get<std::string>();
@@ -282,8 +282,8 @@ void from_json(const nlohmann::json& j, Metadata& m) {
 	m.keyword = j.at("keyword").get<std::string>();
 }/*}}}*/
 
-// Overload for Patch struct{{{
-void from_json(const nlohmann::json& j, Patch& p) {
+// Overload for Program struct{{{
+void from_json(const nlohmann::json& j, Program& p) {
 	p.bnk = j.at("bnk").get<std::int32_t>();
 	p.num = j.at("num").get<std::int32_t>();
 }/*}}}*/
@@ -302,8 +302,8 @@ void from_json(const nlohmann::json& j, State& s) {
 	s = it->second;
 }/*}}}*/
 
-// Overload for Settings struct{{{
-void from_json(const nlohmann::json& j, Settings& s) {
+// Overload for Strip struct{{{
+void from_json(const nlohmann::json& j, Strip& s) {
 	s.state = j.at("state").get<State>();
 	s.volume = j.at("volume").get<std::int16_t>();
 	s.lower_key = j.at("lower_key").get<std::int16_t>();
@@ -314,16 +314,16 @@ void from_json(const nlohmann::json& j, Settings& s) {
 // Overload for Scene struct{{{
 void from_json(const nlohmann::json& j, Scene& sc) {
 	sc.label = j.at("label").get<std::string>();
-	auto& tracks = j.at("tracks");
-	for (std::size_t i = 0; i < tracks.size(); ++i) {
-		from_json(tracks[i], sc.tracks[i]);
+	auto& strips = j.at("strips");
+	for (std::size_t i = 0; i < strips.size(); ++i) {
+		from_json(strips[i], sc.strips[i]);
 	}
 }/*}}}*/
 
 // Overload for Performance struct{{{
 void from_json(const nlohmann::json& j, Performance& p) {
-	from_json(j.at("metadata"), p.metadata);
-	from_json(j.at("patch"), p.patch);
+	from_json(j.at("tagging"), p.tagging);
+	from_json(j.at("program"), p.program);
 	p.type = j.at("type").get<std::string>();
 	p.n_scenes = j.at("n_scenes").get<std::int16_t>();
 	auto& scenes = j.at("scenes");
@@ -335,13 +335,13 @@ void from_json(const nlohmann::json& j, Performance& p) {
 	p.default_scene = j.at("default_scene").get<std::int16_t>();
 	p.sfz_filename = j.at("sfz_file").get<std::string>();
 
-	p.tagging = p.metadata;
-	p.program = p.patch;
+	p.tagging = p.tagging;
+	p.program = p.program;
 }/*}}}*/
 
-/*************************************** to_json ****************************************************/
-// Overload for Metadata struct{{{
-void to_json(nlohmann::ordered_json& j, const Metadata& m) {
+/*********************** to_json ***************************************/
+// Overload for Tagging struct{{{
+void to_json(nlohmann::ordered_json& j, const Tagging& m) {
 	j = nlohmann::ordered_json{{"title", m.title},
 							   {"artist", m.artist},
 							   {"genre", m.genre},
@@ -349,8 +349,8 @@ void to_json(nlohmann::ordered_json& j, const Metadata& m) {
 							   {"keyword", m.keyword}};
 }/*}}}*/
 
-// Overload for Patch struct{{{
-void to_json(nlohmann::ordered_json& j, const Patch& p) {
+// Overload for Program struct{{{
+void to_json(nlohmann::ordered_json& j, const Program& p) {
 	j = nlohmann::ordered_json{{"bnk", p.bnk},
 							   {"num", p.num}};
 }/*}}}*/
@@ -369,8 +369,8 @@ void to_json(nlohmann::ordered_json& j, const State& s) {
 	j = it->second;
 }/*}}}*/
 
-// Overload for Settings struct{{{
-void to_json(nlohmann::ordered_json& j, const Settings& s) {
+// Overload for Strip struct{{{
+void to_json(nlohmann::ordered_json& j, const Strip& s) {
 	j = nlohmann::ordered_json{{"state", s.state},
 							   {"volume", s.volume},
 							   {"lower_key", s.lower_key},
@@ -381,13 +381,13 @@ void to_json(nlohmann::ordered_json& j, const Settings& s) {
 // Overload for Scene struct{{{
 void to_json(nlohmann::ordered_json& j, const Scene& sc) {
 	j = nlohmann::ordered_json{{"label", sc.label},
-							   {"tracks", sc.tracks}};
+							   {"strips", sc.strips}};
 }/*}}}*/
 
 // Overload for Performance struct{{{
 void to_json(nlohmann::ordered_json& j, const Performance& p) {
-	j = nlohmann::ordered_json{{"metadata", p.metadata},
-							   {"patch", p.patch},
+	j = nlohmann::ordered_json{{"tagging", p.tagging},
+							   {"program", p.program},
 							   {"type", p.type},
 							   {"n_scenes", p.n_scenes },
 							   {"scenes", p.scenes},

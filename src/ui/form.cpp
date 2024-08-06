@@ -1,7 +1,7 @@
 #include <curses.h>
 #include <stdlib.h>
 
-#include "catalog.hpp"
+#include "Catalog.hpp"
 #include "form.hpp"
 
 #include "../common/common.hpp"
@@ -49,24 +49,24 @@ Form::Form()/*{{{*/
 bool Form::capture_value()/*{{{*/
 {
 	// Initialize
-		performance.metadata.title.clear();
-		performance.metadata.artist.clear();
-		performance.metadata.genre.clear();
-		performance.metadata.mood.clear();
-		performance.metadata.keyword.clear();
+		performance.tagging.title.clear();
+		performance.tagging.artist.clear();
+		performance.tagging.genre.clear();
+		performance.tagging.mood.clear();
+		performance.tagging.keyword.clear();
 		performance.type.clear();
-		performance.patch.bnk = 0;
-		performance.patch.num = 0;
+		performance.program.bnk = 0;
+		performance.program.num = 0;
 
 	show();
-		field[TITLE].set_string(performance.metadata.title);
-		field[ARTIST].set_string(performance.metadata.artist);
-		field[GENRE].set_string(performance.metadata.genre);
-		field[SECTION].set_string(performance.metadata.mood);
+		field[TITLE].set_string(performance.tagging.title);
+		field[ARTIST].set_string(performance.tagging.artist);
+		field[GENRE].set_string(performance.tagging.genre);
+		field[SECTION].set_string(performance.tagging.mood);
 		field[TYPE].set_string(performance.type);
-		field[KEYWORDS].set_string(performance.metadata.keyword);
-		field[BNK].set_string(static_cast<char>(performance.patch.bnk));
-		field[NUM].set_string(std::int32_t{ performance.patch.num });
+		field[KEYWORDS].set_string(performance.tagging.keyword);
+		field[BNK].set_string(static_cast<char>(performance.program.bnk));
+		field[NUM].set_string(std::int32_t{ performance.program.num });
 		field[SFZ].set_string(performance.sfz_filename);
 		
 		bool success = capture();
@@ -80,14 +80,14 @@ bool Form::capture_value(Performance _Performance)/*{{{*/
 	performance = _Performance;
 	
 	show();
-		field[TITLE].set_string(performance.metadata.title);
-		field[ARTIST].set_string(performance.metadata.artist);
-		field[GENRE].set_string(performance.metadata.genre);
-		field[SECTION].set_string(performance.metadata.mood);
-		field[KEYWORDS].set_string(performance.metadata.keyword);
+		field[TITLE].set_string(performance.tagging.title);
+		field[ARTIST].set_string(performance.tagging.artist);
+		field[GENRE].set_string(performance.tagging.genre);
+		field[SECTION].set_string(performance.tagging.mood);
+		field[KEYWORDS].set_string(performance.tagging.keyword);
 		field[TYPE].set_string(performance.type);
-		field[BNK].set_string(static_cast<char>(performance.patch.bnk)); // We dont add anything here
-		field[NUM].set_string(performance.patch.num);
+		field[BNK].set_string(static_cast<char>(performance.program.bnk)); // We dont add anything here
+		field[NUM].set_string(performance.program.num);
 		field[SFZ].set_string(performance.sfz_filename);
 		
 		bool success = capture();
@@ -137,28 +137,28 @@ bool Form::capture()/*{{{*/
 						field[activeField].get_string(word);
 						switch (activeField) {
 							case TITLE:
-								performance.metadata.title = word;
+								performance.tagging.title = word;
 								break;
 							case ARTIST:
-								performance.metadata.artist = word;
+								performance.tagging.artist = word;
 								break;
 							case GENRE:
-								performance.metadata.genre = word;
+								performance.tagging.genre = word;
 								break;
 							case SECTION:
-								performance.metadata.mood = word;
+								performance.tagging.mood = word;
 								break;
 							case KEYWORDS:
-								performance.metadata.keyword = word;
+								performance.tagging.keyword = word;
 								break;
 							case TYPE:
 								performance.type = word;
 								break;
 							case BNK:
-								performance.patch.bnk = static_cast<std::int16_t>(word[0] - 65);
+								performance.program.bnk = static_cast<std::int16_t>(word[0] - 65);
 								break;
 							case NUM:
-								performance.patch.num = std::stoi(word);
+								performance.program.num = std::stoi(word);
 								break;
 							case SFZ:
 								performance.sfz_filename = word;

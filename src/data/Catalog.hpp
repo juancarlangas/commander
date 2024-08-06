@@ -15,38 +15,35 @@
 #define N_FAVORITOS 10
 static const std::int16_t &TRACKS_PER_PERFORMANCE{ 8 };
 
-struct Metadata {
+struct Tagging {
 	std::string title;
 	std::string artist;
 	std::string genre;
 	std::string mood;
 	std::string keyword;
 };
-typedef Metadata Tagging;
 
-struct Patch {
+struct Program {
 	std::int32_t bnk {0};
 	std::int32_t num {0};
 };
-typedef Patch Program;
 
-struct Settings {
+struct Strip {
 	enum State state {State::Off};
 	std::int16_t volume {100};
 	std::int16_t lower_key {24};
 	std::int16_t upper_key {72};
 	std::int16_t transposition {0};
 };
-typedef Settings Track;
 
 struct Scene {
 	std::string label;
-	std::array<Track, TRACKS_PER_PERFORMANCE> tracks;
+	std::array<Strip, TRACKS_PER_PERFORMANCE> strips;
 };
 
 struct Performance {
-	Metadata metadata; Tagging tagging;
-	Patch patch; Program program;
+	Tagging tagging;
+	Program program;
 	std::string type;
 	std::int16_t n_scenes {0};
 	std::vector<Scene> scenes;
@@ -85,17 +82,17 @@ class Catalog {/*{{{*/
 	};/*}}}*/
 
 // JSON{{{
-void from_json( const nlohmann::json &_JSONobject, Patch &_Patch );
-void from_json( const nlohmann::json &_JSONobject, Settings &_Settings );
+void from_json( const nlohmann::json &_JSONobject, Program &_Program );
+void from_json( const nlohmann::json &_JSONobject, Strip &_Strip );
 void from_json( const nlohmann::json& j, Switch& s);
 void from_json( const nlohmann::json &_JSONobject, Performance &_Performance );
 void from_json( const nlohmann::json &_JSONobject, Scene &_Scene );
-void from_json( const nlohmann::json &_JSONobject, Metadata &_Metadata );
+void from_json( const nlohmann::json &_JSONobject, Tagging &_Tagging );
 
-void to_json(nlohmann::ordered_json& j, const Metadata& m);
-void to_json(nlohmann::ordered_json& j, const Patch& p);
+void to_json(nlohmann::ordered_json& j, const Tagging& m);
+void to_json(nlohmann::ordered_json& j, const Program& p);
 void to_json(nlohmann::ordered_json& j, const Switch& s);
-void to_json(nlohmann::ordered_json& j, const Settings& s);
+void to_json(nlohmann::ordered_json& j, const Strip& s);
 void to_json(nlohmann::ordered_json& j, const Scene& sc);
 void to_json(nlohmann::ordered_json& j, const Performance& p);/*}}}*/
 

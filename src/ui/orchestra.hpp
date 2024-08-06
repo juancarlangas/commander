@@ -3,13 +3,13 @@
 
 #include "ui/elements/window.hpp"
 #include "ui/fields.hpp"
-#include "midi/keyboards.hpp"
-#include "data/catalog.hpp"
+#include "midi/Keyboard.hpp"
+#include "data/Catalog.hpp"
 #include "ui/elements/windows/boxed_windows/boxed_popup.hpp"
 #include "elements/windows/popups/orchestra_elements/check_popup.hpp"
 #include "elements/windows/popups/orchestra_elements/text_popups/field_popup.hpp"
 #include "elements/windows/popups/orchestra_elements/double_X_slider.hpp"
-#include "midi/keyboards.hpp"
+#include "midi/Keyboard.hpp"
 
 enum Notas { C, C_SUS, D, D_SUS, E, F, F_SUS, G, G_SUS, A, A_SUS, B };
 enum Coordinates { X, Y };

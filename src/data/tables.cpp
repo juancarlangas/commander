@@ -28,15 +28,15 @@ void llenado_displayTable(
 
 			for (int32_t i = 0; i < _DBRows; ++i)
 				// Si encontró en algún campo la palabra clave
-				if (low_string(_DataBase[i].metadata.title)
+				if (low_string(_DataBase[i].tagging.title)
 						.find(low_string(_Cadena)) != std::string::npos or
-					low_string(_DataBase[i].metadata.artist)
+					low_string(_DataBase[i].tagging.artist)
 						.find(low_string(_Cadena)) != std::string::npos or
-					low_string(_DataBase[i].metadata.genre)
+					low_string(_DataBase[i].tagging.genre)
 						.find(low_string(_Cadena)) != std::string::npos or
-					low_string(_DataBase[i].metadata.mood)
+					low_string(_DataBase[i].tagging.mood)
 						.find(low_string(_Cadena)) != std::string::npos or
-					low_string(_DataBase[i].metadata.keyword)
+					low_string(_DataBase[i].tagging.keyword)
 						.find(low_string(_Cadena)) != std::string::npos) {
 							// Agrégala
 							_DisplayTable[*_DisplayRows] = &_DataBase[i];
@@ -53,7 +53,7 @@ void llenado_favourite(int fav[], Performance base[], const int baseRows)/*{{{*/
 	int i, count = 1;
 
 	for (i = 0; i <= baseRows - 1; i++)
-		if (strstr(base[i].metadata.keyword.c_str(), "Favourite") != NULL)
+		if (strstr(base[i].tagging.keyword.c_str(), "Favourite") != NULL)
 			fav[count++ % 10] = i;
 
 	return;

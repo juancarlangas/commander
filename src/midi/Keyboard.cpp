@@ -2,14 +2,14 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <jack/midiport.h>
 #include <jack/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ncurses.h>
 #include <ctime>
-#include "midi/keyboards.hpp"
+#include <iostream>
+#include "midi/Keyboard.hpp"
 #include "utilities/timer.hpp"
 
 #include <cstddef>
@@ -21,7 +21,7 @@
 
 int32_t value;
 
-Keyboard::Keyboard( const std::string &_Path )/*{{{*/
+Keyboard::Keyboard(const std::string &_Path)/*{{{*/
 {
 	load_combs_from_json( _Path );
 	MIDI_state = Switch::OFF;
@@ -227,8 +227,10 @@ bool isMidiPort(jack_port_t* port) {/*{{{*/
 
 void Keyboard::connect() noexcept {/*{{{*/
 	// Connect to the JACK server
-    if ((client = jack_client_open(client_name, JackNullOption, NULL)) == NULL) {
-		std::cerr << "Failed to open JACK client " << client_name << " at Keyboard::connect()\n";
+    if ((client = jack_client_open(client_name, JackNullOption, NULL)) ==
+			NULL) {
+		std::cerr << "Failed to open JACK client " << client_name <<
+			" at Keyboard::connect()\n";
     	std::exit(EXIT_FAILURE); 
     }
 
@@ -237,22 +239,27 @@ void Keyboard::connect() noexcept {/*{{{*/
 
     // Create the MIDI_state output port
     if ((output_port = 
-			jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
-		std::cerr << "Failed to register JACK port midi_out at Keyboard::connect()\n";
+			jack_port_register(client, "midi_out",
+				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
+		std::cerr
+			<< "Failed to register JACK port at Keyboard::connect()\n";
     	std::exit(EXIT_FAILURE); 
     }
 
     // Activate the client
     if (jack_activate(client)) {
-		std::cerr << "Failed to activate JACK client " << client_name << " at Keyboard::connect()\n";
+		std::cerr << "Failed to activate JACK client "
+			<< client_name << " at Keyboard::connect()\n";
     	std::exit(EXIT_FAILURE); 
     }
 
 	std::ofstream file {"/home/juancarlangas/Desktop/output.txt"};
 
 	// Get the available ports
-    all_ports_C_String = jack_get_ports(client, NULL, NULL, JackPortIsInput);
-	const char* desired_port_keyword {"a2j:X50 [24] (playback): [0] X50 X50 _ SOUND"};
+    all_ports_C_String =
+		jack_get_ports(client, NULL, NULL, JackPortIsInput);
+	const char* desired_port_keyword {
+		"a2j:Midi Through [14] (playback): [0] Midi Through Port-0"};
 
 	// Try each of them and connect to it
     for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
@@ -285,7 +292,7 @@ void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{
 	timer.sleep(2e8);
 
 	// Patch Change
-	send_PC(performance_buffer.patch.bnk - 65, performance_buffer.patch.num);
+	send_PC(performance_buffer.program.bnk, performance_buffer.program.num);
 
 	jack_midi_data_t to_edit_SysSex[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
 	send_page_SysEx(to_edit_SysSex);
@@ -350,20 +357,20 @@ void Keyboard::dump_scene() noexcept/*{{{*/
 
 	// ADJUST
 	for ( std::size_t i = 0; i < NUMBER_OF_PARTS; ++i ) {
-		if (performance_buffer.scenes[scene].tracks[i].state == State::INT)
+		if (performance_buffer.scenes[scene].strips[i].state == State::INT)
 			param_SysExEs[0][i][11] = 0x00; // -> ON
-		else if (performance_buffer.scenes[scene].tracks[i].state == State::EXT)
+		else if (performance_buffer.scenes[scene].strips[i].state == State::EXT)
 			param_SysExEs[0][i][11] = 0x02; // -> EXT
 											//
-		param_SysExEs[1][i][11] = performance_buffer.scenes[scene].tracks[i].volume;
-		param_SysExEs[2][i][11] = performance_buffer.scenes[scene].tracks[i].lower_key;
-		param_SysExEs[3][i][11] = performance_buffer.scenes[scene].tracks[i].upper_key;
-		if ( performance_buffer.scenes[scene].tracks[i].transposition < 0 ) {
+		param_SysExEs[1][i][11] = performance_buffer.scenes[scene].strips[i].volume;
+		param_SysExEs[2][i][11] = performance_buffer.scenes[scene].strips[i].lower_key;
+		param_SysExEs[3][i][11] = performance_buffer.scenes[scene].strips[i].upper_key;
+		if ( performance_buffer.scenes[scene].strips[i].transposition < 0 ) {
 			param_SysExEs[4][i][10] = 0x7F;
-			param_SysExEs[4][i][11] = 0x80 + performance_buffer.scenes[scene].tracks[i].transposition;
+			param_SysExEs[4][i][11] = 0x80 + performance_buffer.scenes[scene].strips[i].transposition;
 		}
 		else
-			param_SysExEs[4][i][11] = performance_buffer.scenes[scene].tracks[i].transposition;
+			param_SysExEs[4][i][11] = performance_buffer.scenes[scene].strips[i].transposition;
 	}
 	send_scene_SysEx(param_SysExEs);
 }/*}}}*/
@@ -401,7 +408,7 @@ auto Keyboard::send_scene_SysEx(jack_midi_data_t _SysEx[SCENE_SYSEX_PACK_SIZE][N
 
 auto Keyboard::send_PC(const jack_midi_data_t& _Bank, const jack_midi_data_t& _Program) noexcept -> void/*{{{*/
 {
-	callback_PC.lsb[2] = _Bank;
+	callback_PC.lsb[2] = _Bank + 32;
 	callback_PC.pc[1] = _Program;
 
 	should_send_PC = true;

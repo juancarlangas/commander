@@ -9,7 +9,7 @@ PROJECT( Commander
 
 ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/app/main.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/midi/keyboards.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/midi/Keyboard.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/form.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/matroska.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/digits.cpp"
@@ -27,9 +27,9 @@ ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/elements/windows/popups/orchestra_elements/double_X_slider.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/elements/windows/popups/orchestra_elements/text_popup.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/elements/windows/popups/orchestra_elements/text_popups/field_popup.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/catalog.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/Catalog.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/tables.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/playlist.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/data/Playlist.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/math.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/common/string.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/utilities/timer.cpp")
@@ -51,6 +51,6 @@ set_target_properties( Commander
 			PROPERTIES
 			CXX_STANDARD 20
 			RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin" 
-			OUTPUT_NAME "commander-beta" )
+			OUTPUT_NAME "commander" )
 
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )

@@ -1,5 +1,5 @@
-#include "playlist.hpp"
-#include "catalog.hpp"
+#include "Playlist.hpp"
+#include "Catalog.hpp"
 #include <cstdint>
 #include <curses.h>
 #include <fstream>
@@ -74,8 +74,8 @@ void Playlist::cargar( const std::string &_Path ) noexcept/*{{{*/
 
 void Playlist::agregar( Performance *&_Row_ptr ) noexcept/*{{{*/
 {
-	pista[ n_pistas ].titulo = _Row_ptr->metadata.title;
-	pista[ n_pistas ].artista = _Row_ptr->metadata.artist;
+	pista[ n_pistas ].titulo = _Row_ptr->tagging.title;
+	pista[ n_pistas ].artista = _Row_ptr->tagging.artist;
 	pista[ n_pistas ].row_ptr = _Row_ptr;
 
 	++n_pistas;
@@ -121,8 +121,8 @@ void Playlist::sincronizar() noexcept/*{{{*/
 	for (i = 0; i < n_pistas; ++i) {
 		j = 0;
 		while (j < database_ptr->get_activeRows() and
-				(pista[i].titulo != database_ptr->get_cancion(j).metadata.title or
-				pista[i].artista != database_ptr->get_cancion(j).metadata.artist))
+				(pista[i].titulo != database_ptr->get_cancion(j).tagging.title or
+				pista[i].artista != database_ptr->get_cancion(j).tagging.artist))
 			++j;
 		if ( j < database_ptr->get_activeRows() ) // lo encontró -> anéxale el (nuevo) apuntador
 			pista[i].row_ptr = database_ptr->get_cancion_ptr(j);

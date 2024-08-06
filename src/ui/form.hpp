@@ -2,7 +2,7 @@
 #define FORM_H
 
 #include "ui/fields.hpp"
-#include "data/catalog.hpp"
+#include "data/Catalog.hpp"
 
 enum Encuadre {TITLE, ARTIST, GENRE, SECTION, TYPE, KEYWORDS, BNK, NUM, SFZ};
 

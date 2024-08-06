@@ -3,8 +3,8 @@
 
 #include <bits/stdint-intn.h>
 #include <ncurses.h>
-#include "../data/catalog.hpp"
-#include "data/playlist.hpp"
+#include "data/Catalog.hpp"
+#include "data/Playlist.hpp"
 
 
 void print_displayTable(	WINDOW *window,

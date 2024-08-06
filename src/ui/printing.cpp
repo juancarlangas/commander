@@ -3,8 +3,8 @@
 #include <ctype.h>
 #include "../common/common.hpp"
 #include "colors.hpp"
-#include "../data/catalog.hpp"
-#include "data/playlist.hpp"
+#include "data/Catalog.hpp"
+#include "data/Playlist.hpp"
 
 extern const char *get_digit(char, short int);
 
@@ -23,7 +23,7 @@ void print_displayTable(WINDOW *window,/*{{{*/
 	wclear(window);
 	
 	for (i = top; ( i <= top + displayShowResults - 1) && (i <= resultRows - 1); i++) {
-		switch (displayTable[i]->metadata.mood[0]) {
+		switch (displayTable[i]->tagging.mood[0]) {
 			case 'L':
 				wattron(window, COLOR_PAIR(MAGENTA_DEFAULT));
 				break;
@@ -46,10 +46,10 @@ void print_displayTable(WINDOW *window,/*{{{*/
 		if (i == index && winMode == 1)
 			wattron(window, A_REVERSE);
 		mvwprintw( window, 1 + row++, 0, "%40s  %-30s  %-20s  %-23s", 
-				displayTable[i]->metadata.title.substr( 0, 31 ).c_str(),
-				displayTable[i]->metadata.artist.substr( 0, 20 ).c_str(),
-				displayTable[i]->metadata.genre.substr( 0, 15 ).c_str(),
-				displayTable[i]->metadata.keyword.substr( 0, 14 ).c_str() );
+				displayTable[i]->tagging.title.substr( 0, 31 ).c_str(),
+				displayTable[i]->tagging.artist.substr( 0, 20 ).c_str(),
+				displayTable[i]->tagging.genre.substr( 0, 15 ).c_str(),
+				displayTable[i]->tagging.keyword.substr( 0, 14 ).c_str() );
 		wattroff(window, A_REVERSE);
 		wattroff(window, A_BOLD);
 	}
@@ -132,9 +132,9 @@ void print_lcd(WINDOW *window, Performance *linea )/*{{{*/
 	wattron(window, A_BOLD);
 
 	k = 0;
-	while (linea->metadata.title[k] != '\0' && k <= 19) {
+	while (linea->tagging.title[k] != '\0' && k <= 19) {
 		for (yPos = 0; yPos <= 2; yPos++)
-			mvwprintw(window, yPos, 2 + k * 4, "%s", get_digit(toupper(linea->metadata.title[k]), yPos));
+			mvwprintw(window, yPos, 2 + k * 4, "%s", get_digit(toupper(linea->tagging.title[k]), yPos));
 		k++;
 	}
 
@@ -227,9 +227,9 @@ void print_zoom(WINDOW *window, Performance *linea)/*{{{*/
 		
 		//sprintf(message, "%c-%03hd %s", linea->bnk2, linea->num2, linea->title);
 
-		lcd(window, 1, 2, 18, FALSE, linea->metadata.title.c_str());
+		lcd(window, 1, 2, 18, FALSE, linea->tagging.title.c_str());
 
-		mvwprintw(window, 0, 2, "%c-%03d", linea->patch.bnk + 65, linea->patch.num);
+		mvwprintw(window, 0, 2, "%c-%03d", linea->program.bnk + 65, linea->program.num);
 		wrefresh(window);
 	
 	return;
