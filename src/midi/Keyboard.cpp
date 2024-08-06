@@ -159,7 +159,7 @@ auto Keyboard::write_sfz_file(const std::filesystem::path& _SFZfolder, const std
 	sfz_file.close();
 }/*}}}*/
 
-/**************************************** JSON ***********************************************************/
+/***************************** JSON **************************************/
 void from_json( const nlohmann::json &_JSONobject, Combination &_Combination ) {/*{{{*/
     _JSONobject.at( "instruments" ).get_to( _Combination.instruments );
 }/*}}}*/
@@ -185,7 +185,7 @@ volatile bool should_send_scene_SysEx {FALSE};/*}}}*/
 
 // CALLBACK MESSAGES{{{
 struct PatchChangeT {
-	jack_midi_data_t msb[3] {0xB0, 0x00, 0x3F};
+	jack_midi_data_t msb[3] {0xB0, 0x00, 0x00};
     jack_midi_data_t lsb[3] {0xB0, 0x20, 0x00};
     jack_midi_data_t pc[2]  {0xC0, 0x00};
 } callback_PC;
@@ -287,16 +287,23 @@ void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{
     set_performance_buffer(_Performance); // Pass to the buffer
 
 	// PAGE
-	jack_midi_data_t to_play_SysEx[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x00, 0xF7};
+	/*
+	jack_midi_data_t to_play_SysEx[] {
+		0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x00, 0xF7};
 	send_page_SysEx(to_play_SysEx);
 	timer.sleep(2e8);
+	*/
 
 	// Patch Change
-	send_PC(performance_buffer.program.bnk, performance_buffer.program.num);
+	send_PC(
+		performance_buffer.program.bnk, performance_buffer.program.num);
 
-	jack_midi_data_t to_edit_SysSex[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
+	/*
+	jack_midi_data_t to_edit_SysSex[] {
+		0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
 	send_page_SysEx(to_edit_SysSex);
 	timer.sleep(2e8);
+	*/
 
 	scene = 0;
 	//dump_scene();
@@ -408,7 +415,7 @@ auto Keyboard::send_scene_SysEx(jack_midi_data_t _SysEx[SCENE_SYSEX_PACK_SIZE][N
 
 auto Keyboard::send_PC(const jack_midi_data_t& _Bank, const jack_midi_data_t& _Program) noexcept -> void/*{{{*/
 {
-	callback_PC.lsb[2] = _Bank + 32;
+	callback_PC.lsb[2] = 32 + _Bank;
 	callback_PC.pc[1] = _Program;
 
 	should_send_PC = true;

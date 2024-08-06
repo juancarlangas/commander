@@ -252,11 +252,11 @@ std::int32_t main() {
 						break;
 				}
 
-				//if ( x50.is_connected() )
-					//x50.dump_performance( *performance_buffer );
-				//else
+				if ( x50.is_connected() )
+					x50.dump_performance( *performance_buffer );
+				else
 					//solo actualizamos buffer para poder trabajar online
-					//x50.set_performance_buffer( *performance_buffer );
+					x50.set_performance_buffer( *performance_buffer );
 
 				x50.write_sfz_file(
 						catalog.get_sfz_folder(), "commander.sfz",
@@ -273,8 +273,8 @@ std::int32_t main() {
 					dBase[COMBINATIONS].
 					get_favourite_row(caracter_a_numero);
 
-				//if (x50.is_connected())
-					//x50.dump_performance(*performance_buffer);
+				if (x50.is_connected())
+					x50.dump_performance(*performance_buffer);
 
 				update_window[LCD] 	  = true;
 
