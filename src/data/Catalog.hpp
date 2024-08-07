@@ -13,7 +13,7 @@
 #define ROWS 1000
 #define MAXIMO_DE_CANCIONES 1000
 #define N_FAVORITOS 10
-static const std::int16_t &TRACKS_PER_PERFORMANCE{ 8 };
+static const std::int16_t &STRIPS_PER_PERFORMANCE{ 8 };
 
 struct Tagging {
 	std::string title;
@@ -38,7 +38,7 @@ struct Strip {
 
 struct Scene {
 	std::string label;
-	std::array<Strip, TRACKS_PER_PERFORMANCE> strips;
+	std::array<Strip, STRIPS_PER_PERFORMANCE> strips;
 };
 
 struct Performance {

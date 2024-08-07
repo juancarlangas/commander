@@ -9,15 +9,17 @@
 #include <ncurses.h>
 #include <ctime>
 #include <iostream>
-#include "midi/Keyboard.hpp"
-#include "utilities/timer.hpp"
-
 #include <cstddef>
 #include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <stdexcept>
 #include <string>
+
+#include "midi/Keyboard.hpp"
+
+Performance performance_buffer;
+std::int16_t current_scene;
 
 int32_t value;
 
@@ -115,6 +117,7 @@ bool Keyboard::is_connected() noexcept/*{{{*/
 void Keyboard::set_performance_buffer( const Performance &_Performance ) noexcept/*{{{*/
 {
 	performance_buffer = _Performance;
+	current_scene = performance_buffer.default_scene;
 }/*}}}*/
 
 auto Keyboard::get_performance_buffer() noexcept -> const Performance& {/*{{{*/
@@ -123,25 +126,25 @@ auto Keyboard::get_performance_buffer() noexcept -> const Performance& {/*{{{*/
 
 void Keyboard::set_to_default_scene() noexcept/*{{{*/
 {
-	scene = performance_buffer.default_scene;
+	current_scene = performance_buffer.default_scene;
 }/*}}}*/
 
 void Keyboard::to_prev_scene() noexcept/*{{{*/
 {
-	if ( scene > 0 )
-		--scene;
+	if ( current_scene > 0 )
+		--current_scene;
 }/*}}}*/
 
 void Keyboard::to_next_scene() noexcept/*{{{*/
 {
-	if ( scene < performance_buffer.n_scenes - 1 )
-		++scene;
+	if ( current_scene < performance_buffer.n_scenes - 1 )
+		++current_scene;
 }/*}}}*/
 
-void Keyboard::set_scene( const int16_t _Variacion ) noexcept/*{{{*/
+void Keyboard::set_scene( const int16_t _Scene ) noexcept/*{{{*/
 {
-	if ( _Variacion < performance_buffer.n_scenes )
-		scene = _Variacion;
+	if ( _Scene < performance_buffer.n_scenes )
+		current_scene = _Scene;
 }/*}}}*/
 
 auto Keyboard::write_sfz_file(const std::filesystem::path& _SFZfolder, const std::string& _TargetSFZ, const std::string& _OriginSFZ) const noexcept -> void {/*{{{*/
@@ -173,6 +176,7 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 const char* client_name {"Commander"};
 jack_client_t* client {NULL};
 jack_port_t* output_port {NULL};
+jack_port_t* input_port {NULL};
 jack_nframes_t local_nframes = {0};/*}}}*/
 
 // TARGET DATA{{{
@@ -195,28 +199,76 @@ jack_midi_data_t callback_scene_SysExEs[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][
 
 int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*{{{*/
 {
-	void* port_buffer = jack_port_get_buffer(output_port, nframes);
-	jack_midi_clear_buffer(port_buffer);
+    // Buffer de salida
+    void* output_buffer = jack_port_get_buffer(output_port, nframes);
+    jack_midi_clear_buffer(output_buffer);
 
-	if (should_send_PC) {
-		jack_midi_event_write(port_buffer, 0, callback_PC.msb, sizeof(callback_PC.msb));
-		jack_midi_event_write(port_buffer, 0, callback_PC.lsb, sizeof(callback_PC.lsb));
-		jack_midi_event_write(port_buffer, 0, callback_PC.pc,  sizeof(callback_PC.pc));
-		should_send_PC = false;
-	}
+    // Buffer de entrada
+    void* input_buffer = jack_port_get_buffer(input_port, nframes);
+    jack_nframes_t event_count = jack_midi_get_event_count(input_buffer);
+    jack_midi_event_t in_event;
 
-	if (should_send_page_SysEx) {
-		jack_midi_event_write(port_buffer, 0, callback_page_SysEx, PAGE_SYSEX_WORD_SIZE);
-		should_send_page_SysEx = false;
-	}
-	
-	if (should_send_scene_SysEx) {
-		for (std::size_t i_param {0}; i_param < SCENE_SYSEX_PACK_SIZE; ++i_param)
-			for (std::size_t i_part {0}; i_part < NUMBER_OF_PARTS; ++i_part)
-		jack_midi_event_write(port_buffer, 0, callback_scene_SysExEs[i_param][i_part], PARAM_SYSEX_WORD_SIZE);
-		should_send_scene_SysEx = false;
-	}
-	
+    // Enviar mensajes Program Change (PC)
+    if (should_send_PC) {
+        jack_midi_event_write(output_buffer, 0, callback_PC.msb, sizeof(callback_PC.msb));
+        jack_midi_event_write(output_buffer, 0, callback_PC.lsb, sizeof(callback_PC.lsb));
+        jack_midi_event_write(output_buffer, 0, callback_PC.pc, sizeof(callback_PC.pc));
+        should_send_PC = false;
+    }
+
+    // Enviar mensajes System Exclusive (SysEx) de página
+    if (should_send_page_SysEx) {
+        jack_midi_event_write(output_buffer, 0, callback_page_SysEx, PAGE_SYSEX_WORD_SIZE);
+        should_send_page_SysEx = false;
+    }
+
+    // Enviar mensajes System Exclusive (SysEx) de escena
+    if (should_send_scene_SysEx) {
+        for (std::size_t i_param {0}; i_param < SCENE_SYSEX_PACK_SIZE; ++i_param)
+            for (std::size_t i_part {0}; i_part < NUMBER_OF_PARTS; ++i_part)
+                jack_midi_event_write(output_buffer, 0, callback_scene_SysExEs[i_param][i_part], PARAM_SYSEX_WORD_SIZE);
+        should_send_scene_SysEx = false;
+    }
+
+	// Repetidora
+    for (jack_nframes_t i = 0; i < event_count; ++i) {
+        if (jack_midi_event_get(&in_event, input_buffer, i) == 0) {
+
+			// Si es una nota
+            if ((in_event.buffer[0] & 0xF0) == 0x90 or // Note On
+                (in_event.buffer[0] & 0xF0) == 0x80) { // Note Off
+
+				// Obtenemos la nota:
+				// El segundo byte del mensaje MIDI es el número de la nota
+				uint8_t note = in_event.buffer[1];
+
+				// Ciclamos por cada strip del peformance
+				for (std::size_t i {0}; i < STRIPS_PER_PERFORMANCE; ++i) {
+					// Si el canal está activo y la nota está en el rango
+					if ((performance_buffer.scenes[current_scene].
+							strips[i].state == State::INT) and
+						(performance_buffer.scenes[current_scene].
+							strips[i].lower_key <= note) and
+						(note <= performance_buffer.scenes[current_scene].
+						 	strips[i].upper_key)) {
+
+						// Cambiamos el canal de la nota según el strip
+						in_event.buffer[0] =
+							(in_event.buffer[0] & 0xF0) | static_cast<uint8_t>(i);
+
+						// Ajustamos el transpose
+						in_event.buffer[1] += 
+							performance_buffer.scenes[current_scene].
+							strips[i].transposition;
+
+						// Lo enviamos
+						jack_midi_event_write(output_buffer, in_event.time, in_event.buffer, in_event.size);
+					}
+				}
+            }
+        }
+    }
+
     return 0;
 }/*}}}*/
 
@@ -246,14 +298,19 @@ void Keyboard::connect() noexcept {/*{{{*/
     	std::exit(EXIT_FAILURE); 
     }
 
+	// Create the MIDI input port
+    if ((input_port = jack_port_register(client, "midi_in",
+            JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0)) == NULL) {
+        std::cerr << "Failed to register JACK input port at Keyboard::connect()\n";
+        std::exit(EXIT_FAILURE); 
+    }
+
     // Activate the client
     if (jack_activate(client)) {
 		std::cerr << "Failed to activate JACK client "
 			<< client_name << " at Keyboard::connect()\n";
     	std::exit(EXIT_FAILURE); 
     }
-
-	std::ofstream file {"/home/juancarlangas/Desktop/output.txt"};
 
 	// Get the available ports
     all_ports_C_String =
@@ -267,7 +324,6 @@ void Keyboard::connect() noexcept {/*{{{*/
         if (possible_port != NULL && isMidiPort(possible_port)) {
             if (strstr(all_ports_C_String[i], desired_port_keyword) != NULL) {
 				if (jack_connect(client, jack_port_name(output_port), all_ports_C_String[i]) != 0) {
-					file << "Failed to connect client to MIDI_state port." << std::endl;
 					jack_free(all_ports_C_String);
 					jack_client_close(client);
 					std::exit(EXIT_FAILURE);
@@ -277,7 +333,26 @@ void Keyboard::connect() noexcept {/*{{{*/
 		}
     }
 
-	file.close();
+    // Connect input port to desired input port (if applicable)
+    // Here you should specify the desired port for MIDI input
+    const char* desired_input_port_keyword {
+		"a2j:nanoKEY2 [20] (capture): [0] nanoKEY2 nanoKEY2 _ CTRL"};
+
+    // Try each of them and connect to it
+    all_ports_C_String = jack_get_ports(client, NULL, NULL, JackPortIsOutput);
+    for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
+        jack_port_t* possible_port = jack_port_by_name(client, all_ports_C_String[i]);
+        if (possible_port != NULL && isMidiPort(possible_port)) {
+            if (strstr(all_ports_C_String[i], desired_input_port_keyword) != NULL) {
+                if (jack_connect(client, all_ports_C_String[i], jack_port_name(input_port)) != 0) {
+                    jack_free(all_ports_C_String);
+                    jack_client_close(client);
+                    std::exit(EXIT_FAILURE);
+                }
+            }
+        }
+    }
+
 	MIDI_state = Switch::ON;
 }
 /*}}}*/
@@ -305,7 +380,7 @@ void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{
 	timer.sleep(2e8);
 	*/
 
-	scene = 0;
+	current_scene = 0;
 	//dump_scene();
 }/*}}}*/
 
@@ -364,20 +439,20 @@ void Keyboard::dump_scene() noexcept/*{{{*/
 
 	// ADJUST
 	for ( std::size_t i = 0; i < NUMBER_OF_PARTS; ++i ) {
-		if (performance_buffer.scenes[scene].strips[i].state == State::INT)
+		if (performance_buffer.scenes[current_scene].strips[i].state == State::INT)
 			param_SysExEs[0][i][11] = 0x00; // -> ON
-		else if (performance_buffer.scenes[scene].strips[i].state == State::EXT)
+		else if (performance_buffer.scenes[current_scene].strips[i].state == State::EXT)
 			param_SysExEs[0][i][11] = 0x02; // -> EXT
 											//
-		param_SysExEs[1][i][11] = performance_buffer.scenes[scene].strips[i].volume;
-		param_SysExEs[2][i][11] = performance_buffer.scenes[scene].strips[i].lower_key;
-		param_SysExEs[3][i][11] = performance_buffer.scenes[scene].strips[i].upper_key;
-		if ( performance_buffer.scenes[scene].strips[i].transposition < 0 ) {
+		param_SysExEs[1][i][11] = performance_buffer.scenes[current_scene].strips[i].volume;
+		param_SysExEs[2][i][11] = performance_buffer.scenes[current_scene].strips[i].lower_key;
+		param_SysExEs[3][i][11] = performance_buffer.scenes[current_scene].strips[i].upper_key;
+		if ( performance_buffer.scenes[current_scene].strips[i].transposition < 0 ) {
 			param_SysExEs[4][i][10] = 0x7F;
-			param_SysExEs[4][i][11] = 0x80 + performance_buffer.scenes[scene].strips[i].transposition;
+			param_SysExEs[4][i][11] = 0x80 + performance_buffer.scenes[current_scene].strips[i].transposition;
 		}
 		else
-			param_SysExEs[4][i][11] = performance_buffer.scenes[scene].strips[i].transposition;
+			param_SysExEs[4][i][11] = performance_buffer.scenes[current_scene].strips[i].transposition;
 	}
 	send_scene_SysEx(param_SysExEs);
 }/*}}}*/
@@ -386,7 +461,7 @@ void Keyboard::dump_scene( const Performance &_Performance, const int16_t &_Scen
 {
 	set_performance_buffer( _Performance );
 
-	scene = _Scene;
+	current_scene = _Scene;
 	dump_scene();
 }/*}}}*/
 

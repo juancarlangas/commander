@@ -67,9 +67,7 @@ public:
 
 private:
 	std::vector<std::array<struct Combination, PATCHES_PER_BANK>> combinations;
-	Performance performance_buffer;
 	size_t n_bancos;
-	int16_t scene;
 	bool activeMode;
 	bool passiveMode;
 	enum Switch MIDI_state;
