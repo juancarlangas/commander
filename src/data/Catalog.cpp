@@ -289,11 +289,10 @@ void from_json(const nlohmann::json& j, Program& p) {
 }/*}}}*/
 
 // Overload for Swith enum{{{
-void from_json(const nlohmann::json& j, State& s) {
-	static const std::unordered_map<std::string, State> state_map = {
-		{"Off", State::Off},
-		{"INT", State::INT},
-		{"EXT", State::EXT}
+void from_json(const nlohmann::json& j, Switch& s) {
+	static const std::unordered_map<std::string, Switch> state_map = {
+		{"Off", Switch::OFF},
+		{"On", Switch::ON}
 	};
 	auto it = state_map.find(j.get<std::string>());
 	if (it == state_map.end()) {
@@ -304,7 +303,7 @@ void from_json(const nlohmann::json& j, State& s) {
 
 // Overload for Strip struct{{{
 void from_json(const nlohmann::json& j, Strip& s) {
-	s.state = j.at("state").get<State>();
+	s.state = j.at("state").get<Switch>();
 	s.volume = j.at("volume").get<std::int16_t>();
 	s.lower_key = j.at("lower_key").get<std::int16_t>();
 	s.upper_key = j.at("upper_key").get<std::int16_t>();
@@ -356,11 +355,10 @@ void to_json(nlohmann::ordered_json& j, const Program& p) {
 }/*}}}*/
 
 // Overload for Switch enum{{{
-void to_json(nlohmann::ordered_json& j, const State& s) {
-	static const std::unordered_map<State, std::string> state_map = {
-		{State::Off, "Off"},
-		{State::INT, "INT"},
-		{State::EXT, "EXT"}
+void to_json(nlohmann::ordered_json& j, const Switch& s) {
+	static const std::unordered_map<Switch, std::string> state_map = {
+		{Switch::OFF, "Off"},
+		{Switch::ON, "On"}
 	};
 	auto it = state_map.find(s);
 	if (it == state_map.end()) {

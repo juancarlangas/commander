@@ -46,12 +46,12 @@ void Keyboard::load_combs_from_json( const std::string &_Path )/*{{{*/
 	// CALCULATE SIZES
 	n_bancos = combinations.size();
 
-	if ( !combinations.empty() ) {
+	if (!combinations.empty()) {
 		channels_per_combi = combinations[0][0].instruments.size();
 
-		for ( const auto &bank : combinations )
-			for ( const auto &combination : bank )
-				if ( combination.instruments.size() != channels_per_combi ) {
+		for (const auto &bank : combinations)
+			for (const auto &combination : bank)
+				if (combination.instruments.size() != channels_per_combi) {
 					std::cerr << "instruments vector size mismatch\n";
 					exit( EXIT_FAILURE );
 				}
@@ -76,7 +76,7 @@ auto Keyboard::save_combs_to_json(const std::string& _Path) noexcept -> void {/*
     nlohmann::ordered_json json_object = combinations;
 
     // Open a file and write the JSON object to it
-    std::ofstream json_file{ _Path };
+    std::ofstream json_file{_Path};
     if (json_file.fail()) {
         std::cerr << "Failed to open " + _Path + " in Keyboards::save_combs_to_json()\n";
         exit(EXIT_FAILURE);
@@ -246,7 +246,7 @@ int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*
 				for (std::size_t i {0}; i < STRIPS_PER_PERFORMANCE; ++i) {
 					// Si el canal está activo y la nota está en el rango
 					if ((performance_buffer.scenes[current_scene].
-							strips[i].state == State::INT) and
+							strips[i].state == Switch::ON) and
 						(performance_buffer.scenes[current_scene].
 							strips[i].lower_key <= note) and
 						(note <= performance_buffer.scenes[current_scene].
@@ -439,10 +439,8 @@ void Keyboard::dump_scene() noexcept/*{{{*/
 
 	// ADJUST
 	for ( std::size_t i = 0; i < NUMBER_OF_PARTS; ++i ) {
-		if (performance_buffer.scenes[current_scene].strips[i].state == State::INT)
+		if (performance_buffer.scenes[current_scene].strips[i].state == Switch::ON)
 			param_SysExEs[0][i][11] = 0x00; // -> ON
-		else if (performance_buffer.scenes[current_scene].strips[i].state == State::EXT)
-			param_SysExEs[0][i][11] = 0x02; // -> EXT
 											//
 		param_SysExEs[1][i][11] = performance_buffer.scenes[current_scene].strips[i].volume;
 		param_SysExEs[2][i][11] = performance_buffer.scenes[current_scene].strips[i].lower_key;

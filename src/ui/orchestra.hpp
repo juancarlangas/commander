@@ -11,9 +11,9 @@
 #include "elements/windows/popups/orchestra_elements/double_X_slider.hpp"
 #include "midi/Keyboard.hpp"
 
-enum Notas { C, C_SUS, D, D_SUS, E, F, F_SUS, G, G_SUS, A, A_SUS, B };
-enum Coordinates { X, Y };
-enum Moved : bool { NO, YES };
+enum Notas {C, C_SUS, D, D_SUS, E, F, F_SUS, G, G_SUS, A, A_SUS, B};
+enum Coordinates {X, Y};
+enum Moved : bool {NO, YES};
 
 struct Clipboard {
 	int16_t n_variaciones;
@@ -43,13 +43,13 @@ class Orchestra {
 			KeyboardScheme keyboard_scheme;
 			Field vi_field;
 			Field etiqueta_field;
-				std::array<CheckPopup, 8> status_field;
-				std::array<FieldPopup, 8> instrument_field;
-				std::array<FieldPopup, 8> volume_field;
-				std::array<FieldPopup, 8> transposition_field;
-				std::array<DoubleXslider, 8> double_X_slider;
+				std::array<CheckPopup, 16> status_field;
+				std::array<FieldPopup, 16> instrument_field;
+				std::array<FieldPopup, 16> volume_field;
+				std::array<FieldPopup, 16> transposition_field;
+				std::array<DoubleXslider, 16> double_X_slider;
 				std::array<int16_t, 2> cursor;
-		std::array<struct Font, 8> native_font;
+		std::array<struct Font, 16> native_font;
 		struct Font cursor_font, MIDI_font, dimmed_font, light_font;
 		int16_t current_scene;
 		Performance *info;

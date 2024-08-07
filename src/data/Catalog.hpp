@@ -13,7 +13,7 @@
 #define ROWS 1000
 #define MAXIMO_DE_CANCIONES 1000
 #define N_FAVORITOS 10
-static const std::int16_t &STRIPS_PER_PERFORMANCE{ 8 };
+static const std::int16_t &STRIPS_PER_PERFORMANCE{16};
 
 struct Tagging {
 	std::string title;
@@ -29,7 +29,7 @@ struct Program {
 };
 
 struct Strip {
-	enum State state {State::Off};
+	enum Switch state {Switch::OFF};
 	std::int16_t volume {100};
 	std::int16_t lower_key {24};
 	std::int16_t upper_key {72};

@@ -56,46 +56,46 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 
 	// keyboard_ptr_text_box
 	keyboard_scheme.Popup::init(
-			5, 61, _Ypos + ( _Ysize * 40 / 200 ), _Xpos + ( _Xsize * 66 / 200 ) );
-	keyboard_scheme.set_font_color( WHITE_DEFAULT );
-	keyboard_scheme.set_font_width( "Bold" );
+			5, 61, _Ypos + (_Ysize * 40 / 200), _Xpos + (_Xsize * 66 / 200));
+	keyboard_scheme.set_font_color(WHITE_DEFAULT);
+	keyboard_scheme.set_font_width("Bold");
 	keyboard_scheme.auto_draw();
 	keyboard_scheme.update();
 
 	// Variación inicial
-	vi_field.create( "VI", 3, 6, _Ypos + 1, _Xpos + 2, STRING, 16 );
-	vi_field.set_font_width( "Bold" );
-	vi_field.set_font_color( WHITE_DEFAULT );
+	vi_field.create("VI", 3, 6, _Ypos + 1, _Xpos + 2, STRING, 16);
+	vi_field.set_font_width("Bold");
+	vi_field.set_font_color(WHITE_DEFAULT);
 
 	// Etiqueta
-	etiqueta_field.create( "Etiqueta", 3, _Xsize * 80 / 200, _Ypos + 1, _Xpos + ( _Xsize / 4 ),
-							STRING, 16 );
-	etiqueta_field.set_font_width( "Bold" );
-	etiqueta_field.set_font_color( WHITE_DEFAULT );
+	etiqueta_field.create("Etiqueta", 3, _Xsize * 80 / 200, _Ypos + 1, _Xpos + (_Xsize / 4),
+							STRING, 16);
+	etiqueta_field.set_font_width("Bold");
+	etiqueta_field.set_font_color(WHITE_DEFAULT);
 
-	int32_t y_starting_point = _Ypos + ( _Ysize * 70 / 200 );
+	int32_t y_starting_point = _Ypos + (_Ysize * 70 / 200);
 
-	for ( int32_t i = 0; i < 8; ++i ) {
-		status_field[i].init( y_starting_point + i, _Xpos + 2,
+	for (int32_t i = 0; i < 16; ++i) {
+		status_field[i].init(y_starting_point + i, _Xpos + 2,
 				native_font[i], dimmed_font, cursor_font, light_font,
-				i + 49 /*ASCII*/ );
+				i + 49 /*ASCII*/);
 		status_field[i].update();
 
-		instrument_field[i].init( 1, 32, y_starting_point + i, _Xpos + 5,
-				native_font[ i ], dimmed_font, cursor_font, light_font);
+		instrument_field[i].init(1, 32, y_starting_point + i, _Xpos + 5,
+				native_font[i], dimmed_font, cursor_font, light_font);
 		instrument_field[i].update();
 
 		volume_field[i].init( 1, 4, y_starting_point + i, _Xpos + 35,
-				native_font[ i ], dimmed_font, cursor_font, light_font);
+				native_font[i], dimmed_font, cursor_font, light_font);
 		volume_field[i].update();
 
 		transposition_field[i].init( 1, 4, y_starting_point + i, _Xpos + 45,
-				native_font[ i ], dimmed_font, cursor_font, light_font);
+				native_font[i], dimmed_font, cursor_font, light_font);
 		transposition_field[i].update();
 		
 		// invocamos su clase base porque no cuadra con su init
 		double_X_slider[i].OrchestraElement::init( 1, 62, y_starting_point + i, _Xpos + 49,
-				native_font[ i ], dimmed_font, cursor_font, light_font);
+				native_font[i], dimmed_font, cursor_font, light_font);
 		double_X_slider[i].update();
 	}
 
@@ -125,50 +125,43 @@ void KeyboardScheme::auto_draw() noexcept/*{{{*/
 void Orchestra::update() noexcept/*{{{*/ {
 	/* This method actually is the responsable of updating the fields with the true values */
 
-	scene_text_box.set_text( "Variacion " + std::to_string( current_scene + 1 ) +
-								" de " + std::to_string( info->n_scenes ) );
-	vi_field.set_content( std::to_string( info->default_scene ) );
-	etiqueta_field.set_content( info->scenes[ current_scene ].label );
+	scene_text_box.set_text("Variacion " + std::to_string(current_scene + 1) +
+								" de " + std::to_string(info->n_scenes));
+	vi_field.set_content(std::to_string( info->default_scene));
+	etiqueta_field.set_content(info->scenes[current_scene].label);
 
-	for ( int32_t i = 0; i < static_cast<std::int32_t>(keyboard_ptr->channels_per_combi); ++i ) {
+	for (int32_t i = 0; i < static_cast<std::int32_t>(keyboard_ptr->channels_per_combi); ++i) {
 
 		// Preparando las dobles barras
-		int16_t &l_Value = info->scenes[ current_scene ].strips[ i ].lower_key;
-		int16_t &r_Value = info->scenes[ current_scene ].strips[ i ].upper_key;
+		int16_t &l_Value = info->scenes[current_scene].strips[i].lower_key;
+		int16_t &r_Value = info->scenes[current_scene].strips[i].upper_key;
 		// Límites
-		if ( r_Value < MIN_KEY )
+		if (r_Value < MIN_KEY)
 			r_Value = MIN_KEY;
-		if ( l_Value < MIN_KEY )
+		if (l_Value < MIN_KEY)
 			l_Value = MIN_KEY;
-		if ( l_Value > MAX_KEY )
+		if (l_Value > MAX_KEY)
 			l_Value = MAX_KEY;
-		if ( r_Value > MAX_KEY )
+		if (r_Value > MAX_KEY)
 			r_Value = MAX_KEY;
 		// cruzamientos
-		if ( l_Value > r_Value )
+		if (l_Value > r_Value)
 			r_Value = l_Value;
-		double_X_slider[i].set_values( l_Value, r_Value );
+		double_X_slider[i].set_values(l_Value, r_Value);
 
-		if (info->scenes[current_scene].strips[i].state == State::INT) {
-			status_field[ i ].on();
-			instrument_field[ i ].on();
+		if (info->scenes[current_scene].strips[i].state == Switch::ON) {
+			status_field[i].on();
+			instrument_field[i].on();
 			volume_field[i].on();
-			transposition_field[ i ].on();
-			double_X_slider[ i ].on();
-		}
-		else if (info->scenes[current_scene].strips[i].state == State::EXT) {
-			status_field[i].light();
-			instrument_field[i].light();
-			volume_field[i].light();
-			transposition_field[i].light();
-			double_X_slider[i].light();
+			transposition_field[i].on();
+			double_X_slider[i].on();
 		}
 		else {
-			status_field[ i ].off();
-			instrument_field[ i ].off();
+			status_field[i].off();
+			instrument_field[i].off();
 			volume_field[i].off();
-			transposition_field[ i ].off();
-			double_X_slider[ i ].off();
+			transposition_field[i].off();
+			double_X_slider[i].off();
 		}
 
 		instrument_field[i].set_text(keyboard_ptr->get_instrument_name(info->program.bnk, info->program.num,i));
@@ -189,7 +182,7 @@ void Orchestra::show( Performance *&_Performance ) noexcept/*{{{*/
 	vi_field.show();
 	etiqueta_field.show();
 
-	for ( int32_t i = 0; i < 8; ++i ) {
+	for ( int32_t i = 0; i < 16; ++i ) {
 		status_field[i].show();
 		instrument_field[i].show();
 		volume_field[i].show();
@@ -202,7 +195,7 @@ void Orchestra::show( Performance *&_Performance ) noexcept/*{{{*/
 
 void Orchestra::hide() noexcept/*{{{*/
 {	
-	for ( int32_t i = 0; i < 8; ++i ) {
+	for ( int32_t i = 0; i < 16; ++i ) {
 		status_field[i].hide();
 		instrument_field[i].hide();
 		volume_field[i].hide();
@@ -242,7 +235,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 	bool will_dump;
 
 	do {
-		switch ( tecla = getch() ) {
+		switch (tecla = getch()) {
 			case 11: // <C-k> : TOGGLE_MIDI_STATE{{{
 				keyboard_ptr->toggle_MIDI_state();
 				print_MIDI_state( MIDI_state_window, keyboard_ptr->get_MIDI_state() );
@@ -656,29 +649,21 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					etiqueta_field.set_content(temp_word);
 				}
 				else if (cursor[X] == 0) { // CAmbio de status: se va ciclando
-					if (info->scenes[current_scene].strips[cursor[Y]].state == State::INT) {
-						info->scenes[current_scene].strips[cursor[Y]].state = State::EXT;
-						status_field[cursor[Y]].light();
-						instrument_field[cursor[Y]].light();
-						volume_field[cursor[Y]].light();
-						transposition_field[cursor[Y]].light();
-						double_X_slider[cursor[Y]].light();
-					}
-					else if (info->scenes[current_scene].strips[cursor[Y]].state == State::EXT) {
-						info->scenes[current_scene].strips[cursor[Y]].state = State::Off;
-						status_field[cursor[Y]].off();
-						instrument_field[ cursor[Y]].off();
-						volume_field[cursor[Y]].off();
-						transposition_field[cursor[Y]].off();
-						double_X_slider[cursor[Y]].off();
-					}
-					else {
-						info->scenes[current_scene].strips[cursor[Y]].state = State::INT;
+					if (info->scenes[current_scene].strips[cursor[Y]].state == Switch::OFF) {
+						info->scenes[current_scene].strips[cursor[Y]].state = Switch::ON;
 						status_field[cursor[Y]].on();
 						instrument_field[cursor[Y]].on();
 						volume_field[cursor[Y]].on();
 						transposition_field[cursor[Y]].on();
 						double_X_slider[cursor[Y]].on();
+					}
+					else {
+						info->scenes[current_scene].strips[cursor[Y]].state = Switch::OFF;
+						status_field[cursor[Y]].off();
+						instrument_field[cursor[Y]].off();
+						volume_field[cursor[Y]].off();
+						transposition_field[cursor[Y]].off();
+						double_X_slider[cursor[Y]].off();
 					}
 
 					status_field[ cursor[Y] ].set_cursor();
