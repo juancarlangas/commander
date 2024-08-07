@@ -24,6 +24,14 @@ Orchestra::Orchestra() : // Sets colors /*{{{*/
 					{CYAN_DEFAULT, "Bold"},
 					{RED_DEFAULT, "Bold"},
 					{YELLOW_DEFAULT, "Regular"},
+					{CYAN_DEFAULT, "Regular"},
+					{GREEN_DEFAULT, "Bold"},
+					{BLUE_DEFAULT, "Bold"},
+					{YELLOW_DEFAULT, "Bold"},
+					{MAGENTA_DEFAULT, "Bold"},
+					{CYAN_DEFAULT, "Bold"},
+					{RED_DEFAULT, "Bold"},
+					{YELLOW_DEFAULT, "Regular"},
 					{CYAN_DEFAULT, "Regular"}}},
 	cursor_font {WHITE_DEFAULT, "Bold"},
 	MIDI_font {GREEN_DEFAULT, "Bold"},
@@ -498,7 +506,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			case KEY_DOWN :/*{{{*/
-				if ( cursor[ Coordinates::Y ] < 7 ) { // Si puede bajar todavía
+				if ( cursor[ Coordinates::Y ] < 15 ) { // Si puede bajar todavía
 					++cursor[ Coordinates::Y ];
 					switch ( cursor[ Coordinates::X ] ) {
 						case 0: // Check

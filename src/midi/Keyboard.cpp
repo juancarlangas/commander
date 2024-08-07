@@ -316,7 +316,7 @@ void Keyboard::connect() noexcept {/*{{{*/
     all_ports_C_String =
 		jack_get_ports(client, NULL, NULL, JackPortIsInput);
 	const char* desired_port_keyword {
-		"a2j:Midi Through [14] (playback): [0] Midi Through Port-0"};
+		"MIDI Channel Filter:events-in"};
 
 	// Try each of them and connect to it
     for (int i = 0; all_ports_C_String[i] != NULL; ++i) {

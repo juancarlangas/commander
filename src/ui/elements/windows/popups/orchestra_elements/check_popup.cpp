@@ -13,7 +13,7 @@ void CheckPopup::init( const int32_t &_Ypos, const int32_t &_Xpos, const struct 
 	const struct Font &_CursorFont, const struct Font &_DimmedFont, const Font& _LightFont, const char &_Caption ) noexcept
 {
 	caption = _Caption;
-	init( _Ypos, _Xpos, _ActiveFont, _CursorFont, _DimmedFont, _LightFont );
+	init(_Ypos, _Xpos, _ActiveFont, _CursorFont, _DimmedFont, _LightFont);
 }/*}}}*/
 
 void CheckPopup::on() noexcept/*{{{*/
