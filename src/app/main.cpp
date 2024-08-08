@@ -211,13 +211,37 @@ std::int32_t main() {
 
 				break;/*}}}*/
 
-			case DIAL_SCENE: {/*{{{*/
-				// la conversión de 1 a 9 es -48,
-				// pero por indice de arreglo restamos uno más
-				int32_t funcion_a_variacion = caracter - KEY_F0;
-				x50.set_scene( funcion_a_variacion );
-				//if (x50.is_connected())
-					//x50.dump_scene();
+			case DIAL_FAVOURITE: {/*{{{*/
+				performance_buffer =
+					dBase[COMBINATIONS].
+					get_favourite_row(caracter - KEY_F0);
+
+				if (x50.is_connected())
+					x50.dump_performance(*performance_buffer);
+
+				update_window[LCD] 	  = true;
+
+				/* Toda la siguiente parte reinicializa displayTable y coloca el índice
+				 * en el favorito, pero esta es una característica poco conveniente.
+				 *
+				for (k = 0; k <= LONG_STRING - 1; k++)
+					keyword[k] = '\0';
+
+				llenado_displayTable(displayTable, dBase[mode].base, dbRows[mode], keyword, &n_matches);
+
+				charIndex = 0;
+				dTop = 0;
+				dIndex = buffer - dBase[COMBINATIONS].base; // Maravilloso!!! Aritmética de pointer.
+
+				if (winMode == MODE_PLAYLIST) {
+					winMode = MODE_DISPLAY;
+					update_window[PLAYLIST] = true;
+				}
+				update_window[SEARCH]  = true;
+				update_window[DISPLAY] = true;
+				update_window[ZOOM]	  = true;
+				*/
+
 				break;
 			}/*}}}*/
 

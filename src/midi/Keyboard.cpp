@@ -17,6 +17,7 @@
 #include <string>
 
 #include "midi/Keyboard.hpp"
+#include "Catalog.hpp"
 
 Performance performance_buffer;
 std::int16_t current_scene;
@@ -175,7 +176,8 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 // CLIENT DATA{{{
 const char* client_name {"Commander"};
 jack_client_t* client {NULL};
-jack_port_t* output_port {NULL};
+std::array<jack_port_t*, STRIPS_PER_PERFORMANCE> output_port {{NULL}};
+std::array<void*, STRIPS_PER_PERFORMANCE> output_buffer {{NULL}};
 jack_port_t* input_port {NULL};
 jack_nframes_t local_nframes = {0};/*}}}*/
 
@@ -194,41 +196,43 @@ struct PatchChangeT {
     jack_midi_data_t pc[2]  {0xC0, 0x00};
 } callback_PC;
 
-jack_midi_data_t callback_page_SysEx[PAGE_SYSEX_WORD_SIZE];
-jack_midi_data_t callback_scene_SysExEs[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE];/*}}}*/
+//jack_midi_data_t callback_page_SysEx[PAGE_SYSEX_WORD_SIZE];
+//jack_midi_data_t callback_scene_SysExEs[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE];/*}}}*/
 
 int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*{{{*/
 {
-    // Buffer de salida
-    void* output_buffer = jack_port_get_buffer(output_port, nframes);
-    jack_midi_clear_buffer(output_buffer);
-
     // Buffer de entrada
     void* input_buffer = jack_port_get_buffer(input_port, nframes);
     jack_nframes_t event_count = jack_midi_get_event_count(input_buffer);
     jack_midi_event_t in_event;
 
+    // Buffer de salida
+	for (std::size_t n_port {0}; n_port <= 2; ++n_port) {
+		output_buffer[n_port] = jack_port_get_buffer(output_port[n_port], nframes);
+		jack_midi_clear_buffer(output_buffer[n_port]);
+	}
+
     // Enviar mensajes Program Change (PC)
     if (should_send_PC) {
-        jack_midi_event_write(output_buffer, 0, callback_PC.msb, sizeof(callback_PC.msb));
-        jack_midi_event_write(output_buffer, 0, callback_PC.lsb, sizeof(callback_PC.lsb));
-        jack_midi_event_write(output_buffer, 0, callback_PC.pc, sizeof(callback_PC.pc));
+        jack_midi_event_write(output_buffer[0], 0, callback_PC.msb, sizeof(callback_PC.msb));
+        jack_midi_event_write(output_buffer[0], 0, callback_PC.lsb, sizeof(callback_PC.lsb));
+        jack_midi_event_write(output_buffer[0], 0, callback_PC.pc, sizeof(callback_PC.pc));
         should_send_PC = false;
     }
 
     // Enviar mensajes System Exclusive (SysEx) de página
-    if (should_send_page_SysEx) {
-        jack_midi_event_write(output_buffer, 0, callback_page_SysEx, PAGE_SYSEX_WORD_SIZE);
-        should_send_page_SysEx = false;
-    }
+    //if (should_send_page_SysEx) {
+    //    jack_midi_event_write(output_buffer, 0, callback_page_SysEx, PAGE_SYSEX_WORD_SIZE);
+    //    should_send_page_SysEx = false;
+    //}
 
     // Enviar mensajes System Exclusive (SysEx) de escena
-    if (should_send_scene_SysEx) {
-        for (std::size_t i_param {0}; i_param < SCENE_SYSEX_PACK_SIZE; ++i_param)
-            for (std::size_t i_part {0}; i_part < NUMBER_OF_PARTS; ++i_part)
-                jack_midi_event_write(output_buffer, 0, callback_scene_SysExEs[i_param][i_part], PARAM_SYSEX_WORD_SIZE);
-        should_send_scene_SysEx = false;
-    }
+    //if (should_send_scene_SysEx) {
+    //    for (std::size_t i_param {0}; i_param < SCENE_SYSEX_PACK_SIZE; ++i_param)
+    //        for (std::size_t i_part {0}; i_part < NUMBER_OF_PARTS; ++i_part)
+    //            jack_midi_event_write(output_buffer, 0, callback_scene_SysExEs[i_param][i_part], PARAM_SYSEX_WORD_SIZE);
+    //    should_send_scene_SysEx = false;
+    //}
 
 	// Repetidora
     for (jack_nframes_t i = 0; i < event_count; ++i) {
@@ -262,7 +266,12 @@ int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*
 							strips[i].transposition;
 
 						// Lo enviamos
-						jack_midi_event_write(output_buffer, in_event.time, in_event.buffer, in_event.size);
+						if (i <= 7)
+							jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
+						else if (i == 8)
+							jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
+						else if (i == 15)
+							jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
 					}
 				}
             }
@@ -290,13 +299,31 @@ void Keyboard::connect() noexcept {/*{{{*/
     jack_set_process_callback(client, process, 0);
 
     // Create the MIDI_state output port
-    if ((output_port = 
-			jack_port_register(client, "midi_out",
+	if ((output_port[0] = 
+			jack_port_register(client, "midi_out_0",
 				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr
 			<< "Failed to register JACK port at Keyboard::connect()\n";
-    	std::exit(EXIT_FAILURE); 
-    }
+		std::exit(EXIT_FAILURE); 
+	}
+
+    // Create the MIDI_state output port
+	if ((output_port[1] = 
+			jack_port_register(client, "midi_out_1",
+				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
+		std::cerr
+			<< "Failed to register JACK port at Keyboard::connect()\n";
+		std::exit(EXIT_FAILURE); 
+	}
+
+    // Create the MIDI_state output port
+	if ((output_port[2] = 
+			jack_port_register(client, "midi_out_2",
+				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
+		std::cerr
+			<< "Failed to register JACK port at Keyboard::connect()\n";
+		std::exit(EXIT_FAILURE); 
+	}
 
 	// Create the MIDI input port
     if ((input_port = jack_port_register(client, "midi_in",
@@ -315,19 +342,24 @@ void Keyboard::connect() noexcept {/*{{{*/
 	// Get the available ports
     all_ports_C_String =
 		jack_get_ports(client, NULL, NULL, JackPortIsInput);
-	const char* desired_port_keyword {
-		"MIDI Channel Filter:events-in"};
+	std::array<const char*, 3> desired_port_keyword {
+		"a2j:Midi Through [14] (playback): [0] Midi Through Port-0",
+		"CP-80:events-in",
+		"Sampling:events-in"};
 
-	// Try each of them and connect to it
-    for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
-        jack_port_t* possible_port = jack_port_by_name(client, all_ports_C_String[i]);
-        if (possible_port != NULL && isMidiPort(possible_port)) {
-            if (strstr(all_ports_C_String[i], desired_port_keyword) != NULL) {
-				if (jack_connect(client, jack_port_name(output_port), all_ports_C_String[i]) != 0) {
-					jack_free(all_ports_C_String);
-					jack_client_close(client);
-					std::exit(EXIT_FAILURE);
-					break;
+
+	for (std::int32_t i_port {0}; i_port <= 2; ++i_port) {
+		// Try each of them and connect to it
+		for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
+			jack_port_t* possible_port = jack_port_by_name(client, all_ports_C_String[i]);
+			if (possible_port != NULL && isMidiPort(possible_port)) {
+				if (strstr(all_ports_C_String[i], desired_port_keyword[i_port]) != NULL) {
+					if (jack_connect(client, jack_port_name(output_port[i_port]), all_ports_C_String[i]) != 0) {
+						jack_free(all_ports_C_String);
+						jack_client_close(client);
+						std::exit(EXIT_FAILURE);
+						break;
+					}
 				}
 			}
 		}
@@ -468,22 +500,24 @@ void Keyboard::disconnect() noexcept {/*{{{*/
 	jack_free(all_ports_C_String);	
 
     jack_deactivate(client);
-    jack_port_unregister(client, output_port);
+	for (std::int32_t i {0}; i <= 3; ++i)
+		jack_port_unregister(client, output_port[i]);
     jack_client_close(client);
 
     // Set MIDI_state switch to OFF or perform any necessary cleanup
     MIDI_state = Switch::OFF;
 }/*}}}*/
 
-auto Keyboard::send_page_SysEx(jack_midi_data_t _SysEx[PAGE_SYSEX_WORD_SIZE]) -> void {/*{{{*/
-	memcpy(callback_page_SysEx, _SysEx, PAGE_SYSEX_WORD_SIZE);
-	should_send_page_SysEx = true;
+auto Keyboard::send_page_SysEx(/*{{{*/
+		[[maybe_unused]]jack_midi_data_t _SysEx[PAGE_SYSEX_WORD_SIZE]) -> void {
+	//memcpy(callback_page_SysEx, _SysEx, PAGE_SYSEX_WORD_SIZE);{{{
+	//should_send_page_SysEx = true;}}}
 }/*}}}*/
 
-auto Keyboard::send_scene_SysEx(jack_midi_data_t _SysEx[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE]) -> void {/*{{{*/
-	memcpy(callback_scene_SysExEs, _SysEx, SCENE_SYSEX_PACK_SIZE * NUMBER_OF_PARTS * PARAM_SYSEX_WORD_SIZE);
-
-	should_send_scene_SysEx = true;
+auto Keyboard::send_scene_SysEx(/*{{{*/
+		[[maybe_unused]]jack_midi_data_t _SysEx[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE]) -> void {
+	//memcpy(callback_scene_SysExEs, _SysEx, SCENE_SYSEX_PACK_SIZE * NUMBER_OF_PARTS * PARAM_SYSEX_WORD_SIZE);
+	//should_send_scene_SysEx = true;
 }/*}}}*/
 
 auto Keyboard::send_PC(const jack_midi_data_t& _Bank, const jack_midi_data_t& _Program) noexcept -> void/*{{{*/
@@ -493,4 +527,3 @@ auto Keyboard::send_PC(const jack_midi_data_t& _Bank, const jack_midi_data_t& _P
 
 	should_send_PC = true;
 }/*}}}*/
-

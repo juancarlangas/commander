@@ -261,7 +261,7 @@ Performance *Catalog::get_cancion_ptr( const int32_t &_Index ) noexcept/*{{{*/
 
 Performance *Catalog::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
 {
-	return favourites[ _FavNumber ];
+	return favourites[_FavNumber];
 }/*}}}*/
 
 auto Catalog::set_sfz_folder(const std::filesystem::path& _Folder) noexcept -> void {/*{{{*/

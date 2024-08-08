@@ -86,10 +86,8 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 		case 17: comando = EXIT; break;
 
 		default:
-			if ( KEY_F(1) <= digit and digit <= KEY_F(10) )
-				comando = DIAL_SCENE;
-			else if (  48 <= digit and digit <= 57 )
-				comando = FAVOURITE;
+			if ( KEY_F(1) <= digit and digit <= KEY_F(12) )
+				comando = DIAL_FAVOURITE;
 			else if ( ( 58 <= digit and digit <= 122 ) || digit == '/' )
 				comando = INCREASE_QUERY;
             break;

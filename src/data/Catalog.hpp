@@ -12,7 +12,7 @@
 
 #define ROWS 1000
 #define MAXIMO_DE_CANCIONES 1000
-#define N_FAVORITOS 10
+#define N_FAVORITOS 12
 static const std::int16_t &STRIPS_PER_PERFORMANCE{16};
 
 struct Tagging {
