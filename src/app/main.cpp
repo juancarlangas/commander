@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <cstdlib>
+#include <filesystem>
 #include <panel.h>/*}}}*/
 
 #include "common/common.hpp"/*{{{*/
@@ -21,6 +22,7 @@
 #include "data/Catalog.hpp"
 #include "data/Playlist.hpp"
 #include "ui/printing.hpp"
+#include "utils/environment.hpp"
 /*}}}*/
 
 enum HotKeysMode {
@@ -35,20 +37,14 @@ std::int32_t main() {
 	std::array<std::int16_t,8> update_window {0};/*}}}*/
 
 	// Folders{{{
-	const char *home_directory_c;
-	if ( ( home_directory_c = getenv("HOME") ) == NULL )
-		home_directory_c = getpwuid(getuid())->pw_dir;
-	const std::string home_directory {home_directory_c};
-
-   	char config_directory_c[50];
-   	sprintf(config_directory_c, "%s/.config/commander", home_directory_c);
-	std::string generic_path;
-    const std::string config_directory {config_directory_c};/*}}}*/
+	const std::filesystem::path home_dir {get_home_dir()};
+	const std::filesystem::path config_dir {
+		home_dir/".config/commander"};/*}}}*/
 
 	// Data{{{
-	Catalog* dBase = new Catalog [] {{config_directory + "/catalog.json"}};
+	Catalog* dBase = new Catalog [] {{config_dir/"catalog.json"}};
 	Catalog& catalog {dBase[COMBINATIONS]};
-	catalog.set_sfz_folder(static_cast<std::filesystem::path>(home_directory)/".sounds"/"sfz"/"commander");
+	catalog.set_sfz_folder(home_dir/".sounds"/"sfz"/"commander");
 
 	std::int32_t n_performances {catalog.get_activeRows()};
 /*}}}*/
@@ -79,7 +75,7 @@ std::int32_t main() {
 	enum matroska command = BEGIN;/*}}}*/
 
 	// Keyboard{{{
-	Keyboard x50 {config_directory + "/combinations.json"};
+	Keyboard x50 {config_dir/"combinations.json"};
 
 	orquestacion.link_MIDI_device( &x50 );/*}}}*/
 
@@ -99,8 +95,7 @@ std::int32_t main() {
 
 				x50.set_performance_buffer( *performance_buffer );
 
-				playlist->cargar(
-						config_directory + "/Playlists/default.csv");
+				playlist->cargar(config_dir/"Playlists"/"default.csv");
 
 				update_window[LCD]		= true;
 				update_window[SEARCH] 	= true;
@@ -214,7 +209,7 @@ std::int32_t main() {
 			case DIAL_FAVOURITE: {/*{{{*/
 				performance_buffer =
 					dBase[COMBINATIONS].
-					get_favourite_row(caracter - KEY_F0);
+					get_favourite_row(caracter - KEY_F0 - 1);
 
 				if (x50.is_connected())
 					x50.dump_performance(*performance_buffer);
@@ -517,8 +512,8 @@ std::int32_t main() {
 				break;/*}}}*/
 
 			case EXPORTATE:/*{{{*/
-				catalog.save_to_json( config_directory + "/catalog.json" );
-				x50.save_combs_to_json(config_directory + "/combinations.json");
+				catalog.save_to_json(config_dir/"catalog.json" );
+				x50.save_combs_to_json(config_dir/"combinations.json");
 
 				*keyword = '\0';
 
@@ -540,8 +535,8 @@ std::int32_t main() {
 			case EXPORTATE_AND_QUIT :/*{{{*/
 				// Esta madrola hace lo básico del EXPORTATE y diréctamente modifica
 				// el command para que el while saque a la chingada el programa
-				catalog.save_to_json( config_directory + "/catalog.json" );
-				x50.save_combs_to_json(config_directory + "/combinations.json");
+				catalog.save_to_json(config_dir/"catalog.json");
+				x50.save_combs_to_json(config_dir/"combinations.json");
 
 				command = EXIT;
 
@@ -605,7 +600,7 @@ std::int32_t main() {
 				if ( playlist->get_n_pistas() > plTop + playlistShowResults )
 					++plTop;
 
-				playlist->guardar(home_directory + "/.config/commander/Playlists/default.csv" );
+				playlist->guardar(home_dir/".config"/"commander"/"Playlists"/"default.csv");
 
 				update_window[PLAYLIST] = true;
 
@@ -613,8 +608,7 @@ std::int32_t main() {
 
 			case DEL_FROM_PLAYLIST:/*{{{*/
 				playlist->eliminar( pl_index );
-				playlist->guardar( home_directory + "/.config/commander/Playlists/default.csv" );
-
+				playlist->guardar(home_dir/".config"/"commander"/"Playlists"/"default.csv");
 				if ( pl_index == playlist->get_n_pistas() ) {//fin de lista
 					decrease_index( &plTop, &pl_index );
 					plIndexB = pl_index; // Guardamos compatibilidad

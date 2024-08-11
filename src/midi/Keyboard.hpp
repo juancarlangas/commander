@@ -17,7 +17,7 @@
 #include "data/nlohmann/json.hpp"
 #include "midi/midi.hpp"
 #include "data/Catalog.hpp"
-#include "utilities/timer.hpp"
+#include "utils/timer.hpp"
 
 static const size_t& PATCHES_PER_BANK {128};
 

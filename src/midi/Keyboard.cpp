@@ -199,18 +199,18 @@ struct PatchChangeT {
 //jack_midi_data_t callback_page_SysEx[PAGE_SYSEX_WORD_SIZE];
 //jack_midi_data_t callback_scene_SysExEs[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE];/*}}}*/
 
-int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*{{{*/
+int process([[maybe_unused]] jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
 {
     // Buffer de entrada
     void* input_buffer = jack_port_get_buffer(input_port, nframes);
     jack_nframes_t event_count = jack_midi_get_event_count(input_buffer);
     jack_midi_event_t in_event;
 
-    // Buffer de salida
-	for (std::size_t n_port {0}; n_port <= 2; ++n_port) {
-		output_buffer[n_port] = jack_port_get_buffer(output_port[n_port], nframes);
-		jack_midi_clear_buffer(output_buffer[n_port]);
-	}
+    // Buffers de salida
+    for (std::size_t n_port {0}; n_port <= 2; ++n_port) {
+        output_buffer[n_port] = jack_port_get_buffer(output_port[n_port], nframes);
+        jack_midi_clear_buffer(output_buffer[n_port]);
+    }
 
     // Enviar mensajes Program Change (PC)
     if (should_send_PC) {
@@ -220,66 +220,65 @@ int process([[maybe_unused]]jack_nframes_t nframes, [[maybe_unused]]void* arg)/*
         should_send_PC = false;
     }
 
-    // Enviar mensajes System Exclusive (SysEx) de página
-    //if (should_send_page_SysEx) {
-    //    jack_midi_event_write(output_buffer, 0, callback_page_SysEx, PAGE_SYSEX_WORD_SIZE);
-    //    should_send_page_SysEx = false;
-    //}
-
-    // Enviar mensajes System Exclusive (SysEx) de escena
-    //if (should_send_scene_SysEx) {
-    //    for (std::size_t i_param {0}; i_param < SCENE_SYSEX_PACK_SIZE; ++i_param)
-    //        for (std::size_t i_part {0}; i_part < NUMBER_OF_PARTS; ++i_part)
-    //            jack_midi_event_write(output_buffer, 0, callback_scene_SysExEs[i_param][i_part], PARAM_SYSEX_WORD_SIZE);
-    //    should_send_scene_SysEx = false;
-    //}
-
-	// Repetidora
+    // Procesar eventos MIDI
     for (jack_nframes_t i = 0; i < event_count; ++i) {
         if (jack_midi_event_get(&in_event, input_buffer, i) == 0) {
 
-			// Si es una nota
-            if ((in_event.buffer[0] & 0xF0) == 0x90 or // Note On
+            auto& strips = performance_buffer.scenes[current_scene].strips;
+
+            // Si es una nota (Note On/Off)
+            if ((in_event.buffer[0] & 0xF0) == 0x90 || // Note On
                 (in_event.buffer[0] & 0xF0) == 0x80) { // Note Off
 
-				// Obtenemos la nota:
-				// El segundo byte del mensaje MIDI es el número de la nota
-				uint8_t note = in_event.buffer[1];
+                uint8_t note = in_event.buffer[1];
+                uint8_t event_type = in_event.buffer[0] & 0xF0;
 
-				// Ciclamos por cada strip del peformance
-				for (std::size_t i {0}; i < STRIPS_PER_PERFORMANCE; ++i) {
-					// Si el canal está activo y la nota está en el rango
-					if ((performance_buffer.scenes[current_scene].
-							strips[i].state == Switch::ON) and
-						(performance_buffer.scenes[current_scene].
-							strips[i].lower_key <= note) and
-						(note <= performance_buffer.scenes[current_scene].
-						 	strips[i].upper_key)) {
+                for (std::size_t j {0}; j < STRIPS_PER_PERFORMANCE; ++j) {
+                    if (strips[j].state == Switch::ON &&
+                        strips[j].lower_key <= note &&
+                        note <= strips[j].upper_key) {
 
-						// Cambiamos el canal de la nota según el strip
-						in_event.buffer[0] =
-							(in_event.buffer[0] & 0xF0) | static_cast<uint8_t>(i);
+                        // Cambiamos el canal de la nota según el strip
+                        in_event.buffer[0] = event_type | static_cast<uint8_t>(j);
 
-						// Ajustamos el transpose
-						in_event.buffer[1] += 
-							performance_buffer.scenes[current_scene].
-							strips[i].transposition;
+                        // Ajustamos el transpose
+                        in_event.buffer[1] += strips[j].transposition;
 
-						// Lo enviamos
-						if (i <= 7)
-							jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
-						else if (i == 8)
-							jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
-						else if (i == 15)
-							jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
+                        // Lo enviamos al buffer correspondiente
+                        if (j <= 7) {
+                            jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
+                        } else if (j == 8) {
+                            jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
+                        } else if (j == 9) {
+                            jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
+                        }
+                    }
+                }
+            }
+
+            // Si es un mensaje Control Change (CC)
+            else if ((in_event.buffer[0] & 0xF0) == 0xB0) {  // Control Change
+
+                for (std::size_t j {0}; j < STRIPS_PER_PERFORMANCE; ++j) {
+                    if (strips[j].state == Switch::ON) {
+                        // Lo enviamos al buffer correspondiente, sin modificar el mensaje
+                        if (j <= 7) {
+                            jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
+                        } else if (j == 8) {
+                            jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
+                        } else if (j == 9) {
+                            jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
+                        }
 					}
 				}
+
+				jack_midi_event_write(output_buffer[3], in_event.time, in_event.buffer, in_event.size);
             }
         }
     }
 
     return 0;
-}/*}}}*/
+} /*}}}*/
 
 bool isMidiPort(jack_port_t* port) {/*{{{*/
     const char* type = jack_port_type(port);
@@ -300,7 +299,7 @@ void Keyboard::connect() noexcept {/*{{{*/
 
     // Create the MIDI_state output port
 	if ((output_port[0] = 
-			jack_port_register(client, "midi_out_0",
+			jack_port_register(client, "1_to_8",
 				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr
 			<< "Failed to register JACK port at Keyboard::connect()\n";
@@ -308,8 +307,8 @@ void Keyboard::connect() noexcept {/*{{{*/
 	}
 
     // Create the MIDI_state output port
-	if ((output_port[1] = 
-			jack_port_register(client, "midi_out_1",
+	if ((output_port[1] =
+			jack_port_register(client, "9",
 				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr
 			<< "Failed to register JACK port at Keyboard::connect()\n";
@@ -318,13 +317,21 @@ void Keyboard::connect() noexcept {/*{{{*/
 
     // Create the MIDI_state output port
 	if ((output_port[2] = 
-			jack_port_register(client, "midi_out_2",
+			jack_port_register(client, "10",
 				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr
 			<< "Failed to register JACK port at Keyboard::connect()\n";
 		std::exit(EXIT_FAILURE); 
 	}
 
+    // Create the MIDI_state output port
+	if ((output_port[3] =
+			jack_port_register(client, "16",
+				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
+		std::cerr
+			<< "Failed to register JACK port at Keyboard::connect()\n";
+		std::exit(EXIT_FAILURE); 
+	}
 	// Create the MIDI input port
     if ((input_port = jack_port_register(client, "midi_in",
             JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0)) == NULL) {
@@ -342,11 +349,13 @@ void Keyboard::connect() noexcept {/*{{{*/
 	// Get the available ports
     all_ports_C_String =
 		jack_get_ports(client, NULL, NULL, JackPortIsInput);
-	std::array<const char*, 3> desired_port_keyword {
+	std::array<const char*, 5> desired_port_keyword {
 		"a2j:Midi Through [14] (playback): [0] Midi Through Port-0",
 		"CP-80:events-in",
-		"Sampling:events-in"};
-
+		"Sampling:events-in",
+		"To Mono TRITON:events-in",
+		"To Mono Sforzando:events-in"
+	};
 
 	for (std::int32_t i_port {0}; i_port <= 2; ++i_port) {
 		// Try each of them and connect to it
@@ -368,7 +377,8 @@ void Keyboard::connect() noexcept {/*{{{*/
     // Connect input port to desired input port (if applicable)
     // Here you should specify the desired port for MIDI input
     const char* desired_input_port_keyword {
-		"a2j:nanoKEY2 [20] (capture): [0] nanoKEY2 nanoKEY2 _ CTRL"};
+		"a2j:Impact LX61  [24] (capture): [0] Impact LX61  MIDI1"
+	};
 
     // Try each of them and connect to it
     all_ports_C_String = jack_get_ports(client, NULL, NULL, JackPortIsOutput);
