@@ -1,6 +1,8 @@
 #ifndef MATROSKA_HPP
 #define MATROSKA_HPP
 
+#include <string_view>
+
 
 enum matroska/*{{{*/
 	{	NEXT = 0,
@@ -38,9 +40,9 @@ enum matroska/*{{{*/
 		EXIT,
 		EXPORTATE_AND_QUIT };/*}}}*/
 
-enum matroska get_command(	const int digit,
-							const short mode, short windowMode,
-							char cadena[], short int ci,
-							int dIndex ) noexcept;
+enum matroska get_command(const int digit,
+						const short mode, short windowMode,
+						std::string_view _Query, short int ci,
+						int dIndex ) noexcept;
 
 #endif

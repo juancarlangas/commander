@@ -1,10 +1,9 @@
 #include "common/matroska.hpp"
 #include "common.hpp"
 #include <curses.h>
-#include <string.h>
 
-enum matroska get_command(	const int digit, const short mode, short windowMode, 
-							char cadena[], short int ci, int dIndex ) noexcept
+enum matroska get_command(const int digit, const short mode,
+		short windowMode, std::string_view _Query, short int ci, int dIndex) noexcept
 {
 	enum matroska comando = NEXT;
 
@@ -12,45 +11,44 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 
 		// ENTER{{{
 		case '\n': //RESET_QUERY SEQUENCE*
-			if (strstr(":add", cadena) != NULL && strstr(cadena, ":add") != NULL)
-				//if (cadena[0] == '\0'); // Se garantiza que no hay búsquedas
+			if (_Query == ":add")
 					comando = ADD_VALUE;
 
-			else if (strcmp(":del", cadena) == 0) {
-				//if (cadena[0] == '\0'); // Se garantiza que no hay búsquedas
+			else if (_Query == ":del") {
 				if (windowMode == MODE_DISPLAY)
 					comando = DELETE_VALUE;
 			}
 
-			else if (strstr(":seq", cadena) != NULL && strstr(cadena, ":seq") != NULL) {
+			else if (_Query == ":seq") {
 				if (mode == COMBINATOR)
 					comando = TOGGLE_WORK_MODE;
 				else
 					comando = RESET_QUERY;
 			}
-			else if (strstr(":cmb", cadena) != NULL && strstr(cadena, ":cmb") != NULL) { 
+
+			else if (_Query == ":cmb") {
 				if (mode == SEQUENCER)
 					comando = TOGGLE_WORK_MODE;
 				else
 					comando = RESET_QUERY;
 			}
 
-			else if ( !strcmp( cadena, ":wpl" ) )
+			else if (_Query == ":wpl")
 				comando = SAVE_PLAYLIST;
 
-			else if ( !strcmp( cadena, ":lpl" ) )
+			else if (_Query == ":lpl")
 				comando = LOAD_PLAYLIST;
 
-			else if ( !strcmp( cadena, ":cpl" ) )
+			else if (_Query == ":cpl")
 				comando = CLEAR_PLAYLIST;
 
-			else if (strstr(":w", cadena) != NULL && strstr(cadena, ":w") != NULL)
+			else if (_Query == ":w" or _Query == ":wa")
 				comando = EXPORTATE;
 
-			else if ( strcmp( ":q", cadena ) == 0 )
+			else if (_Query == ":q" or _Query == ":qa")
 				comando = EXIT;
 
-			else if ( strcmp( ":wq", cadena ) == 0 )
+			else if (_Query == ":wq" or _Query == ":wqa")
 				comando = EXPORTATE_AND_QUIT;
 
 			else
@@ -58,20 +56,54 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 
 			break;/*}}}*/
 
-		case 11: comando = TOGGLE_MIDI_STATE; break; //<C-K>
-		case 20: if (windowMode == MODE_DISPLAY) comando = EDIT_VALUE; break; //<C-T>
-		case 15: if ( windowMode == MODE_DISPLAY ) comando = EDIT_ORCHESTRATION; break; //<C-O>
-		case 3: if ( windowMode == MODE_DISPLAY ) comando = COPY_ORCHESTRATION; break; // <C-C>
-		case 22: if ( windowMode == MODE_DISPLAY ) comando = PASTE_ORCHESTRATION; break; // <C-P>
-		case '+': if (windowMode == MODE_DISPLAY && dIndex >= 0) comando = ADD_TO_PLAYLIST; break;
-		case '-': if (windowMode == MODE_PLAYLIST) comando = DEL_FROM_PLAYLIST; break;
-		case 27: comando = RESET_QUERY; break;
-		case '\t': comando = CHANGE_WINDOW; break;
-		case KEY_UP: case KEY_DOWN: comando = MOVE_INDEX; break;
-		case KEY_LEFT:	comando = TO_PREV_SCENE; break;
-		case KEY_RIGHT:	comando = TO_NEXT_SCENE; break;
-		case 566: comando = DRAG_UP; break;
-		case 525: comando = DRAG_DOWN; break;
+		case 11: // <C-K>
+			comando = TOGGLE_MIDI_STATE;
+			break;
+		case 20: // <C-K>
+			if (windowMode == MODE_DISPLAY)
+				 comando = EDIT_VALUE;
+			break;
+		case 15: // <C-O>
+			if (windowMode == MODE_DISPLAY)
+				comando = EDIT_ORCHESTRATION;
+			break;
+		case 3: // <C-C>
+			if (windowMode == MODE_DISPLAY)
+				comando = COPY_ORCHESTRATION;
+			break;
+		case 22: // <C-P>
+			if (windowMode == MODE_DISPLAY)
+				 comando = PASTE_ORCHESTRATION;
+			 break;
+		case '+':
+			 if (windowMode == MODE_DISPLAY && dIndex >= 0)
+				 comando = ADD_TO_PLAYLIST;
+			 break;
+		case '-':
+			 if (windowMode == MODE_PLAYLIST)
+				 comando = DEL_FROM_PLAYLIST;
+			 break;
+		case 27:
+			 comando = RESET_QUERY;
+			 break;
+		case '\t':
+			 comando = CHANGE_WINDOW;
+			 break;
+		case KEY_UP: case KEY_DOWN:
+			 comando = MOVE_INDEX;
+			 break;
+		case KEY_LEFT:
+			 comando = TO_PREV_SCENE;
+			 break;
+		case KEY_RIGHT:
+			 comando = TO_NEXT_SCENE;
+			 break;
+		case 566:
+			 comando = DRAG_UP;
+			 break;
+		case 525:
+			 comando = DRAG_DOWN;
+			 break;
 		case 520:
 			if (windowMode == MODE_DISPLAY)
 				comando = DELETE_VALUE;
@@ -83,7 +115,9 @@ enum matroska get_command(	const int digit, const short mode, short windowMode,
 			if (ci > 0) comando = DECREASE_QUERY;
 			break;
 
-		case 17: comando = EXIT; break;
+		case 17:
+			comando = EXIT;
+			break;
 
 		default:
 			if ( KEY_F(1) <= digit and digit <= KEY_F(12) )
