@@ -10,7 +10,7 @@
 
 #include "common/common.hpp"/*{{{*/
 #include "common/matroska.hpp"
-#include "ui/orchestra.hpp"
+#include "ui/Orchestra.hpp"
 #include "midi/Keyboard.hpp"
 #include "ui/form.hpp"
 #include "ui/ncurses.hpp"

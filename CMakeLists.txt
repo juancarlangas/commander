@@ -17,7 +17,7 @@ ADD_EXECUTABLE( Commander
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/ncurses.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/printing.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/screen.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/orchestra.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/Orchestra.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/elements/window.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/elements/windows/popup.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ui/elements/windows/boxed_window.cpp"

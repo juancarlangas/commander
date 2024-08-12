@@ -8,7 +8,7 @@
 #include <ncurses.h>
 #include <panel.h>
 
-#include "ui/orchestra.hpp"
+#include "ui/Orchestra.hpp"
 
 extern int screen_width, screen_height;
 extern short displayShowResults, playlistShowResults;	
