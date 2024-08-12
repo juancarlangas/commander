@@ -3,6 +3,7 @@
 #include "elements/windows/popups/orchestra_elements/double_X_slider.hpp"
 #include "midi/midi.hpp"
 #include "ui/colors.hpp"
+#include "ui/elements/window.hpp"
 #include "ui/ncurses.hpp"
 #include "midi/Keyboard.hpp"
 #include "printing.hpp"
@@ -17,7 +18,7 @@ using Coordinates::Y;
 Juanca::Timer timer;
 
 Orchestra::Orchestra() : // Sets colors /*{{{*/
-	native_font {{	{GREEN_DEFAULT, "Bold"},
+	native_font ({	{GREEN_DEFAULT, "Bold"},
 					{BLUE_DEFAULT, "Bold"},
 					{YELLOW_DEFAULT, "Bold"},
 					{MAGENTA_DEFAULT, "Bold"},
@@ -32,7 +33,7 @@ Orchestra::Orchestra() : // Sets colors /*{{{*/
 					{CYAN_DEFAULT, "Bold"},
 					{RED_DEFAULT, "Bold"},
 					{YELLOW_DEFAULT, "Regular"},
-					{CYAN_DEFAULT, "Regular"}}},
+					{CYAN_DEFAULT, "Regular"}}),
 	cursor_font {WHITE_DEFAULT, "Bold"},
 	MIDI_font {GREEN_DEFAULT, "Bold"},
 	dimmed_font {GRAY_DEFAULT, "Bold"},
@@ -84,26 +85,29 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 	int32_t y_starting_point = _Ypos + (_Ysize * 70 / 200);
 
 	for (int32_t i = 0; i < 16; ++i) {
+		// Since channel 1 intended to be "General".. Just temp fixes
+		Font specific_font {i == 0 ? light_font : native_font[i]};
+
 		status_field[i].init(y_starting_point + i, _Xpos + 2,
-				native_font[i], dimmed_font, cursor_font, light_font,
+				specific_font, dimmed_font, cursor_font, light_font,
 				i + 49 /*ASCII*/);
 		status_field[i].update();
 
 		instrument_field[i].init(1, 32, y_starting_point + i, _Xpos + 5,
-				native_font[i], dimmed_font, cursor_font, light_font);
+				specific_font, dimmed_font, cursor_font, light_font);
 		instrument_field[i].update();
 
 		volume_field[i].init( 1, 4, y_starting_point + i, _Xpos + 35,
-				native_font[i], dimmed_font, cursor_font, light_font);
+				specific_font, dimmed_font, cursor_font, light_font);
 		volume_field[i].update();
 
 		transposition_field[i].init( 1, 4, y_starting_point + i, _Xpos + 45,
-				native_font[i], dimmed_font, cursor_font, light_font);
+				specific_font, dimmed_font, cursor_font, light_font);
 		transposition_field[i].update();
 		
 		// invocamos su clase base porque no cuadra con su init
 		double_X_slider[i].OrchestraElement::init( 1, 62, y_starting_point + i, _Xpos + 49,
-				native_font[i], dimmed_font, cursor_font, light_font);
+				specific_font, dimmed_font, cursor_font, light_font);
 		double_X_slider[i].update();
 	}
 
