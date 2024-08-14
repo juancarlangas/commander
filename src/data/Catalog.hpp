@@ -30,6 +30,7 @@ struct Program {
 
 struct Strip {
 	enum Switch state {Switch::OFF};
+	std::int16_t midi_ch {0};
 	std::int16_t volume {100};
 	std::int16_t lower_key {24};
 	std::int16_t upper_key {72};

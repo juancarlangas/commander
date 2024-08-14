@@ -10,9 +10,21 @@
 #include "elements/windows/popups/orchestra_elements/text_popups/field_popup.hpp"
 #include "elements/windows/popups/orchestra_elements/double_X_slider.hpp"
 #include "midi/Keyboard.hpp"
+#include <jack/types.h>
 
 enum Notas {C, C_SUS, D, D_SUS, E, F, F_SUS, G, G_SUS, A, A_SUS, B};
 enum Coordinates {X, Y};
+enum CursorX {
+	DEFAULT_SCENE = 0,
+	SCENE_LABEL,
+	STATE = 0,
+	MIDI_CH,
+	INSTRUMENT,
+	VOLUME,
+	TRANSPOSITION,
+	L_SLIDER,
+	R_SLIDER
+};
 enum Moved : bool {NO, YES};
 
 struct Clipboard {
