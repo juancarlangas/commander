@@ -23,7 +23,7 @@ static const size_t& PATCHES_PER_BANK {128};
 
 static const size_t& PAGE_SYSEX_WORD_SIZE {7};
 static const size_t& SCENE_SYSEX_PACK_SIZE {5};
-static const size_t& NUMBER_OF_PARTS {8};
+static const size_t& NUMBER_OF_PARTS {16};
 static const size_t& PARAM_SYSEX_WORD_SIZE {13};
 
 struct Combination {
