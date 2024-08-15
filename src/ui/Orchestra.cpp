@@ -380,7 +380,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						}
 					}
 					else
-						switch (cursor[ Coordinates::X]) {
+						switch (cursor[Coordinates::X]) {
 							case CursorX::STATE:
 								status_field[cursor[Coordinates::Y]].set_cursor();
 								break;
@@ -431,49 +431,58 @@ void Orchestra::capture_key() noexcept/*{{{*/
 			case KEY_LEFT :/*{{{*/
 				if (cursor[Coordinates::X] > 0) {
 					--cursor[Coordinates::X];
-					if (cursor[Coordinates::Y] == -1) {// Zona de arriba
+					if (cursor[Coordinates::Y] == -1) { // Zona de arriba
 						info->scenes[current_scene].label = temp_word;
 						temp_word = std::to_string(info->default_scene);
 						vi_field.set_cursor();
 					}
 					else // Zona de objetos
-						switch ( cursor[X] ) {
-							case 0 : // Status <- Instrumento
+						switch (cursor[Coordinates::X]) {
+							case CursorX::STATE : // Status <- Instrumento
+								info->scenes[current_scene].strips[cursor[Y]].
+									midi_ch = std::stoi(temp_word);
+								status_field[cursor[Coordinates::Y]].set_cursor();
+								break;
+
+							case CursorX::MIDI_CH:
 								keyboard_ptr->set_instrument_name(
 										info->program.bnk,
 										info->program.num,
 										cursor[Y], temp_word);
-								status_field[cursor[Coordinates::Y]]
-									.set_cursor();
+								temp_word =
+									info->scenes[current_scene].strips[cursor[Y]].midi_ch == 0 ?
+									"0" : std::to_string(
+									info->scenes[current_scene].strips[cursor[Y]].midi_ch);
+								channel_field[cursor[Coordinates::Y]].set_cursor();
 								break;
-							case 1 : // Instrumento <- Volumen
+
+							case CursorX::INSTRUMENT : // Instrumento <- Volumen
 								info->scenes[current_scene].
 									strips[cursor[Y]].volume =
 									std::stoi(temp_word);
-								temp_word =
-									keyboard_ptr->get_instrument_name(
+								temp_word = keyboard_ptr->get_instrument_name(
 										info->program.bnk,
 										info->program.num, cursor[Y]);
 								instrument_field[cursor[Y]].set_cursor();
 								break;
-							case 2: // Volumen <- Transposition
-								info->scenes[ current_scene ].strips[ cursor[Y] ].transposition =
-									std::stoi( temp_word );
+							case CursorX::VOLUME: // Volumen <- Transposition
+								info->scenes[current_scene].strips[cursor[Y]].
+									transposition = std::stoi(temp_word);
 								temp_word =
-									info->scenes[current_scene].strips[ cursor[Y] ].volume == 0
-									? "0" : std::to_string(
-									info->scenes[current_scene].strips[ cursor[ Y ] ].volume );
-								volume_field[ cursor[ Coordinates::Y] ].set_cursor();
+									info->scenes[current_scene].strips[cursor[Y]].volume == 0 ?
+									"0" : std::to_string(
+									info->scenes[current_scene].strips[cursor[Y]].volume);
+								volume_field[cursor[Coordinates::Y]].set_cursor();
 								break;
-							case 3 : // Transposition <- Left slider
-								double_X_slider[ cursor[ Coordinates::Y ] ].leave_cursor();
+							case CursorX::TRANSPOSITION : // Transposition <- Left slider
+								double_X_slider[cursor[Coordinates::Y]].leave_cursor();
 								temp_word = 
-									info->scenes[current_scene].strips[ cursor[Y] ].transposition == 0
+									info->scenes[current_scene].strips[cursor[Y]].transposition == 0
 									? "0" : std::to_string(
-									info->scenes[ current_scene ].strips[ cursor[Y] ].transposition );
-								transposition_field[ cursor[ Coordinates::Y ] ].set_cursor();
+									info->scenes[current_scene].strips[cursor[Y]].transposition);
+								transposition_field[cursor[Coordinates::Y]].set_cursor();
 								break;
-							case 4 :
+							case CursorX::L_SLIDER :
 								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
 								break;
 						}
@@ -484,59 +493,57 @@ void Orchestra::capture_key() noexcept/*{{{*/
 			case KEY_RIGHT :/*{{{*/
 				// Default scene
 				if (cursor[Coordinates::Y] == -1) {
-					if (cursor[Coordinates::X] == 0) {
+					if (cursor[Coordinates::X] == CursorX::DEFAULT_SCENE) {
 						info->default_scene = std::stoi(temp_word);
 						++cursor[Coordinates::X];
 						temp_word = info->scenes[current_scene].label;
 						etiqueta_field.set_cursor();
 					}
 				}
-				else if (cursor[Coordinates::X] < 5) {
+				else if (cursor[Coordinates::X] < CursorX::R_SLIDER) {
 					++cursor[Coordinates::X];
-					if ( cursor[Y] == -1 ) {// Zona de arriba
-						if ( cursor[X] == 1 )
-							cursor[X] = 2;
-						if ( cursor[X] == 2 ) {
-							info->default_scene = std::stoi( temp_word );
-							temp_word = info->scenes[ current_scene ].label;
-							etiqueta_field.set_cursor();
-						}
+					switch (cursor[Coordinates::X]) {
+						case CursorX::MIDI_CH : // Volumen -> Transposition
+							status_field[cursor[Coordinates::Y]].leave_cursor();
+							temp_word = 
+								info->scenes[current_scene].strips[cursor[Coordinates::Y]].midi_ch == 0
+								? "0" : std::to_string(
+								info->scenes[current_scene].strips[cursor[Coordinates::Y]].midi_ch);
+							channel_field[cursor[Coordinates::Y]].set_cursor();
+							break;
+						case CursorX::INSTRUMENT : // check -> Instrument
+							status_field[cursor[Coordinates::Y]].leave_cursor();
+							temp_word = keyboard_ptr->get_instrument_name(
+									info->program.bnk, info->program.num, cursor[Y] );
+							instrument_field[cursor[Coordinates::Y]].set_cursor();
+							break;
+						case CursorX::VOLUME : // Instrument -> volumen
+							keyboard_ptr->set_instrument_name(
+									info->program.bnk, info->program.num, cursor[Y], temp_word );
+							temp_word = 
+								info->scenes[current_scene].strips[ cursor[Y] ].volume == 0
+								? "0" : std::to_string(
+								info->scenes[ current_scene ].strips[ cursor[Y] ].volume );
+							volume_field[ cursor[ Coordinates::Y ] ].set_cursor();
+							break;
+						case CursorX::TRANSPOSITION : // Volumen -> Transposition
+							info->scenes[ current_scene ].strips[ cursor[Y] ].volume =
+								std::stoi( temp_word );
+							temp_word = 
+								info->scenes[current_scene].strips[ cursor[Y] ].transposition == 0
+								? "0" : std::to_string(
+								info->scenes[ current_scene ].strips[ cursor[Y] ].transposition );
+							transposition_field[ cursor[ Coordinates::Y ] ].set_cursor();
+							break;
+						case CursorX::L_SLIDER : // Transposition -> Left slider
+							info->scenes[ current_scene ].strips[ cursor[Y] ].transposition =
+								std::stoi( temp_word );
+							double_X_slider[ cursor[ Coordinates::Y ] ].set_cursor_at_left();
+							break;
+						case CursorX::R_SLIDER :
+							double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
+							break;
 					}
-					else // Zona de objetos
-						switch ( cursor[ Coordinates::X ] ) {
-							case 1 : // check -> Instrument
-								status_field[ cursor[ Coordinates::Y ] ].leave_cursor();
-								temp_word = keyboard_ptr->get_instrument_name(
-										info->program.bnk, info->program.num, cursor[Y] );
-								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
-								break;
-							case 2 : // Instrument -> volumen
-								keyboard_ptr->set_instrument_name(
-										info->program.bnk, info->program.num, cursor[Y], temp_word );
-								temp_word = 
-									info->scenes[current_scene].strips[ cursor[Y] ].volume == 0
-									? "0" : std::to_string(
-									info->scenes[ current_scene ].strips[ cursor[Y] ].volume );
-								volume_field[ cursor[ Coordinates::Y ] ].set_cursor();
-								break;
-							case 3 : // Volumen -> Transposition
-								info->scenes[ current_scene ].strips[ cursor[Y] ].volume =
-									std::stoi( temp_word );
-								temp_word = 
-									info->scenes[current_scene].strips[ cursor[Y] ].transposition == 0
-									? "0" : std::to_string(
-									info->scenes[ current_scene ].strips[ cursor[Y] ].transposition );
-								transposition_field[ cursor[ Coordinates::Y ] ].set_cursor();
-								break;
-							case 4 : // Transposition -> Left slider
-								info->scenes[ current_scene ].strips[ cursor[Y] ].transposition =
-									std::stoi( temp_word );
-								double_X_slider[ cursor[ Coordinates::Y ] ].set_cursor_at_left();
-								break;
-							case 5 :
-								double_X_slider[ cursor[ Coordinates::Y ] ].swap_cursor();
-								break;
-						}
 					will_dump = true;
 				}
 				break;/*}}}*/
@@ -545,14 +552,26 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				if (cursor[Coordinates::Y] < 15) { // Si puede bajar todavía
 					++cursor[Coordinates::Y];
 					switch (cursor[Coordinates::X]) {
-						case 0: // Check
+						case CursorX::STATE: // Check
 							if (cursor[Coordinates::Y] == 0) // viene de arriba
 								info->default_scene = std::stoi(temp_word);
 							else
 								status_field[cursor[Coordinates::Y] - 1].leave_cursor();
 							status_field[cursor[Coordinates::Y]].set_cursor();
 							break;
-						case 1: // Instrument
+
+						case CursorX::MIDI_CH : // Transposition
+							if (cursor[ Coordinates::Y] > 0 ) // NO viene de arriba
+								info->scenes[current_scene].strips[cursor[Y] - 1].midi_ch =
+									std::stoi(temp_word);
+							temp_word =
+								info->scenes[current_scene].strips[cursor[Y]].midi_ch == 0 ?
+								"0" : std::to_string(
+								info->scenes[current_scene].strips[cursor[Y]].midi_ch);
+							channel_field[cursor[Y]].set_cursor();
+							break;
+
+						case CursorX::INSTRUMENT: // Instrument
 							if (cursor[Coordinates::Y] == 0) {
 								info->scenes[current_scene].label = temp_word;
 								temp_word = 
@@ -571,8 +590,9 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								instrument_field[cursor[ Coordinates::Y ]].set_cursor();
 							}
 							break;
-						case 2: // Volumen
-							if ( cursor[ Coordinates::Y ] == 0 )
+
+						case CursorX::VOLUME: // Volumen
+							if (cursor[Coordinates::Y] == 0) // Venía de arriba
 								info->scenes[current_scene].label = temp_word;
 							else
 								info->scenes[ current_scene ].strips[ cursor[Y] - 1 ].volume =
@@ -584,7 +604,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								volume_field[cursor[Coordinates::Y]].set_cursor();
 							break;
 
-						case 3 : // Transposition
+						case CursorX::TRANSPOSITION : // Transposition
 							if ( cursor[ Coordinates::Y ] == 0 )
 								info->scenes[ current_scene ].label = temp_word;
 							else
@@ -596,14 +616,14 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								info->scenes[ current_scene ].strips[ cursor[Y] ].transposition );
 							transposition_field[ cursor[Y] ].set_cursor();
 							break;
-						case 4 : // Left Slider
+						case CursorX::L_SLIDER : // Left Slider
 							if ( cursor[ Coordinates::Y ] == 0 )
 								info->scenes[ current_scene ].label = temp_word;
 							else
 								double_X_slider[ cursor[ Coordinates::Y ] - 1 ].leave_cursor();
 							double_X_slider[ cursor[ Coordinates::Y ] ].set_cursor_at_left();
 							break;
-						case 5:
+						case CursorX::R_SLIDER:
 							// Análogo a case 4
 							if ( cursor[ Coordinates::Y ] == 0 )
 								info->scenes[ current_scene ].label = temp_word;
@@ -618,11 +638,11 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 			case KEY_UP :/*{{{*/
 				if (cursor[Coordinates::Y] > -1) { // aún no está en la label
-					--cursor[ Coordinates::Y ];
+					--cursor[Coordinates::Y];
 					switch (cursor[ Coordinates::X]) {
-						case 0: // check: nada que salvar
-							status_field[ cursor[ Coordinates::Y ] + 1 ].leave_cursor();
-							if ( cursor[ Coordinates::Y ] == -1 ) {
+						case CursorX::STATE: // check: nada que salvar
+							status_field[cursor[Coordinates::Y] + 1].leave_cursor();
+							if (cursor[Coordinates::Y ] == -1) {
 								temp_word = std::to_string(info->default_scene);
 								vi_field.set_cursor();
 							}
@@ -630,7 +650,23 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								status_field[ cursor[ Coordinates::Y ] ].set_cursor();
 							break;
 
-						case 1: // instrumento: se salva siempre
+						case CursorX::MIDI_CH: // transposition
+							info->scenes[current_scene].strips[cursor[Coordinates::Y] + 1].midi_ch =
+								std::stoi(temp_word);
+							if (cursor[Coordinates::Y] == -1) {
+								temp_word = std::to_string(info->default_scene);
+								vi_field.set_cursor();
+								cursor[Coordinates::X] = CursorX::DEFAULT_SCENE;
+							}
+							else {
+								temp_word = 
+									info->scenes[current_scene].strips[cursor[Y]].midi_ch == 0
+									? "0" : std::to_string(
+									info->scenes[current_scene].strips[cursor[Y]].midi_ch);
+								channel_field[cursor[Coordinates::Y]].set_cursor();
+							}
+							break;
+						case CursorX::INSTRUMENT: // instrumento: se salva siempre
 							keyboard_ptr->set_instrument_name(
 									info->program.bnk, info->program.num, cursor[Y] + 1, temp_word );
 							if (cursor[ Coordinates::Y] == -1 ) {
@@ -643,7 +679,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								instrument_field[ cursor[ Coordinates::Y ] ].set_cursor();
 							}
 							break;
-						case 2: // volumen
+						case CursorX::VOLUME :
 							info->scenes[current_scene].strips[cursor[Y] + 1].volume =
 								std::stoi( temp_word );
 							if (cursor[ Coordinates::Y ] == -1) {
@@ -659,7 +695,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								volume_field[cursor[ Coordinates::Y]].set_cursor();
 							}
 							break;
-						case 3: // transposition
+						case CursorX::TRANSPOSITION: // transposition
 							info->scenes[ current_scene ].strips[ cursor[Y] + 1 ].transposition =
 								std::stoi( temp_word );
 							if ( cursor[ Coordinates::Y ] == -1 ) {
@@ -674,7 +710,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 								transposition_field[ cursor[ Coordinates::Y ] ].set_cursor();
 							}
 							break;
-						case 4:
+						case CursorX::L_SLIDER:
 							double_X_slider[ cursor[ Coordinates::Y ] + 1 ].leave_cursor();
 							if ( cursor[ Coordinates::Y ] == -1 ) {
 								temp_word = info->scenes[ current_scene ].label;
@@ -683,9 +719,9 @@ void Orchestra::capture_key() noexcept/*{{{*/
 							else
 								double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_left();
 							break;
-						case 5:
+						case CursorX::R_SLIDER:
 							double_X_slider[ cursor[ Coordinates::Y] + 1 ].leave_cursor();
-							if ( cursor[ Coordinates::Y ] == -1 ) {
+							if (cursor[Coordinates::Y] == -1) {
 								temp_word = info->scenes[ current_scene ].label;
 								etiqueta_field.set_cursor();
 							}
@@ -752,18 +788,23 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						? vi_field.set_content(temp_word)
 						: etiqueta_field.set_content(temp_word);
 				}
-				// Instrmento
-				else if ( cursor[X] == 1 ) {
-					temp_word = temp_word.substr( 0, temp_word.length() - 1 );
-					instrument_field[ cursor[Y] ].set_text( temp_word );
+				else if (cursor[Coordinates::X] == CursorX::STATE) {
+					temp_word = temp_word.substr(0, temp_word.length() - 1);
+					transposition_field[ cursor[Y] ].set_text( temp_word );
 				}
-				// Volumen
-				else if ( cursor[X] == 2 ) {
-					temp_word = temp_word.substr( 0, temp_word.length() - 1 );
-					volume_field[ cursor[Y] ].set_text( temp_word );
+				else if (cursor[Coordinates::X] == CursorX::MIDI_CH) {
+					temp_word = temp_word.substr(0, temp_word.length() - 1);
+					channel_field[cursor[Y]].set_text(temp_word);
 				}
-				// Transposition
-				else if ( cursor[X] == 3 ) {
+				else if (cursor[Coordinates::X] == CursorX::INSTRUMENT) {
+					temp_word = temp_word.substr(0, temp_word.length() - 1);
+					instrument_field[cursor[Y]].set_text(temp_word);
+				}
+				else if ( cursor[Coordinates::X] == CursorX::VOLUME) {
+					temp_word = temp_word.substr(0, temp_word.length() - 1);
+					volume_field[cursor[Y]].set_text(temp_word);
+				}
+				else if ( cursor[Coordinates::X] == CursorX::TRANSPOSITION ) {
 					temp_word = temp_word.substr( 0, temp_word.length() - 1 );
 					transposition_field[ cursor[Y] ].set_text( temp_word );
 				}
@@ -802,23 +843,27 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			case '\n' :/*{{{*/
-				if (cursor[Y] == -1)
-					if (cursor[X] == 0)
+				if (cursor[Coordinates::Y] == -1)
+					if (cursor[Coordinates::X] == CursorX::DEFAULT_SCENE)
 						info->default_scene = std::stoi(temp_word);
 					else
 						info->scenes[current_scene].label = temp_word;
-				else switch (cursor[X]) {
-					case 1 :
+				else switch (cursor[Coordinates::X]) {
+					case CursorX::MIDI_CH :
+						info->scenes[current_scene].strips[cursor[Y]].midi_ch =
+							temp_word == "" ? 0 : std::stoi(temp_word);
+						break;
+					case CursorX::INSTRUMENT :
 						keyboard_ptr->set_instrument_name(
 								info->program.bnk, info->program.num, cursor[Y], temp_word );
 						break;
-					case 2 :
+					case CursorX::VOLUME :
 						info->scenes[ current_scene ].strips[ cursor[Y] ].volume =
 							temp_word == "" ? 0 : std::stoi( temp_word );
 						break;
-					case 3 :
-						info->scenes[ current_scene ].strips[ cursor[Y] ].transposition =
-							temp_word == "" ? 0 : std::stoi( temp_word );
+					case CursorX::TRANSPOSITION :
+						info->scenes[current_scene].strips[cursor[Y]].transposition =
+							temp_word == "" ? 0 : std::stoi(temp_word);
 						break;
 					default:
 						break;
@@ -846,36 +891,45 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			case 1 : // DUplicate{{{
-				if ( info->n_scenes < MAX_VARIATIONS ) {
+				if (info->n_scenes < MAX_VARIATIONS) {
 					info->scenes.push_back(Scene {});
-					for ( int32_t i = info->n_scenes - 1; i >= current_scene; --i )
+					for (int32_t i = info->n_scenes - 1; i >= current_scene; --i )
 						info->scenes[ i + 1 ] = info->scenes[ i ];
 					++info->n_scenes;
 					update();
 
-					if ( cursor[Y] == -1 ) { // si está hasta arriba
-						if ( cursor[X] <= 1 ) {
-							info->default_scene = std::stoi( temp_word );
-							vi_field.set_content( std::to_string( info->default_scene ) );
+					if (cursor[Coordinates::Y] == -1 ) { // si está hasta arriba
+						if (cursor[X] == CursorX::DEFAULT_SCENE) {
+							info->default_scene = std::stoi(temp_word);
+							vi_field.set_content( std::to_string(info->default_scene));
 							vi_field.set_cursor();
 						}
 						else {
-							info->scenes[ current_scene - 1 ].label = temp_word; // guardamos
+							info->scenes[current_scene - 1].label = temp_word; // guardamos
 							temp_word = info->scenes[ current_scene ].label; // copiamos nuevo
 							etiqueta_field.set_cursor();
 						}
 					}
 					else
-						switch ( cursor[X] ) {
-							case 0:
+						switch (cursor[Coordinates::X]) {
+							case CursorX::STATE:
 								status_field[ cursor[Y] ].set_cursor();
 								break;
-							case 1:
+							case CursorX::MIDI_CH:
+								info->scenes[current_scene + 1].strips[cursor[Coordinates::Y]].midi_ch =
+									std::stoi(temp_word);
+								temp_word =
+									info->scenes[current_scene].strips[cursor[Coordinates::Y]].midi_ch == 0
+									? "0" : std::to_string(
+									info->scenes[current_scene].strips[cursor[Coordinates::Y]].midi_ch);
+								channel_field[cursor[Coordinates::Y]].set_cursor();
+								break;
+							case CursorX::INSTRUMENT:
 								keyboard_ptr->set_instrument_name(
 										info->program.bnk, info->program.num, cursor[Y], temp_word );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
-							case 2:
+							case CursorX::VOLUME:
 								info->scenes[ current_scene + 1 ].strips[ cursor[Y] ].volume =
 									std::stoi( temp_word );
 								temp_word = 
@@ -884,19 +938,19 @@ void Orchestra::capture_key() noexcept/*{{{*/
 									info->scenes[ current_scene ].strips[ cursor[Y] ].volume );
 								volume_field[ cursor[Y] ].set_cursor();
 								break;
-							case 3:
-								info->scenes[ current_scene + 1 ].strips[ cursor[Y] ].transposition =
-									std::stoi( temp_word );
-								temp_word = 
-									info->scenes[current_scene].strips[ cursor[Y] ].transposition == 0
+							case CursorX::TRANSPOSITION:
+								info->scenes[current_scene + 1].strips[cursor[Coordinates::Y]].transposition =
+									std::stoi(temp_word);
+								temp_word =
+									info->scenes[current_scene].strips[cursor[Coordinates::Y]].transposition == 0
 									? "0" : std::to_string(
-									info->scenes[ current_scene ].strips[ cursor[Y] ].transposition );
-								transposition_field[ cursor[Y] ].set_cursor();
+									info->scenes[current_scene].strips[cursor[Coordinates::Y]].transposition);
+								transposition_field[cursor[Coordinates::Y]].set_cursor();
 								break;
-							case 4:
+							case CursorX::L_SLIDER:
 								double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_left();
 								break;
-							case 5:
+							case CursorX::R_SLIDER:
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
@@ -914,17 +968,18 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			case 18 : // Eliminate{{{
-				if ( info->n_scenes > 1 ) {
+				if (info->n_scenes > 1) {
 					if ( current_scene == info->n_scenes - 1 )
 						--current_scene;
 					for ( int32_t i = current_scene; i < info->n_scenes - 1; ++i )
 						info->scenes[i] = info->scenes[i + 1];
 					--info->n_scenes;
 					update();
-					if ( cursor[Y] == -1 ) { // si está hasta arriba
-						if ( cursor[X] <= 1 ) {
-							info->default_scene = std::stoi( temp_word );
-							vi_field.set_content( std::to_string( info->default_scene ) );
+
+					if (cursor[Coordinates::Y] == -1) { // si está hasta arriba
+						if (cursor[Coordinates::X] == CursorX::DEFAULT_SCENE) {
+							info->default_scene = std::stoi(temp_word);
+							vi_field.set_content( std::to_string(info->default_scene));
 							vi_field.set_cursor();
 						}
 						else {
@@ -934,16 +989,25 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						}
 					}
 					else
-						switch ( cursor[X] ) {
-							case 0:
-								status_field[ cursor[Y] ].set_cursor();
+						switch (cursor[Coordinates::X]) {
+							case CursorX::STATE:
+								status_field[cursor[Y]].set_cursor();
 								break;
-							case 1:
+							case CursorX::MIDI_CH:
+								info->scenes[current_scene + 1].strips[cursor[Coordinates::Y]].midi_ch =
+									std::stoi(temp_word);
+								temp_word =
+									info->scenes[current_scene].strips[cursor[Coordinates::Y]].midi_ch == 0
+									? "0" : std::to_string(
+									info->scenes[current_scene].strips[cursor[Coordinates::Y]].midi_ch);
+								channel_field[cursor[Coordinates::Y]].set_cursor();
+								break;
+							case CursorX::INSTRUMENT:
 								keyboard_ptr->set_instrument_name(
 										info->program.bnk, info->program.num, cursor[Y], temp_word );
 								instrument_field[ cursor[Y] ].set_cursor();
 								break;
-							case 2:
+							case CursorX::VOLUME:
 								info->scenes[ current_scene + 1 ].strips[ cursor[Y] ].volume =
 									std::stoi( temp_word );
 								temp_word = 
@@ -952,7 +1016,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 									info->scenes[ current_scene ].strips[ cursor[Y] ].volume );
 								volume_field[ cursor[Y] ].set_cursor();
 								break;
-							case 3:
+							case CursorX::TRANSPOSITION:
 								info->scenes[ current_scene + 1 ].strips[ cursor[Y] ].transposition =
 									std::stoi( temp_word );
 								temp_word = 
@@ -961,13 +1025,14 @@ void Orchestra::capture_key() noexcept/*{{{*/
 									info->scenes[ current_scene ].strips[ cursor[Y] ].transposition );
 								transposition_field[ cursor[Y] ].set_cursor();
 								break;
-							case 4:
+							case CursorX::L_SLIDER:
 								double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_left();
 								break;
-							case 5:
+							case CursorX::R_SLIDER:
 								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
 								break;
 						}
+					/*
 					if ( keyboard_ptr->get_MIDI_state() == Switch::ON ) {
 						jack_midi_data_t to_edit_SysEx[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
 						keyboard_ptr->send_page_SysEx(to_edit_SysEx);
@@ -975,6 +1040,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 						keyboard_ptr->dump_scene( *info, current_scene );
 					}
+					*/
 					will_dump = false;
 					info->scenes.pop_back();
 				}
@@ -1005,46 +1071,63 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 					update();
 
-					if ( cursor[Y] == -1 ) { // si está hasta arriba
-						info->scenes[ current_scene + 1 ].label = temp_word; // guardamos
-						temp_word = info->scenes[ current_scene ].label; // copiamos nuevo
-						etiqueta_field.set_cursor();
-					}
-					else
-						switch ( cursor[X] ) {
-							case 0:
-								status_field[ cursor[Y] ].set_cursor();
-								break;
-							case 1:
-								keyboard_ptr->set_instrument_name(
-										info->program.bnk, info->program.num, cursor[Y], temp_word );
-								instrument_field[ cursor[Y] ].set_cursor();
-								break;
-							case 2:
-								info->scenes[ current_scene + 1 ].strips[ cursor[Y] ].volume =
-									std::stoi( temp_word );
-								temp_word = 
-									info->scenes[current_scene].strips[ cursor[Y] ].volume == 0
-									? "0" : std::to_string(
-									info->scenes[ current_scene ].strips[ cursor[Y] ].volume );
-								volume_field[ cursor[Y] ].set_cursor();
-								break;
-							case 3:
-								info->scenes[ current_scene + 1 ].strips[ cursor[Y] ].transposition =
-									std::stoi( temp_word );
-								temp_word = 
-									info->scenes[current_scene].strips[ cursor[Y] ].transposition == 0
-									? "0" : std::to_string(
-									info->scenes[ current_scene ].strips[ cursor[Y] ].transposition );
-								transposition_field[ cursor[Y] ].set_cursor();
-								break;
-							case 4:
-								double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_left();
-								break;
-							case 5:
-								double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
-								break;
+					if (cursor[Coordinates::Y] == -1 ) { // si está hasta arriba
+						if (cursor[X] == CursorX::DEFAULT_SCENE) {
+							info->default_scene = std::stoi(temp_word);
+							vi_field.set_content( std::to_string(info->default_scene));
+							vi_field.set_cursor();
 						}
+						else {
+							info->scenes[current_scene - 1].label = temp_word; // guardamos
+							temp_word = info->scenes[ current_scene ].label; // copiamos nuevo
+							etiqueta_field.set_cursor();
+						}
+					}
+
+					else switch (cursor[Coordinates::X]) {
+						case CursorX::STATE:
+							status_field[cursor[Y]].set_cursor();
+							break;
+						case CursorX::MIDI_CH:
+							info->scenes[current_scene + 1].strips[cursor[Y]].midi_ch =
+								std::stoi(temp_word);
+							temp_word =
+								info->scenes[current_scene].strips[cursor[Y]].midi_ch == 0
+								? "0" : std::to_string(
+								info->scenes[current_scene].strips[cursor[Y]].midi_ch);
+							channel_field[cursor[Y]].set_cursor();
+							break;
+						case CursorX::INSTRUMENT:
+							keyboard_ptr->set_instrument_name(
+									info->program.bnk, info->program.num, cursor[Y], temp_word );
+							instrument_field[ cursor[Y] ].set_cursor();
+							break;
+						case CursorX::VOLUME:
+							info->scenes[ current_scene + 1 ].strips[ cursor[Y] ].volume =
+								std::stoi( temp_word );
+							temp_word = 
+								info->scenes[current_scene].strips[ cursor[Y] ].volume == 0
+								? "0" : std::to_string(
+								info->scenes[ current_scene ].strips[ cursor[Y] ].volume );
+							volume_field[ cursor[Y] ].set_cursor();
+							break;
+						case CursorX::TRANSPOSITION:
+							info->scenes[current_scene + 1].strips[cursor[Y]].transposition =
+								std::stoi(temp_word);
+							temp_word =
+								info->scenes[current_scene].strips[cursor[Y]].transposition == 0
+								? "0" : std::to_string(
+								info->scenes[current_scene].strips[cursor[Y]].transposition);
+							transposition_field[ cursor[Y] ].set_cursor();
+							break;
+						case CursorX::L_SLIDER:
+							double_X_slider[ cursor[Coordinates::Y] ].set_cursor_at_left();
+							break;
+						case CursorX::R_SLIDER:
+							double_X_slider[ cursor[Coordinates::Y ] ].set_cursor_at_right();
+							break;
+					}
+
 					if ( keyboard_ptr->get_MIDI_state() == Switch::ON ) {
 						jack_midi_data_t to_edit_SysEx[] {0xF0, 0x42, 0x30, 0x7A, 0x4E, 0x01, 0xF7};
 						keyboard_ptr->send_page_SysEx(to_edit_SysEx);
@@ -1058,28 +1141,34 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 			default :/*{{{*/
 				if (tecla == 32 or (44 <= tecla and tecla <= 122) or tecla == 263) {
-					if (cursor[Y] == -1) {
+
+					if (cursor[Coordinates::Y] == -1) {
 						sprintf(tecla_c_string, "%c", tecla);
 						temp_word = temp_word + tecla_c_string;
-						cursor[Coordinates::X] == 0
+						cursor[Coordinates::X] == CursorX::DEFAULT_SCENE
 							? vi_field.set_content(temp_word)
 							: etiqueta_field.set_content(temp_word);
 					}
-					else switch ( cursor[X] ) {
-						case 1:
+					else switch (cursor[Coordinates::X]) {
+						case CursorX::MIDI_CH :
+							sprintf(tecla_c_string, "%c", tecla);
+							temp_word = temp_word + tecla_c_string;
+							channel_field[cursor[Coordinates::Y]].set_text(temp_word);
+							break;
+						case CursorX::INSTRUMENT:
 							sprintf( tecla_c_string, "%c", tecla );
 							temp_word = temp_word + tecla_c_string;
 							instrument_field[ cursor[Y] ].set_text( temp_word );
 							break;
-						case 2 :
+						case CursorX::VOLUME :
 							sprintf( tecla_c_string, "%c", tecla );
 							temp_word = temp_word + tecla_c_string;
 							volume_field[ cursor[Y] ].set_text( temp_word );
 							break;
-						case 3 :
-							sprintf( tecla_c_string, "%c", tecla );
+						case CursorX::TRANSPOSITION :
+							sprintf(tecla_c_string, "%c", tecla);
 							temp_word = temp_word + tecla_c_string;
-							transposition_field[ cursor[Y] ].set_text( temp_word );
+							transposition_field[cursor[Coordinates::Y]].set_text(temp_word);
 							break;
 						default:
 							break;
@@ -1096,7 +1185,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 			// keyboard_ptr->dump_scene( *info, scenes );
 		}
 
-	} while ( again );
+	} while (again);
 }/*}}}*/
 
 void Orchestra::reset_variation() noexcept/*{{{*/
