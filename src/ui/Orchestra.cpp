@@ -813,31 +813,39 @@ void Orchestra::capture_key() noexcept/*{{{*/
 
 				break;/*}}}*/
 
-			case '<' : // CTRL-KEY_LEFT{{{
-				if ( cursor[Y] > -1 ) { // Zona de controles
-					if ( cursor[X] == 4 ) { // left slider
-						if ( double_X_slider[ cursor[Y] ].decrease_left_slider() == Moved::YES )
-							--( info->scenes[ current_scene ].strips[ cursor[Y] ].lower_key );
+			case '<' : // {{{
+				if (cursor[Coordinates::Y] > -1) { // Zona de controles
+					if (cursor[X] == CursorX::L_SLIDER) {
+						if (double_X_slider[cursor[Y]].
+								decrease_left_slider() == Moved::YES)
+							--(info->scenes[current_scene].
+									strips[cursor[Y]].lower_key);
 					}
-					else if ( cursor[X] == 5 ) { // right slider
-						if ( double_X_slider[ cursor[Y] ].decrease_right_slider() == Moved::YES )
-							--( info->scenes[ current_scene ].strips[ cursor[Y] ].upper_key );
+					else if (cursor[X] == CursorX::R_SLIDER) {
+						if (double_X_slider[cursor[Y]].
+								decrease_right_slider() == Moved::YES)
+							--(info->scenes[current_scene].
+									strips[ cursor[Y] ].upper_key);
 					}
 					will_dump = true;
 				}
 
 				break;/*}}}*/
 
-			// CTRL-KEY_RIGHT{{{
-			case '>' :
-				if ( cursor[Y] > -1 ) {
-					if ( cursor[X] == 4 ) {
-						if ( double_X_slider[ cursor[Y] ].increase_left_slider() == Moved::YES )
-							++( info->scenes[ current_scene ].strips[ cursor[Y] ].lower_key );
+			case '>' : // {{{
+
+				if (cursor[Coordinates::Y] > -1) {
+					if (cursor[Coordinates::X] == CursorX::L_SLIDER) {
+						if (double_X_slider[cursor[Y]].
+								increase_left_slider() == Moved::YES)
+							++(info->scenes[current_scene].
+									strips[cursor[Y]].lower_key);
 					}
-					else if ( cursor[X] == 5 ) {
-						if ( double_X_slider[ cursor[Y] ].increase_right_slider() == Moved::YES )
-							++( info->scenes[ current_scene ].strips[ cursor[Y] ].upper_key );
+					else if (cursor[Coordinates::X] == CursorX::R_SLIDER){
+						if (double_X_slider[cursor[Y]].
+								increase_right_slider() == Moved::YES)
+							++(info->scenes[current_scene].
+									strips[cursor[Y]].upper_key);
 					}
 					will_dump = true;
 				}
