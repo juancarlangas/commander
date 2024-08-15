@@ -176,8 +176,8 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 // CLIENT DATA{{{
 const char* client_name {"Commander"};
 jack_client_t* client {NULL};
-std::array<jack_port_t*, STRIPS_PER_PERFORMANCE> output_port {{NULL}};
-std::array<void*, STRIPS_PER_PERFORMANCE> output_buffer {{NULL}};
+std::array<jack_port_t*, 5> output_port {{NULL}};
+std::array<void*, 5> output_buffer {{NULL}};
 jack_port_t* input_port {NULL};
 jack_nframes_t local_nframes = {0};/*}}}*/
 
@@ -207,7 +207,7 @@ int process([[maybe_unused]] jack_nframes_t nframes, [[maybe_unused]] void* arg)
     jack_midi_event_t in_event;
 
     // Buffers de salida
-    for (std::size_t n_port {0}; n_port <= 2; ++n_port) {
+    for (std::size_t n_port {0}; n_port < 5; ++n_port) {
         output_buffer[n_port] = jack_port_get_buffer(output_port[n_port], nframes);
         jack_midi_clear_buffer(output_buffer[n_port]);
     }
@@ -227,7 +227,7 @@ int process([[maybe_unused]] jack_nframes_t nframes, [[maybe_unused]] void* arg)
             auto& strips = performance_buffer.scenes[current_scene].strips;
 
             // Si es una nota (Note On/Off)
-            if ((in_event.buffer[0] & 0xF0) == 0x90 || // Note On
+            if ((in_event.buffer[0] & 0xF0) == 0x90 or // Note On
                 (in_event.buffer[0] & 0xF0) == 0x80) { // Note Off
 
                 uint8_t note = in_event.buffer[1];
@@ -238,41 +238,43 @@ int process([[maybe_unused]] jack_nframes_t nframes, [[maybe_unused]] void* arg)
                         strips[j].lower_key <= note &&
                         note <= strips[j].upper_key) {
 
-                        // Cambiamos el canal de la nota según el strip
-                        in_event.buffer[0] = event_type | static_cast<uint8_t>(j);
+						const std::uint8_t& strip_channel {static_cast<std::uint8_t>(strips[j].midi_ch)};
+
+                        // Cambiamos el canal de la nota según el canal del strip
+                        in_event.buffer[0] = event_type | strip_channel;
 
                         // Ajustamos el transpose
                         in_event.buffer[1] += strips[j].transposition;
 
-                        // Lo enviamos al buffer correspondiente
-                        if (j <= 7) {
+                        // Lo enviamos al buffer correspondiente al canal del strip
+                        if (strip_channel <= 7) { // KORG
                             jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
-                        } else if (j == 8) {
+                        } else if (strip_channel == 8) { // CP-80
                             jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
-                        } else if (j == 9) {
+                        } else if (strip_channel == 9) { // Acoustic Piano
                             jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
-                        }
+                        } else if (strip_channel == 10) { // Sampling
+                            jack_midi_event_write(output_buffer[3], in_event.time, in_event.buffer, in_event.size);
+						}
+
                     }
                 }
-            }
 
-            // Si es un mensaje Control Change (CC)
-            else if ((in_event.buffer[0] & 0xF0) == 0xB0) {  // Control Change
+			// Si es un mensaje Control Change (CC)
+			} else if ((in_event.buffer[0] & 0xF0) == 0xB0) {  // Control Change
+                uint8_t channel = in_event.buffer[0] & 0x0F;
 
-                for (std::size_t j {0}; j < STRIPS_PER_PERFORMANCE; ++j) {
-                    if (strips[j].state == Switch::ON) {
-                        // Lo enviamos al buffer correspondiente, sin modificar el mensaje
-                        if (j <= 7) {
-                            jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
-                        } else if (j == 8) {
-                            jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
-                        } else if (j == 9) {
-                            jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
-                        }
-					}
-				}
-
-				jack_midi_event_write(output_buffer[3], in_event.time, in_event.buffer, in_event.size);
+                // CC en canal MIDI 0 -> puerto 0
+                if (channel == 0) {
+					jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
+					jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
+					jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
+					jack_midi_event_write(output_buffer[3], in_event.time, in_event.buffer, in_event.size);
+                }
+                // CC en canal MIDI 15 -> puerto 3
+                else if (channel == 15) {
+                    jack_midi_event_write(output_buffer[4], in_event.time, in_event.buffer, in_event.size);
+                }
             }
         }
     }
@@ -298,8 +300,8 @@ void Keyboard::connect() noexcept {/*{{{*/
     jack_set_process_callback(client, process, 0);
 
     // Create the MIDI_state output port
-	if ((output_port[0] = 
-			jack_port_register(client, "1_to_8",
+	if ((output_port[0] =
+			jack_port_register(client, "0_to_7",
 				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr
 			<< "Failed to register JACK port at Keyboard::connect()\n";
@@ -308,6 +310,15 @@ void Keyboard::connect() noexcept {/*{{{*/
 
     // Create the MIDI_state output port
 	if ((output_port[1] =
+			jack_port_register(client, "8",
+				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
+		std::cerr
+			<< "Failed to register JACK port at Keyboard::connect()\n";
+		std::exit(EXIT_FAILURE); 
+	}
+
+    // Create the MIDI_state output port
+	if ((output_port[2] =
 			jack_port_register(client, "9",
 				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr
@@ -316,7 +327,7 @@ void Keyboard::connect() noexcept {/*{{{*/
 	}
 
     // Create the MIDI_state output port
-	if ((output_port[2] = 
+	if ((output_port[3] =
 			jack_port_register(client, "10",
 				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr
@@ -325,13 +336,14 @@ void Keyboard::connect() noexcept {/*{{{*/
 	}
 
     // Create the MIDI_state output port
-	if ((output_port[3] =
+	if ((output_port[4] =
 			jack_port_register(client, "16",
 				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
 		std::cerr
 			<< "Failed to register JACK port at Keyboard::connect()\n";
 		std::exit(EXIT_FAILURE); 
 	}
+
 	// Create the MIDI input port
     if ((input_port = jack_port_register(client, "midi_in",
             JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0)) == NULL) {
@@ -352,12 +364,12 @@ void Keyboard::connect() noexcept {/*{{{*/
 	std::array<const char*, 5> desired_port_keyword {
 		"a2j:Midi Through [14] (playback): [0] Midi Through Port-0",
 		"CP-80:events-in",
+		"Acoustic Piano:events-in",
 		"Sampling:events-in",
-		"To Mono TRITON:events-in",
-		"To Mono Sforzando:events-in"
+		"LSP Mixer x4 Stereo:events-in"
 	};
 
-	for (std::int32_t i_port {0}; i_port <= 2; ++i_port) {
+	for (std::int32_t i_port {0}; i_port < 5; ++i_port) {
 		// Try each of them and connect to it
 		for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
 			jack_port_t* possible_port = jack_port_by_name(client, all_ports_C_String[i]);
