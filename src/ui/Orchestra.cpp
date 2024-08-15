@@ -439,7 +439,8 @@ void Orchestra::capture_key() noexcept/*{{{*/
 					else // Zona de objetos
 						switch (cursor[Coordinates::X]) {
 							case CursorX::STATE : // Status <- Instrumento
-								info->scenes[current_scene].strips[cursor[Y]].
+								info->scenes[current_scene].
+									strips[cursor[Y]].
 									midi_ch = std::stoi(temp_word);
 								status_field[cursor[Coordinates::Y]].set_cursor();
 								break;
@@ -740,7 +741,7 @@ void Orchestra::capture_key() noexcept/*{{{*/
 						etiqueta_field.set_content(temp_word);
 					}
 				}
-				else if (cursor[X] == 0) { // CAmbio de status
+				else if (cursor[X] == CursorX::STATE) {
 					if (info->scenes[current_scene].strips[cursor[Y]].
 							state == Switch::OFF) {
 						info->scenes[current_scene].strips[cursor[Y]].
@@ -766,14 +767,14 @@ void Orchestra::capture_key() noexcept/*{{{*/
 							keyboard_ptr->get_instrument_name(
 								info->program.bnk, info->program.num, 
 								cursor[Y]));
-					volume_field[ cursor[Y] ].set_value(
+					volume_field[cursor[Y]].set_value(
 							info->scenes[current_scene].strips[cursor[Y]].
 							volume);
 					transposition_field[cursor[Y]].set_value(
 							info->scenes[current_scene].strips[cursor[Y]].
 							transposition);
 				}
-				else if (cursor[X] == 1) { // Espacio en INSRUMENTO
+				else if (cursor[X] == CursorX::INSTRUMENT) {
 					temp_word.append(" ");
 					instrument_field[cursor[Y]].set_text(temp_word);
 				}
