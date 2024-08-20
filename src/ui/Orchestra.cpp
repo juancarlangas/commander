@@ -45,7 +45,7 @@ void Orchestra::link_MIDI_device( Keyboard *_Teclado ) noexcept/*{{{*/
 	keyboard_ptr = _Teclado;
 }/*}}}*/
 
-void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
+void Orchestra::init(const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 						const int32_t _Ypos, const int32_t _Xpos ) noexcept
 {
 	current_scene = 0;
@@ -86,7 +86,7 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 
 	for (std::size_t i {0}; i < NUMBER_OF_PARTS; ++i) {
 		// Since channel 1 intended to be "General".. Just temp fixes
-		Font specific_font {i == 0 ? light_font : native_font[i]};
+		const Font& specific_font {native_font[i]};
 
 		status_field[i].init(y_starting_point + i, _Xpos + 2,
 				specific_font, dimmed_font, cursor_font, light_font,
@@ -105,7 +105,7 @@ void Orchestra::init( const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 				specific_font, dimmed_font, cursor_font, light_font);
 		volume_field[i].update();
 
-		transposition_field[i].init( 1, 4, y_starting_point + i, _Xpos + 45,
+		transposition_field[i].init( 1, 4, y_starting_point + i, _Xpos + 60,
 				specific_font, dimmed_font, cursor_font, light_font);
 		transposition_field[i].update();
 		
@@ -492,19 +492,20 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			case KEY_RIGHT :/*{{{*/
-				// Default scene
+				// HASTA ARRIBA
 				if (cursor[Coordinates::Y] == -1) {
 					if (cursor[Coordinates::X] == CursorX::DEFAULT_SCENE) {
-						info->default_scene = std::stoi(temp_word);
 						++cursor[Coordinates::X];
+						info->default_scene = std::stoi(temp_word);
 						temp_word = info->scenes[current_scene].label;
 						etiqueta_field.set_cursor();
 					}
 				}
+				// LO DEMÁS
 				else if (cursor[Coordinates::X] < CursorX::R_SLIDER) {
 					++cursor[Coordinates::X];
 					switch (cursor[Coordinates::X]) {
-						case CursorX::MIDI_CH : // Volumen -> Transposition
+						case CursorX::MIDI_CH :
 							status_field[cursor[Coordinates::Y]].leave_cursor();
 							temp_word = 
 								info->scenes[current_scene].strips[cursor[Coordinates::Y]].midi_ch == 0
@@ -735,12 +736,14 @@ void Orchestra::capture_key() noexcept/*{{{*/
 				break;/*}}}*/
 
 			case ' ' :/*{{{*/
-				if (cursor[Y] == -1) { // Hasta arriba
+				// HASTA ARRIBA
+				if (cursor[Y] == -1) {
 					if (cursor[X] == 1) {
 						temp_word.append(" ");
 						etiqueta_field.set_content(temp_word);
 					}
 				}
+				// LO DEMÁS
 				else if (cursor[X] == CursorX::STATE) {
 					if (info->scenes[current_scene].strips[cursor[Y]].
 							state == Switch::OFF) {

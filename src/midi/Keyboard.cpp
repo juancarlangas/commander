@@ -224,56 +224,57 @@ int process([[maybe_unused]] jack_nframes_t nframes, [[maybe_unused]] void* arg)
     for (jack_nframes_t i = 0; i < event_count; ++i) {
         if (jack_midi_event_get(&in_event, input_buffer, i) == 0) {
 
+            // Si es un mensaje Control Change (CC) en canal 16, reenviarlo al puerto 4
+            if ((in_event.buffer[0] & 0xF0) == 0xB0 && (in_event.buffer[0] & 0x0F) == 15) {
+                jack_midi_event_write(output_buffer[4], in_event.time, in_event.buffer, in_event.size);
+                continue; // No procesar más este evento
+            }
+
             auto& strips = performance_buffer.scenes[current_scene].strips;
 
-            // Si es una nota (Note On/Off)
-            if ((in_event.buffer[0] & 0xF0) == 0x90 or // Note On
-                (in_event.buffer[0] & 0xF0) == 0x80) { // Note Off
+            // Si es una nota (Note On/Off) o un mensaje Control Change (CC)
+            if ((in_event.buffer[0] & 0xF0) == 0x90 ||  // Note On
+                (in_event.buffer[0] & 0xF0) == 0x80 ||  // Note Off
+                (in_event.buffer[0] & 0xF0) == 0xB0) {  // Control Change
 
-                uint8_t note = in_event.buffer[1];
+                uint8_t note_or_cc = in_event.buffer[1];
                 uint8_t event_type = in_event.buffer[0] & 0xF0;
 
                 for (std::size_t j {0}; j < STRIPS_PER_PERFORMANCE; ++j) {
                     if (strips[j].state == Switch::ON &&
-                        strips[j].lower_key <= note &&
-                        note <= strips[j].upper_key) {
+                        strips[j].lower_key <= note_or_cc &&
+                        note_or_cc <= strips[j].upper_key) {
 
-						const std::uint8_t& strip_channel {static_cast<std::uint8_t>(strips[j].midi_ch)};
+                        const std::uint8_t& strip_channel {static_cast<std::uint8_t>(strips[j].midi_ch)};
 
-                        // Cambiamos el canal de la nota según el canal del strip
+                        // Cambiamos el canal de la nota o mensaje CC según el canal del strip
                         in_event.buffer[0] = event_type | strip_channel;
 
-                        // Ajustamos el transpose
-                        in_event.buffer[1] += strips[j].transposition;
+                        // Si es una nota, ajustamos el transpose
+                        if (event_type == 0x90 || event_type == 0x80) {
+                            in_event.buffer[1] += strips[j].transposition;
+                        }
 
-                        // Lo enviamos al buffer correspondiente al canal del strip
-                        if (strip_channel <= 7) { // KORG
-                            jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
-                        } else if (strip_channel == 8) { // CP-80
-                            jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
-                        } else if (strip_channel == 9) { // Acoustic Piano
-                            jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
-                        } else if (strip_channel == 10) { // Sampling
-                            jack_midi_event_write(output_buffer[3], in_event.time, in_event.buffer, in_event.size);
-						}
+                        // Desactivar -Wpedantic para usar rangos en switch
+                        #pragma GCC diagnostic push
+                        #pragma GCC diagnostic ignored "-Wpedantic"
+                        switch (strip_channel) {
+                            case 0 ... 7:  // KORG
+                                jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
+                                break;
+                            case 8:  // CP-80
+                                jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
+                                break;
+                            case 10:  // Synth Pad
+                                jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
+                                break;
+                            case 11:  // Sampling
+                                jack_midi_event_write(output_buffer[3], in_event.time, in_event.buffer, in_event.size);
+                                break;
+                        }
+                        #pragma GCC diagnostic pop  // Restaurar advertencias
 
                     }
-                }
-
-			// Si es un mensaje Control Change (CC)
-			} else if ((in_event.buffer[0] & 0xF0) == 0xB0) {  // Control Change
-                uint8_t channel = in_event.buffer[0] & 0x0F;
-
-                // CC en canal MIDI 0 -> puerto 0
-                if (channel == 0) {
-					jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
-					jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
-					jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
-					jack_midi_event_write(output_buffer[3], in_event.time, in_event.buffer, in_event.size);
-                }
-                // CC en canal MIDI 15 -> puerto 3
-                else if (channel == 15) {
-                    jack_midi_event_write(output_buffer[4], in_event.time, in_event.buffer, in_event.size);
                 }
             }
         }
@@ -364,7 +365,7 @@ void Keyboard::connect() noexcept {/*{{{*/
 	std::array<const char*, 5> desired_port_keyword {
 		"a2j:Midi Through [14] (playback): [0] Midi Through Port-0",
 		"CP-80:events-in",
-		"Acoustic Piano:events-in",
+		"Synth Pad:events-in",
 		"Sampling:events-in",
 		"LSP Mixer x4 Stereo:events-in"
 	};

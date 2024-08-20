@@ -306,8 +306,8 @@ void from_json(const nlohmann::json& j, Strip& s) {
 	s.state = j.at("state").get<Switch>();
 	s.midi_ch = j.at("midi_ch").get<std::int16_t>();
 	s.volume = j.at("volume").get<std::int16_t>();
-	s.lower_key = j.at("lower_key").get<std::int16_t>();
-	s.upper_key = j.at("upper_key").get<std::int16_t>();
+	s.lower_key = j.at("lo_key").get<std::int16_t>();
+	s.upper_key = j.at("hi_key").get<std::int16_t>();
 	s.transposition = j.at("transposition").get<std::int16_t>();
 }/*}}}*/
 
@@ -373,8 +373,8 @@ void to_json(nlohmann::ordered_json& j, const Strip& s) {
 	j = nlohmann::ordered_json{{"state", s.state},
 							   {"midi_ch", s.midi_ch},
 							   {"volume", s.volume},
-							   {"lower_key", s.lower_key},
-							   {"upper_key", s.upper_key},
+							   {"lo_key", s.lower_key},
+							   {"hi_key", s.upper_key},
 							   {"transposition", s.transposition}};
 }/*}}}*/
 
