@@ -101,7 +101,7 @@ void Orchestra::init(const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 				specific_font, dimmed_font, cursor_font, light_font);
 		instrument_field[i].update();
 
-		volume_field[i].init(1, 4, y_starting_point + i, _Xpos + 35,
+		volume_field[i].init(1, 4, y_starting_point + i, _Xpos + 42,
 				specific_font, dimmed_font, cursor_font, light_font);
 		volume_field[i].update();
 
