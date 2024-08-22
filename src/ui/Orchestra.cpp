@@ -85,12 +85,12 @@ void Orchestra::init(const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 	int32_t y_starting_point = _Ypos + (_Ysize * 70 / 200);
 
 	for (std::size_t i {0}; i < NUMBER_OF_PARTS; ++i) {
-		// Since channel 1 intended to be "General".. Just temp fixes
 		const Font& specific_font {native_font[i]};
 
 		status_field[i].init(y_starting_point + i, _Xpos + 2,
 				specific_font, dimmed_font, cursor_font, light_font,
-				i + 49 /*ASCII*/);
+				// for hex
+				(i < 10) ? ('0' + i) : ('A' + (i - 10)));
 		status_field[i].update();
 
 		channel_field[i].init(1, 4, y_starting_point + i, _Xpos + 5,
