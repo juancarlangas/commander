@@ -142,9 +142,9 @@ void Keyboard::to_next_scene() noexcept/*{{{*/
 		++current_scene;
 }/*}}}*/
 
-void Keyboard::set_scene( const int16_t _Scene ) noexcept/*{{{*/
+void Keyboard::set_scene(const int16_t _Scene) noexcept/*{{{*/
 {
-	if ( _Scene < performance_buffer.n_scenes )
+	if (_Scene < performance_buffer.n_scenes)
 		current_scene = _Scene;
 }/*}}}*/
 
@@ -199,7 +199,7 @@ struct PatchChangeT {
 //jack_midi_data_t callback_page_SysEx[PAGE_SYSEX_WORD_SIZE];
 //jack_midi_data_t callback_scene_SysExEs[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE];/*}}}*/
 
-int process([[maybe_unused]] jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
+int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
 {
     // Buffer de entrada
     void* input_buffer = jack_port_get_buffer(input_port, nframes);
@@ -214,9 +214,12 @@ int process([[maybe_unused]] jack_nframes_t nframes, [[maybe_unused]] void* arg)
 
     // Enviar mensajes Program Change (PC)
     if (should_send_PC) {
-        jack_midi_event_write(output_buffer[0], 0, callback_PC.msb, sizeof(callback_PC.msb));
-        jack_midi_event_write(output_buffer[0], 0, callback_PC.lsb, sizeof(callback_PC.lsb));
-        jack_midi_event_write(output_buffer[0], 0, callback_PC.pc, sizeof(callback_PC.pc));
+        jack_midi_event_write(output_buffer[0], 0, callback_PC.msb, 
+				sizeof(callback_PC.msb));
+        jack_midi_event_write(output_buffer[0], 0, callback_PC.lsb, 
+				sizeof(callback_PC.lsb));
+        jack_midi_event_write(output_buffer[0], 0, callback_PC.pc, 
+				sizeof(callback_PC.pc));
         should_send_PC = false;
     }
 
@@ -224,57 +227,69 @@ int process([[maybe_unused]] jack_nframes_t nframes, [[maybe_unused]] void* arg)
     for (jack_nframes_t i = 0; i < event_count; ++i) {
         if (jack_midi_event_get(&in_event, input_buffer, i) == 0) {
 
-            // Si es un mensaje Control Change (CC) en canal 16, reenviarlo al puerto 4
-            if ((in_event.buffer[0] & 0xF0) == 0xB0 && (in_event.buffer[0] & 0x0F) == 15) {
-                jack_midi_event_write(output_buffer[4], in_event.time, in_event.buffer, in_event.size);
+            // Si es un mensaje Control Change (CC) en canal 16,
+			// reenviarlo al puerto 4
+            if ((in_event.buffer[0] & 0xF0) == 0xB0 &&
+				(in_event.buffer[0] & 0x0F) == 15) {
+                jack_midi_event_write(output_buffer[4], in_event.time, 
+						in_event.buffer, in_event.size);
                 continue; // No procesar más este evento
             }
 
-            auto& strips = performance_buffer.scenes[current_scene].strips;
+            const auto& strips {
+				performance_buffer.scenes[current_scene].strips};
 
-            // Si es una nota (Note On/Off) o un mensaje Control Change (CC)
-            if ((in_event.buffer[0] & 0xF0) == 0x90 ||  // Note On
-                (in_event.buffer[0] & 0xF0) == 0x80 ||  // Note Off
-                (in_event.buffer[0] & 0xF0) == 0xB0) {  // Control Change
+            // Reenviar cualquier tipo de evento MIDI
+            const std::uint8_t& midi_event = in_event.buffer[0];
+            const std::uint8_t& note_or_cc_or_pb = in_event.buffer[1];
 
-                uint8_t note_or_cc = in_event.buffer[1];
-                uint8_t event_type = in_event.buffer[0] & 0xF0;
+            for (std::size_t j {0}; j < STRIPS_PER_PERFORMANCE; ++j) {
+                if (strips[j].state == Switch::ON and
+                    (midi_event == 0xB0 || midi_event == 0xE0 ||
+                    (strips[j].lower_key <= note_or_cc_or_pb and
+                    note_or_cc_or_pb <= strips[j].upper_key))) {
 
-                for (std::size_t j {0}; j < STRIPS_PER_PERFORMANCE; ++j) {
-                    if (strips[j].state == Switch::ON &&
-                        strips[j].lower_key <= note_or_cc &&
-                        note_or_cc <= strips[j].upper_key) {
+                    const std::uint8_t& strip_channel {
+						static_cast<std::uint8_t>(strips[j].midi_ch)};
 
-                        const std::uint8_t& strip_channel {static_cast<std::uint8_t>(strips[j].midi_ch)};
+                    // Cambiamos el canal del evento
+					// según el canal del strip
+                    in_event.buffer[0] =
+						(midi_event & 0xF0) | strip_channel;
 
-                        // Cambiamos el canal de la nota o mensaje CC según el canal del strip
-                        in_event.buffer[0] = event_type | strip_channel;
-
-                        // Si es una nota, ajustamos el transpose
-                        if (event_type == 0x90 || event_type == 0x80) {
-                            in_event.buffer[1] += strips[j].transposition;
-                        }
-
-                        // Desactivar -Wpedantic para usar rangos en switch
-                        #pragma GCC diagnostic push
-                        #pragma GCC diagnostic ignored "-Wpedantic"
-                        switch (strip_channel) {
-                            case 0 ... 7:  // KORG
-                                jack_midi_event_write(output_buffer[0], in_event.time, in_event.buffer, in_event.size);
-                                break;
-                            case 8:  // CP-80
-                                jack_midi_event_write(output_buffer[1], in_event.time, in_event.buffer, in_event.size);
-                                break;
-                            case 10:  // Synth Pad
-                                jack_midi_event_write(output_buffer[2], in_event.time, in_event.buffer, in_event.size);
-                                break;
-                            case 11:  // Sampling
-                                jack_midi_event_write(output_buffer[3], in_event.time, in_event.buffer, in_event.size);
-                                break;
-                        }
-                        #pragma GCC diagnostic pop  // Restaurar advertencias
-
+                    // Si es una nota, ajustamos el transpose
+                    if ((midi_event & 0xF0) == 0x90 ||
+						(midi_event & 0xF0) == 0x80) {
+                        in_event.buffer[1] += strips[j].transposition;
                     }
+
+                    // Desactivar -Wpedantic para usar rangos en switch
+                    #pragma GCC diagnostic push
+                    #pragma GCC diagnostic ignored "-Wpedantic"
+                    switch (j) {
+                        case 0 ... 7:  // Strips 0-7
+                            jack_midi_event_write(
+									output_buffer[0], in_event.time, 
+									in_event.buffer, in_event.size);
+                            break;
+                        case 8:  // Strip 8
+                            jack_midi_event_write(
+									output_buffer[1], in_event.time, 
+									in_event.buffer, in_event.size);
+                            break;
+                        case 9:  // Strip 9
+                            jack_midi_event_write(
+									output_buffer[2], in_event.time, 
+									in_event.buffer, in_event.size);
+                            break;
+                        case 10:  // Strip 10
+                            jack_midi_event_write(
+									output_buffer[3], in_event.time, 
+									in_event.buffer, in_event.size);
+                            break;
+                    }
+                    #pragma GCC diagnostic pop  // Restaurar advertencias
+
                 }
             }
         }

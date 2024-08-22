@@ -272,7 +272,7 @@ auto Catalog::get_sfz_folder() const noexcept -> std::filesystem::path {/*{{{*/
 	return sfz_folder;
 }/*}}}*/
 
-/************************************* from_json **************************************************/
+/************************ from_json *************************************/
 // Overload for Tagging struct{{{
 void from_json(const nlohmann::json& j, Tagging& m) {
 	m.title = j.at("title").get<std::string>();

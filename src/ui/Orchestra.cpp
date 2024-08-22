@@ -64,8 +64,8 @@ void Orchestra::init(const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 	scene_text_box.update();
 
 	// keyboard_ptr_text_box
-	keyboard_scheme.Popup::init(
-			5, 61, _Ypos + (_Ysize * 40 / 200), _Xpos + (_Xsize * 66 / 200));
+	keyboard_scheme.Popup::init(5, 61,
+			_Ypos + (_Ysize * 40 / 200), _Xpos + (_Xsize * 80 / 200));
 	keyboard_scheme.set_font_color(WHITE_DEFAULT);
 	keyboard_scheme.set_font_width("Bold");
 	keyboard_scheme.auto_draw();
@@ -77,8 +77,8 @@ void Orchestra::init(const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 	vi_field.set_font_color(WHITE_DEFAULT);
 
 	// Etiqueta
-	etiqueta_field.create("Etiqueta", 3, _Xsize * 80 / 200, _Ypos + 1, _Xpos + (_Xsize / 4),
-							STRING, 16);
+	etiqueta_field.create("Etiqueta", 3, _Xsize * 80 / 200,
+			_Ypos + 1, _Xpos + (_Xsize / 4), STRING, 16);
 	etiqueta_field.set_font_width("Bold");
 	etiqueta_field.set_font_color(WHITE_DEFAULT);
 
@@ -101,16 +101,18 @@ void Orchestra::init(const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 				specific_font, dimmed_font, cursor_font, light_font);
 		instrument_field[i].update();
 
-		volume_field[i].init(1, 4, y_starting_point + i, _Xpos + 42,
+		volume_field[i].init(1, 4, y_starting_point + i, _Xpos + 46,
 				specific_font, dimmed_font, cursor_font, light_font);
 		volume_field[i].update();
 
-		transposition_field[i].init( 1, 4, y_starting_point + i, _Xpos + 60,
+		transposition_field[i].init(1, 4,
+				y_starting_point + i, _Xpos + 54,
 				specific_font, dimmed_font, cursor_font, light_font);
 		transposition_field[i].update();
 		
 		// invocamos su clase base porque no cuadra con su init
-		double_X_slider[i].OrchestraElement::init( 1, 62, y_starting_point + i, _Xpos + 49,
+		double_X_slider[i].OrchestraElement::init(1, 62, 
+				y_starting_point + i, _Xpos + 60,
 				specific_font, dimmed_font, cursor_font, light_font);
 		double_X_slider[i].update();
 	}
