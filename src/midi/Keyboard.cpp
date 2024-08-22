@@ -207,9 +207,10 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
     jack_midi_event_t in_event;
 
     // Buffers de salida
-    for (std::size_t n_port {0}; n_port < 5; ++n_port) {
-        output_buffer[n_port] = jack_port_get_buffer(output_port[n_port], nframes);
-        jack_midi_clear_buffer(output_buffer[n_port]);
+    for (std::size_t i {0}; i < N_OUTPUT_PORTS; ++i) {
+        output_buffer[i] =
+            jack_port_get_buffer(output_port[i], nframes);
+        jack_midi_clear_buffer(output_buffer[i]);
     }
 
     // Enviar mensajes Program Change (PC)
@@ -224,73 +225,54 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
     }
 
     // Procesar eventos MIDI
+    const auto& strips = performance_buffer.scenes[current_scene].strips;
+
     for (jack_nframes_t i = 0; i < event_count; ++i) {
         if (jack_midi_event_get(&in_event, input_buffer, i) == 0) {
+            const std::uint8_t event_type = in_event.buffer[0] & 0xF0;
+            const std::uint8_t note_or_cc_or_pb = in_event.buffer[1];
 
             // Si es un mensaje Control Change (CC) en canal 16,
 			// reenviarlo al puerto 4
-            if ((in_event.buffer[0] & 0xF0) == 0xB0 &&
-				(in_event.buffer[0] & 0x0F) == 15) {
+            if (event_type == 0xB0 && (in_event.buffer[0] & 0x0F) == 15) {
                 jack_midi_event_write(output_buffer[4], in_event.time, 
 						in_event.buffer, in_event.size);
-                continue; // No procesar más este evento
+                continue;
             }
 
-            const auto& strips {
-				performance_buffer.scenes[current_scene].strips};
+            for (std::size_t j = 0; j < STRIPS_PER_PERFORMANCE; ++j) {
+                if (strips[j].state == Switch::ON &&
+                	(event_type == 0xB0 || event_type == 0xE0 ||
+                     (strips[j].lower_key <= note_or_cc_or_pb &&
+					  note_or_cc_or_pb <= strips[j].upper_key))) {
 
-            // Reenviar cualquier tipo de evento MIDI
-            const std::uint8_t& midi_event = in_event.buffer[0];
-            const std::uint8_t& note_or_cc_or_pb = in_event.buffer[1];
+                    // Usar el buffer original si no es necesario
+					// ajustar transposición
+                    std::uint8_t temp_buffer[3];  // tamaño máximo de 
+												  // evento MIDI
+					// Clonamos
+					std::copy_n(in_event.buffer, in_event.size, 
+						temp_buffer);
 
-            for (std::size_t j {0}; j < STRIPS_PER_PERFORMANCE; ++j) {
-                if (strips[j].state == Switch::ON and
-                    (midi_event == 0xB0 || midi_event == 0xE0 ||
-                    (strips[j].lower_key <= note_or_cc_or_pb and
-                    note_or_cc_or_pb <= strips[j].upper_key))) {
+                    if (event_type == 0x90 ||
+						event_type == 0x80) { // Nota
+						// Ajustamos canal
+						temp_buffer[0] = (temp_buffer[0] & 0xF0) |
+							static_cast<std::uint8_t>(strips[j].midi_ch);
+						// Transponemos
+						temp_buffer[1] += strips[j].transposition;
+					} else {
+						// Ajustamos canal
+						temp_buffer[0] = (temp_buffer[0] & 0xF0) |
+							static_cast<std::uint8_t>(strips[j].midi_ch);
+					}
 
-                    const std::uint8_t& strip_channel {
-						static_cast<std::uint8_t>(strips[j].midi_ch)};
-
-                    // Cambiamos el canal del evento
-					// según el canal del strip
-                    in_event.buffer[0] =
-						(midi_event & 0xF0) | strip_channel;
-
-                    // Si es una nota, ajustamos el transpose
-                    if ((midi_event & 0xF0) == 0x90 ||
-						(midi_event & 0xF0) == 0x80) {
-                        in_event.buffer[1] += strips[j].transposition;
-                    }
-
-                    // Desactivar -Wpedantic para usar rangos en switch
-                    #pragma GCC diagnostic push
-                    #pragma GCC diagnostic ignored "-Wpedantic"
-                    switch (j) {
-                        case 0 ... 7:  // Strips 0-7
-                            jack_midi_event_write(
-									output_buffer[0], in_event.time, 
-									in_event.buffer, in_event.size);
-                            break;
-                        case 8:  // Strip 8
-                            jack_midi_event_write(
-									output_buffer[1], in_event.time, 
-									in_event.buffer, in_event.size);
-                            break;
-                        case 9:  // Strip 9
-                            jack_midi_event_write(
-									output_buffer[2], in_event.time, 
-									in_event.buffer, in_event.size);
-                            break;
-                        case 10:  // Strip 10
-                            jack_midi_event_write(
-									output_buffer[3], in_event.time, 
-									in_event.buffer, in_event.size);
-                            break;
-                    }
-                    #pragma GCC diagnostic pop  // Restaurar advertencias
-
-                }
+					// Determinar el puerto de salida basado en 'j'
+					const std::size_t port = (j < 8) ? 0 : (j - 7);
+					jack_midi_event_write(output_buffer[port], 
+									  in_event.time, temp_buffer, 
+									  in_event.size);
+				}
             }
         }
     }
