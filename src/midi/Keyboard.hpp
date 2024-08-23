@@ -26,7 +26,7 @@ static const size_t& SCENE_SYSEX_PACK_SIZE {5};
 static const size_t& NUMBER_OF_PARTS {16};
 static const size_t& PARAM_SYSEX_WORD_SIZE {13};
 
-static const size_t& N_OUTPUT_PORTS {5};
+static const size_t& N_OUTPUT_PORTS {16};
 
 struct Combination {
 	std::vector<std::string> instruments;

@@ -304,6 +304,7 @@ void from_json(const nlohmann::json& j, Switch& s) {
 // Overload for Strip struct{{{
 void from_json(const nlohmann::json& j, Strip& s) {
 	s.state = j.at("state").get<Switch>();
+	s.midi_ch = j.at("midi_port").get<std::int16_t>();
 	s.midi_ch = j.at("midi_ch").get<std::int16_t>();
 	s.volume = j.at("volume").get<std::int16_t>();
 	s.lower_key = j.at("lo_key").get<std::int16_t>();
@@ -371,6 +372,7 @@ void to_json(nlohmann::ordered_json& j, const Switch& s) {
 // Overload for Strip struct{{{
 void to_json(nlohmann::ordered_json& j, const Strip& s) {
 	j = nlohmann::ordered_json{{"state", s.state},
+							   {"midi_port", s.midi_port},
 							   {"midi_ch", s.midi_ch},
 							   {"volume", s.volume},
 							   {"lo_key", s.lower_key},

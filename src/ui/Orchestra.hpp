@@ -56,6 +56,7 @@ class Orchestra {
 			Field vi_field;
 			Field etiqueta_field;
 				std::array<CheckPopup, NUMBER_OF_PARTS> status_field;
+				std::array<FieldPopup, NUMBER_OF_PARTS> port;
 				std::array<FieldPopup, NUMBER_OF_PARTS> channel_field;
 				std::array<FieldPopup, NUMBER_OF_PARTS> instrument_field;
 				std::array<FieldPopup, NUMBER_OF_PARTS> volume_field;

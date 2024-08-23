@@ -176,8 +176,8 @@ void to_json(nlohmann::ordered_json& _J, const Combination& _C) {/*{{{*/
 // CLIENT DATA{{{
 const char* client_name {"Commander"};
 jack_client_t* client {NULL};
-std::array<jack_port_t*, 5> output_port {{NULL}};
-std::array<void*, 5> output_buffer {{NULL}};
+std::array<jack_port_t*, N_OUTPUT_PORTS> output_port {{NULL}};
+std::array<void*, N_OUTPUT_PORTS> output_buffer {{NULL}};
 jack_port_t* input_port {NULL};
 jack_nframes_t local_nframes = {0};/*}}}*/
 
