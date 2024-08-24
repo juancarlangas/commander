@@ -182,7 +182,7 @@ jack_port_t* input_port {NULL};
 jack_nframes_t local_nframes = {0};/*}}}*/
 
 // TARGET DATA{{{
-const char** all_ports_C_String;/*}}}*/
+const char** all_port_names;/*}}}*/
 
 // Control{{{
 volatile bool should_send_PC {FALSE};
@@ -198,6 +198,101 @@ struct PatchChangeT {
 
 //jack_midi_data_t callback_page_SysEx[PAGE_SYSEX_WORD_SIZE];
 //jack_midi_data_t callback_scene_SysExEs[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE];/*}}}*/
+
+void Keyboard::connect() noexcept {/*{{{*/
+	// Connect to the JACK server
+    if ((client = jack_client_open(client_name, JackNullOption, NULL)) ==
+			NULL) {
+		std::cerr << "Failed to open JACK client " << client_name <<
+			" at Keyboard::connect()\n";
+    	std::exit(EXIT_FAILURE); 
+    }
+
+	// Register the process callback
+    jack_set_process_callback(client, process, 0);
+
+	// OUTPUT PORTS
+	for (std::size_t i {0}; i < N_OUTPUT_PORTS; ++i) {
+		std::string port_name {"MIDI Out " + std::to_string(i)};
+		if ((output_port[i] = jack_port_register(client, port_name.c_str(),
+				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
+			std::cerr <<
+				"Failed to register JACK PORT " << i <<
+				"at Keyboard::connect()" << std::endl;
+			std::exit(EXIT_FAILURE);
+		}
+	}
+
+	// Create the MIDI input port
+    if ((input_port = jack_port_register(client, "midi_in",
+            JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0)) == NULL) {
+        std::cerr << "Failed to register JACK input port at Keyboard::connect()\n";
+        std::exit(EXIT_FAILURE); 
+    }
+
+    // Activate the client
+    if (jack_activate(client)) {
+		std::cerr << "Failed to activate JACK client "
+			<< client_name << " at Keyboard::connect()\n";
+    	std::exit(EXIT_FAILURE); 
+    }
+
+	// Get the available ports
+    all_port_names =
+		jack_get_ports(client, NULL, NULL, JackPortIsInput);
+
+	// Connect to
+	std::array<std::string, 5> desired_input {
+		"a2j:Midi Through [14] (playback): [0] Midi Through Port-0",
+		"CP-80:events-in",
+		"Synth Pad:events-in",
+		"Sampling:events-in",
+		"LSP Mixer x4 Stereo:events-in"
+	};
+
+	for (std::size_t i {0}; i < desired_input.size(); ++i) {
+		// Try each of them and connect to it
+		for (std::size_t j {0}; all_port_names[j] != NULL; ++j) {
+			jack_port_t* possible_input =
+				jack_port_by_name(client, all_port_names[j]);
+			if (possible_input != NULL && isMidiPort(possible_input)) {
+				if (std::string(all_port_names[j]) == desired_input[i]) {
+					if (jack_connect(client, jack_port_name(
+							output_port[i]), all_port_names[j]) != 0) {
+						jack_free(all_port_names);
+						jack_client_close(client);
+						std::exit(EXIT_FAILURE);
+						break;
+					}
+				}
+			}
+		}
+    }
+
+    // Connect input port to desired input port (if applicable)
+    // Here you should specify the desired port for MIDI input
+    const char* desired_input_port_keyword {
+		"a2j:Impact LX61  [24] (capture): [0] Impact LX61  MIDI1"
+	};
+
+    // Try each of them and connect to it
+    all_port_names = jack_get_ports(client, NULL, NULL, JackPortIsOutput);
+    for (int i = 0; all_port_names[i] != NULL; ++i) {
+        jack_port_t* possible_port = jack_port_by_name(client, all_port_names[i]);
+        if (possible_port != NULL && isMidiPort(possible_port)) {
+            if (strstr(all_port_names[i], desired_input_port_keyword) != NULL) {
+                if (jack_connect(client, all_port_names[i], jack_port_name(input_port)) != 0) {
+                    jack_free(all_port_names);
+                    jack_client_close(client);
+                    std::exit(EXIT_FAILURE);
+                }
+            }
+        }
+    }
+
+	MIDI_state = Switch::ON;
+}
+/*}}}*/
 
 int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
 {
@@ -284,130 +379,6 @@ bool isMidiPort(jack_port_t* port) {/*{{{*/
     const char* type = jack_port_type(port);
     return (strcmp(type, JACK_DEFAULT_MIDI_TYPE) == 0);
 }/*}}}*/
-
-void Keyboard::connect() noexcept {/*{{{*/
-	// Connect to the JACK server
-    if ((client = jack_client_open(client_name, JackNullOption, NULL)) ==
-			NULL) {
-		std::cerr << "Failed to open JACK client " << client_name <<
-			" at Keyboard::connect()\n";
-    	std::exit(EXIT_FAILURE); 
-    }
-
-	// Register the process callback
-    jack_set_process_callback(client, process, 0);
-
-    // Create the MIDI_state output port
-	if ((output_port[0] =
-			jack_port_register(client, "0_to_7",
-				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
-		std::cerr
-			<< "Failed to register JACK port at Keyboard::connect()\n";
-		std::exit(EXIT_FAILURE); 
-	}
-
-    // Create the MIDI_state output port
-	if ((output_port[1] =
-			jack_port_register(client, "8",
-				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
-		std::cerr
-			<< "Failed to register JACK port at Keyboard::connect()\n";
-		std::exit(EXIT_FAILURE); 
-	}
-
-    // Create the MIDI_state output port
-	if ((output_port[2] =
-			jack_port_register(client, "9",
-				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
-		std::cerr
-			<< "Failed to register JACK port at Keyboard::connect()\n";
-		std::exit(EXIT_FAILURE); 
-	}
-
-    // Create the MIDI_state output port
-	if ((output_port[3] =
-			jack_port_register(client, "10",
-				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
-		std::cerr
-			<< "Failed to register JACK port at Keyboard::connect()\n";
-		std::exit(EXIT_FAILURE); 
-	}
-
-    // Create the MIDI_state output port
-	if ((output_port[4] =
-			jack_port_register(client, "16",
-				JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0)) == NULL) {
-		std::cerr
-			<< "Failed to register JACK port at Keyboard::connect()\n";
-		std::exit(EXIT_FAILURE); 
-	}
-
-	// Create the MIDI input port
-    if ((input_port = jack_port_register(client, "midi_in",
-            JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0)) == NULL) {
-        std::cerr << "Failed to register JACK input port at Keyboard::connect()\n";
-        std::exit(EXIT_FAILURE); 
-    }
-
-    // Activate the client
-    if (jack_activate(client)) {
-		std::cerr << "Failed to activate JACK client "
-			<< client_name << " at Keyboard::connect()\n";
-    	std::exit(EXIT_FAILURE); 
-    }
-
-	// Get the available ports
-    all_ports_C_String =
-		jack_get_ports(client, NULL, NULL, JackPortIsInput);
-	std::array<const char*, 5> desired_port_keyword {
-		"a2j:Midi Through [14] (playback): [0] Midi Through Port-0",
-		"CP-80:events-in",
-		"Synth Pad:events-in",
-		"Sampling:events-in",
-		"LSP Mixer x4 Stereo:events-in"
-	};
-
-	for (std::int32_t i_port {0}; i_port < 5; ++i_port) {
-		// Try each of them and connect to it
-		for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
-			jack_port_t* possible_port = jack_port_by_name(client, all_ports_C_String[i]);
-			if (possible_port != NULL && isMidiPort(possible_port)) {
-				if (strstr(all_ports_C_String[i], desired_port_keyword[i_port]) != NULL) {
-					if (jack_connect(client, jack_port_name(output_port[i_port]), all_ports_C_String[i]) != 0) {
-						jack_free(all_ports_C_String);
-						jack_client_close(client);
-						std::exit(EXIT_FAILURE);
-						break;
-					}
-				}
-			}
-		}
-    }
-
-    // Connect input port to desired input port (if applicable)
-    // Here you should specify the desired port for MIDI input
-    const char* desired_input_port_keyword {
-		"a2j:Impact LX61  [24] (capture): [0] Impact LX61  MIDI1"
-	};
-
-    // Try each of them and connect to it
-    all_ports_C_String = jack_get_ports(client, NULL, NULL, JackPortIsOutput);
-    for (int i = 0; all_ports_C_String[i] != NULL; ++i) {
-        jack_port_t* possible_port = jack_port_by_name(client, all_ports_C_String[i]);
-        if (possible_port != NULL && isMidiPort(possible_port)) {
-            if (strstr(all_ports_C_String[i], desired_input_port_keyword) != NULL) {
-                if (jack_connect(client, all_ports_C_String[i], jack_port_name(input_port)) != 0) {
-                    jack_free(all_ports_C_String);
-                    jack_client_close(client);
-                    std::exit(EXIT_FAILURE);
-                }
-            }
-        }
-    }
-
-	MIDI_state = Switch::ON;
-}
-/*}}}*/
 
 void Keyboard::dump_performance(const Performance& _Performance) noexcept {/*{{{*/
 	// SET BUFFER
@@ -517,7 +488,7 @@ void Keyboard::dump_scene( const Performance &_Performance, const int16_t &_Scen
 
 void Keyboard::disconnect() noexcept {/*{{{*/
     // Deactivate, unregister, and close the client
-	jack_free(all_ports_C_String);	
+	jack_free(all_port_names);	
 
     jack_deactivate(client);
 	for (std::int32_t i {0}; i <= 3; ++i)

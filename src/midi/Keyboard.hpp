@@ -26,7 +26,7 @@ static const size_t& SCENE_SYSEX_PACK_SIZE {5};
 static const size_t& NUMBER_OF_PARTS {16};
 static const size_t& PARAM_SYSEX_WORD_SIZE {13};
 
-static const size_t& N_OUTPUT_PORTS {16};
+static const size_t& N_OUTPUT_PORTS {5};
 
 struct Combination {
 	std::vector<std::string> instruments;
@@ -79,5 +79,9 @@ private:
 // JSON
 void from_json( const nlohmann::json &_JSONobject, struct Combination &_Combination );
 void to_json(nlohmann::ordered_json& _J, const Combination& _C);
+
+// JACK
+int process(jack_nframes_t nframes, [[maybe_unused]] void* arg);
+bool isMidiPort(jack_port_t* port);
 
 #endif
