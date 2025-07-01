@@ -247,7 +247,7 @@ void Keyboard::connect() noexcept {/*{{{*/
 		"CP-80:events-in",
 		"Synth Pad:events-in",
 		"Sampling:events-in",
-		"LSP Mixer x4 Stereo:events-in"
+		"INSTRUMENTS Mixer:events-in"
 	};
 
 	for (std::size_t i {0}; i < desired_input.size(); ++i) {
