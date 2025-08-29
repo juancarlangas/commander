@@ -38,7 +38,6 @@ add_executable(Commander
     "${CMAKE_CURRENT_SOURCE_DIR}/src/common/string.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/timer.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/environment.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/ui/pdf/PDFViewer.cpp"
 )
 
 # Incluir directorios

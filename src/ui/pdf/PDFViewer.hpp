@@ -2,7 +2,6 @@
 
 #include <QWidget>
 #include <QPdfDocument>
-#include <QPdfView>
 
 class PDFViewer : public QWidget {
     Q_OBJECT

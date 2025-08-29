@@ -17,7 +17,7 @@
 #include <string>
 
 #include "midi/Keyboard.hpp"
-#include "Catalog.hpp"
+#include "data/Catalog.hpp"
 
 Performance performance_buffer;
 std::int16_t current_scene;
@@ -243,13 +243,15 @@ void Keyboard::connect() noexcept {/*{{{*/
 
 	// Connect to
 	std::array<std::string, 5> desired_input {
-		"a2j:Midi Through [14] (playback): [0] Midi Through Port-0",
+		"Piano:events-in",
 		"CP-80:events-in",
 		"Synth Pad:events-in",
 		"Sampling:events-in",
-		"INSTRUMENTS Mixer:events-in"
+		"TRITON:events-in"
 	};
 
+	/*
+	// We dont want to connect automatically to all the possible inputs
 	for (std::size_t i {0}; i < desired_input.size(); ++i) {
 		// Try each of them and connect to it
 		for (std::size_t j {0}; all_port_names[j] != NULL; ++j) {
@@ -289,6 +291,7 @@ void Keyboard::connect() noexcept {/*{{{*/
             }
         }
     }
+	*/
 
 	MIDI_state = Switch::ON;
 }
@@ -310,11 +313,12 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
 
     // Enviar mensajes Program Change (PC)
     if (should_send_PC) {
-        jack_midi_event_write(output_buffer[0], 0, callback_PC.msb, 
+        // Change output_buffer[0] to output_buffer[4] to send PC to port 4
+        jack_midi_event_write(output_buffer[4], 0, callback_PC.msb, 
 				sizeof(callback_PC.msb));
-        jack_midi_event_write(output_buffer[0], 0, callback_PC.lsb, 
+        jack_midi_event_write(output_buffer[4], 0, callback_PC.lsb, 
 				sizeof(callback_PC.lsb));
-        jack_midi_event_write(output_buffer[0], 0, callback_PC.pc, 
+        jack_midi_event_write(output_buffer[4], 0, callback_PC.pc, 
 				sizeof(callback_PC.pc));
         should_send_PC = false;
     }
@@ -327,6 +331,7 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
             const std::uint8_t event_type = in_event.buffer[0] & 0xF0;
             const std::uint8_t note_or_cc_or_pb = in_event.buffer[1];
 
+			/* Por ahora no se procesa nada de esto
             // Si es un mensaje Control Change (CC) en canal 16,
 			// reenviarlo al puerto 4
             if (event_type == 0xB0 && (in_event.buffer[0] & 0x0F) == 15) {
@@ -334,10 +339,11 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
 						in_event.buffer, in_event.size);
                 continue;
             }
+			*/
 
             for (std::size_t j = 0; j < STRIPS_PER_PERFORMANCE; ++j) {
                 if (strips[j].state == Switch::ON &&
-                	(event_type == 0xB0 || event_type == 0xE0 ||
+                	(event_type == 0xB0 || /*event_type == 0xE0 ||*/
                      (strips[j].lower_key <= note_or_cc_or_pb &&
 					  note_or_cc_or_pb <= strips[j].upper_key))) {
 
@@ -507,7 +513,7 @@ auto Keyboard::send_page_SysEx(/*{{{*/
 
 auto Keyboard::send_scene_SysEx(/*{{{*/
 		[[maybe_unused]]jack_midi_data_t _SysEx[SCENE_SYSEX_PACK_SIZE][NUMBER_OF_PARTS][PARAM_SYSEX_WORD_SIZE]) -> void {
-	//memcpy(callback_scene_SysExEs, _SysEx, SCENE_SYSEX_PACK_SIZE * NUMBER_OF_PARTS * PARAM_SYSEX_WORD_SIZE);
+	//memcpy(callback_scene_SysEx, _SysEx, SCENE_SYSEX_PACK_SIZE * NUMBER_OF_PARTS * PARAM_SYSEX_WORD_SIZE);
 	//should_send_scene_SysEx = true;
 }/*}}}*/
 
