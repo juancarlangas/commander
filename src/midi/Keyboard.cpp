@@ -30,7 +30,7 @@ Keyboard::Keyboard(const std::string &_Path)/*{{{*/
 	MIDI_state = Switch::OFF;
 }/*}}}*/
 
-void Keyboard::load_combs_from_json( const std::string &_Path )/*{{{*/
+void Keyboard::load_combs_from_json(const std::string &_Path)/*{{{*/
 {
 	// LOAD DATA
 	std::ifstream json_file{ _Path };
@@ -237,6 +237,7 @@ void Keyboard::connect() noexcept {/*{{{*/
     	std::exit(EXIT_FAILURE); 
     }
 
+	/*
 	// Get the available ports
     all_port_names =
 		jack_get_ports(client, NULL, NULL, JackPortIsInput);
@@ -250,7 +251,6 @@ void Keyboard::connect() noexcept {/*{{{*/
 		"TRITON:events-in"
 	};
 
-	/*
 	// We dont want to connect automatically to all the possible inputs
 	for (std::size_t i {0}; i < desired_input.size(); ++i) {
 		// Try each of them and connect to it
@@ -299,27 +299,26 @@ void Keyboard::connect() noexcept {/*{{{*/
 
 int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
 {
-    // Buffer de entrada
+	/* It seems we need one buffer per input/output port */
+	// Input buffers
     void* input_buffer = jack_port_get_buffer(input_port, nframes);
     jack_nframes_t event_count = jack_midi_get_event_count(input_buffer);
     jack_midi_event_t in_event;
 
-    // Buffers de salida
+	// OUtput buffers
     for (std::size_t i {0}; i < N_OUTPUT_PORTS; ++i) {
         output_buffer[i] =
             jack_port_get_buffer(output_port[i], nframes);
         jack_midi_clear_buffer(output_buffer[i]);
     }
 
-    // Enviar mensajes Program Change (PC)
+	/* Heres where we send the PC and SysEx if needed. Lately we should
+	 * send them in each track the user wants, but for now we send them */
     if (should_send_PC) {
-        // Change output_buffer[0] to output_buffer[4] to send PC to port 4
-        jack_midi_event_write(output_buffer[4], 0, callback_PC.msb, 
-				sizeof(callback_PC.msb));
-        jack_midi_event_write(output_buffer[4], 0, callback_PC.lsb, 
-				sizeof(callback_PC.lsb));
-        jack_midi_event_write(output_buffer[4], 0, callback_PC.pc, 
-				sizeof(callback_PC.pc));
+        // Send PC to port 0 (was port 4)
+        jack_midi_event_write(output_buffer[5], 0, callback_PC.msb, sizeof(callback_PC.msb));
+        jack_midi_event_write(output_buffer[5], 0, callback_PC.lsb, sizeof(callback_PC.lsb));
+        jack_midi_event_write(output_buffer[5], 0, callback_PC.pc, sizeof(callback_PC.pc));
         should_send_PC = false;
     }
 
@@ -331,49 +330,54 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
             const std::uint8_t event_type = in_event.buffer[0] & 0xF0;
             const std::uint8_t note_or_cc_or_pb = in_event.buffer[1];
 
-			/* Por ahora no se procesa nada de esto
-            // Si es un mensaje Control Change (CC) en canal 16,
-			// reenviarlo al puerto 4
-            if (event_type == 0xB0 && (in_event.buffer[0] & 0x0F) == 15) {
-                jack_midi_event_write(output_buffer[4], in_event.time, 
-						in_event.buffer, in_event.size);
+            // Ignore Channel Pressure (Aftertouch) messages
+            if (event_type == 0xD0) {
                 continue;
             }
-			*/
+            // Only allow CC64 (damper pedal) and CC1 (modulation wheel) to pass, ignore other CCs
+            if (event_type == 0xB0 && (note_or_cc_or_pb != 64 && note_or_cc_or_pb != 1)) {
+                continue;
+            }
 
             for (std::size_t j = 0; j < STRIPS_PER_PERFORMANCE; ++j) {
                 if (strips[j].state == Switch::ON &&
-                	(event_type == 0xB0 || /*event_type == 0xE0 ||*/
+                    (event_type == 0xB0 || /*event_type == 0xE0 ||*/
                      (strips[j].lower_key <= note_or_cc_or_pb &&
-					  note_or_cc_or_pb <= strips[j].upper_key))) {
+                      note_or_cc_or_pb <= strips[j].upper_key))) {
 
-                    // Usar el buffer original si no es necesario
-					// ajustar transposición
-                    std::uint8_t temp_buffer[3];  // tamaño máximo de 
-												  // evento MIDI
-					// Clonamos
-					std::copy_n(in_event.buffer, in_event.size, 
-						temp_buffer);
+                    std::uint8_t temp_buffer[3];
+                    std::copy_n(in_event.buffer, in_event.size, temp_buffer);
 
                     if (event_type == 0x90 ||
-						event_type == 0x80) { // Nota
-						// Ajustamos canal
-						temp_buffer[0] = (temp_buffer[0] & 0xF0) |
-							static_cast<std::uint8_t>(strips[j].midi_ch);
-						// Transponemos
-						temp_buffer[1] += strips[j].transposition;
-					} else {
-						// Ajustamos canal
-						temp_buffer[0] = (temp_buffer[0] & 0xF0) |
-							static_cast<std::uint8_t>(strips[j].midi_ch);
+                        event_type == 0x80) { // Nota
+                        temp_buffer[0] = (temp_buffer[0] & 0xF0) |
+                            static_cast<std::uint8_t>(strips[j].midi_ch);
+                        temp_buffer[1] += strips[j].transposition;
+                    } else {
+                        temp_buffer[0] = (temp_buffer[0] & 0xF0) |
+                            static_cast<std::uint8_t>(strips[j].midi_ch);
+                    }
+
+                    // Heres where we specify the output port depending on the track
+                    std::size_t port = 0;
+                    if (j <= 7) {
+                        port = 5; // The last one
+                    } else if (j == 8) {
+                        port = 1;
+                    } else if (j == 9) {
+                        port = 3;
+                    } else if (j == 10) {
+                        port = 4;
+                    } else if (j == 11) {
+                        port = 0;
+                    } else if (j == 12) {
+                        port = 2;
 					}
 
-					// Determinar el puerto de salida basado en 'j'
-					const std::size_t port = (j < 8) ? 0 : (j - 7);
-					jack_midi_event_write(output_buffer[port], 
+                    jack_midi_event_write(output_buffer[port], 
 									  in_event.time, temp_buffer, 
 									  in_event.size);
-				}
+                }
             }
         }
     }
