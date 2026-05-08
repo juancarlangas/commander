@@ -115,6 +115,10 @@ enum matroska get_command(const int digit, const short mode,
 			if (ci > 0) comando = DECREASE_QUERY;
 			break;
 
+		case KEY_RESIZE:
+			comando = RESIZE_SCREEN;
+			break;
+
 		case 17:
 			comando = EXIT;
 			break;

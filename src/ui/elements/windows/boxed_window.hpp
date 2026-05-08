@@ -16,7 +16,7 @@ class BoxedWindow : public Window {
 		void draw() noexcept;
 		void update() noexcept;
 	protected:
-		WINDOW *box;
+		WINDOW *box {nullptr};
 };
 
 #endif

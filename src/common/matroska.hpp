@@ -37,6 +37,7 @@ enum matroska/*{{{*/
 		EXPORTATE,
 		SELECT_PART,
 		TOGGLE_MIDI_STATE,
+		RESIZE_SCREEN,
 		EXIT,
 		EXPORTATE_AND_QUIT };/*}}}*/
 

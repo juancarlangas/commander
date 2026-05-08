@@ -9,7 +9,7 @@ class Popup : public Window {
 		void show() noexcept;
 		void hide() noexcept;
 	protected:
-		PANEL *area_panel;
+		PANEL *area_panel {nullptr};
 };
 
 

@@ -2,6 +2,11 @@
 
 void Popup::init(const int32_t _Ysize, const int32_t _Xsize, const int32_t _Ypos, const int32_t _Xpos) noexcept
 {
+	if (Popup::area_panel != nullptr) {
+		del_panel(Popup::area_panel);
+		Popup::area_panel = nullptr;
+	}
+
 	Window::init( _Ysize, _Xsize, _Ypos, _Xpos );
 	Popup::area_panel = new_panel(area);
 }

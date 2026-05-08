@@ -21,7 +21,7 @@ class Window {
 		void set_font_blinking( const bool & ) noexcept;
 		void update() noexcept;
 	protected:
-		WINDOW *area;
+		WINDOW *area {nullptr};
 		int32_t y_size, x_size, y_pos, x_pos;
 };
 
