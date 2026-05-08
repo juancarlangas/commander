@@ -10,7 +10,7 @@ class BoxedPopup : public BoxedWindow {
 		void show() noexcept;
 		void hide() noexcept;
 	protected:
-		PANEL *box_panel, *area_panel;
+		PANEL *box_panel {nullptr}, *area_panel {nullptr};
 };
 
 #endif

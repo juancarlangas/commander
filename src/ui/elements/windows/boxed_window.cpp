@@ -5,6 +5,11 @@ void BoxedWindow::init(	const int32_t _Ysize, const int32_t _Xsize,
 						const int32_t _Ypos, const int32_t _Xpos,
 						const int32_t _Frame_Width ) noexcept
 {
+	if (box != nullptr) {
+		delwin(box);
+		box = nullptr;
+	}
+
 	box = newwin( _Ysize, _Xsize, _Ypos, _Xpos );
 	Window::init( _Ysize - _Frame_Width * 2, _Xsize - _Frame_Width * 2,
 					_Ypos - _Frame_Width, _Xpos - _Frame_Width + 1 );

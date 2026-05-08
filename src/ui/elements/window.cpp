@@ -8,6 +8,11 @@
 void Window::init(	const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 					const int32_t _Ypos, const int32_t _Xpos ) noexcept
 {
+	if (area != nullptr) {
+		delwin(area);
+		area = nullptr;
+	}
+
 	y_size = _Ysize;
 	x_size = _Xsize;
 	y_pos = _Ypos;

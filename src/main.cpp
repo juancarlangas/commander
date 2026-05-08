@@ -79,12 +79,39 @@ std::int32_t main() {
 
 	orquestacion.link_MIDI_device( &x50 );/*}}}*/
 
+	const auto keep_index_visible = [](int32_t &top, const int32_t index, const int32_t shown_results) {
+		if (index < top)
+			top = index;
+		else if (shown_results > 0 && index >= top + shown_results)
+			top = index - shown_results + 1;
+
+		if (top < 0)
+			top = 0;
+	};
+
 	// Engine{{{
 	do {
-		for ( i = LCD; i <= ZOOM; i++ )
+		for ( i = LCD; i <= MIDI_STATE; i++ )
 			update_window[i] = false;
 
 		switch (command) {
+			case RESIZE_SCREEN:/*{{{*/
+				resize_windows();
+				draw_windows();
+				keep_index_visible(dTop, dIndex, displayShowResults);
+				keep_index_visible(plTop, plIndexB, playlistShowResults);
+
+				update_window[LCD]       = true;
+				update_window[SEARCH]    = true;
+				update_window[DISPLAY]   = true;
+				update_window[PLAYLIST]  = true;
+				update_window[COMPUTER]  = true;
+				update_window[DIGITS]    = true;
+				update_window[ZOOM]      = true;
+				update_window[MIDI_STATE] = true;
+
+				break;/*}}}*/
+
 			case BEGIN:/*{{{*/
 				llenado_displayTable(
 					displayTable, catalog.performances, n_performances,

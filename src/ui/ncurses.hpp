@@ -28,6 +28,7 @@ extern Orchestra orquestacion;
 void ncurses_start_sequence() noexcept;
 void ncurses_end_sequence() noexcept;
 auto set_windows(void) noexcept -> void;
+auto resize_windows(void) noexcept -> void;
 void draw_windows(void);
 void tint_lcd(const short int mode);
 void update_popups() noexcept;
