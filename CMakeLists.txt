@@ -31,7 +31,7 @@ add_executable(Commander
 	"${SRC_DIR}/ui/elements/windows/popups/orchestra_elements/double_X_slider.cpp"
 	"${SRC_DIR}/ui/elements/windows/popups/orchestra_elements/text_popup.cpp"
 	"${SRC_DIR}/ui/elements/windows/popups/orchestra_elements/text_popups/field_popup.cpp"
-	"${SRC_DIR}/data/Library.cpp"
+	"${SRC_DIR}/data/Catalog.cpp"
 	"${SRC_DIR}/data/tables.cpp"
 	"${SRC_DIR}/data/Playlist.cpp"
 	"${SRC_DIR}/common/math.cpp"

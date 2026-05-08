@@ -316,9 +316,9 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
 	 * send them in each track the user wants, but for now we send them */
     if (should_send_PC) {
         // Send PC to port 0 (was port 4)
-        jack_midi_event_write(output_buffer[5], 0, callback_PC.msb, sizeof(callback_PC.msb));
-        jack_midi_event_write(output_buffer[5], 0, callback_PC.lsb, sizeof(callback_PC.lsb));
-        jack_midi_event_write(output_buffer[5], 0, callback_PC.pc, sizeof(callback_PC.pc));
+        jack_midi_event_write(output_buffer[4], 0, callback_PC.msb, sizeof(callback_PC.msb));
+        jack_midi_event_write(output_buffer[4], 0, callback_PC.lsb, sizeof(callback_PC.lsb));
+        jack_midi_event_write(output_buffer[4], 0, callback_PC.pc, sizeof(callback_PC.pc));
         should_send_PC = false;
     }
 
@@ -361,13 +361,13 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
                     // Heres where we specify the output port depending on the track
                     std::size_t port = 0;
                     if (j <= 7) {
-                        port = 5; // The last one
+                        port = 4; // The TRITON
                     } else if (j == 8) {
                         port = 1;
                     } else if (j == 9) {
                         port = 3;
                     } else if (j == 10) {
-                        port = 4;
+                        port = 5;
                     } else if (j == 11) {
                         port = 0;
                     } else if (j == 12) {
