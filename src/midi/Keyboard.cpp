@@ -17,7 +17,7 @@
 #include <string>
 
 #include "midi/Keyboard.hpp"
-#include "data/Catalog.hpp"
+#include "data/Library.hpp"
 
 Performance performance_buffer;
 std::int16_t current_scene;
