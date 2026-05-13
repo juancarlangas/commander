@@ -1,5 +1,5 @@
-#ifndef DATABASES_HPP
-#define DATABASES_HPP
+#ifndef LIBRARY_HPP
+#define LIBRARY_HPP
 
 #include "midi/midi.hpp"
 
@@ -52,10 +52,10 @@ struct Performance {
 	std::string sfz_filename;
 };
 
-class Catalog {/*{{{*/
+class Library {/*{{{*/
 	public:
-		Catalog();
-		Catalog( const std::string & ) noexcept;
+		Library();
+		Library( const std::string & ) noexcept;
 		void load_from_json( const std::string &_Path);
 		int32_t get_activeRows() noexcept;
 		void add_value(const Performance& _Performance);

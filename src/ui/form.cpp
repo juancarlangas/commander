@@ -1,7 +1,7 @@
 #include <curses.h>
 #include <stdlib.h>
 
-#include "data/Catalog.hpp"
+#include "data/Library.hpp"
 #include "form.hpp"
 
 #include "../common/common.hpp"

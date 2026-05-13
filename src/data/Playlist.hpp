@@ -1,7 +1,7 @@
 #ifndef PLAYLIST_HPP
 #define PLAYLIST_HPP
 
-#include "data/Catalog.hpp"
+#include "data/Library.hpp"
 //#include "utilities/src/files.hpp"
 #include <array>
 #include <cstdint>
@@ -15,8 +15,8 @@ struct Pista {
 
 class Playlist {
 	public:
-		Playlist( Catalog *_Catalog_ptr ); // solo inicializa
-		Playlist( const std::string &_Path, Catalog *_Catalog_ptr );
+		Playlist( Library *_Library_ptr ); // solo inicializa
+		Playlist( const std::string &_Path, Library *_Library_ptr );
 
 		void cargar( const std::string &_Path ) noexcept;
 		void guardar( const std::string &_Path) noexcept;
@@ -40,7 +40,7 @@ class Playlist {
 		std::array<struct Pista, MAXIMO_DE_CANCIONES> pista;
 		int32_t n_pistas;
 
-		Catalog *database_ptr;
+		Library *database_ptr;
 };
 
 #endif

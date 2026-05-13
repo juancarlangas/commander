@@ -19,7 +19,7 @@
 #include "common/string.hpp"
 #include "common/matroska.hpp"
 #include "data/tables.hpp"
-#include "data/Catalog.hpp"
+#include "data/Library.hpp"
 #include "data/Playlist.hpp"
 #include "ui/printing.hpp"
 #include "utils/environment.hpp"
@@ -42,18 +42,18 @@ std::int32_t main() {
 		home_dir/".config/commander"};/*}}}*/
 
 	// Data{{{
-	Catalog* dBase = new Catalog [] {{config_dir/"catalog.json"}};
-	Catalog& catalog {dBase[COMBINATIONS]};
-	catalog.set_sfz_folder(home_dir/".sounds"/"sfz"/"commander");
+	Library* dBase = new Library [] {{config_dir/"catalog.json"}};
+	Library& library {dBase[COMBINATIONS]};
+	library.set_sfz_folder(home_dir/".sounds"/"sfz"/"commander");
 
-	std::int32_t n_performances {catalog.get_activeRows()};
+	std::int32_t n_performances {library.get_activeRows()};
 /*}}}*/
 
 	// Variables{{{
 	Performance** displayTable = new Performance* [1000](); // arreglo de apuntadores
 	Performance *orch_clipboard_ptr, *performance_buffer; // apuntadores simple
 
-	Playlist *playlist = new Playlist( &catalog );
+	Playlist *playlist = new Playlist( &library );
 
 	int32_t n_matches;
 	int32_t dIndex { 0 }; // Absolute selected index of the whole displayTable
@@ -114,11 +114,11 @@ std::int32_t main() {
 
 			case BEGIN:/*{{{*/
 				llenado_displayTable(
-					displayTable, catalog.performances, n_performances,
+					displayTable, library.performances, n_performances,
 					keyword, &n_matches);
 
 				if (n_performances > 0) // permitimos 0 lineas
-					performance_buffer = &catalog.performances.front();
+					performance_buffer = &library.performances.front();
 
 				x50.set_performance_buffer( *performance_buffer );
 
@@ -305,7 +305,7 @@ std::int32_t main() {
 					x50.set_performance_buffer( *performance_buffer );
 
 				x50.write_sfz_file(
-						catalog.get_sfz_folder(), "commander.sfz",
+						library.get_sfz_folder(), "commander.sfz",
 						performance_buffer->sfz_filename);
 
 				update_window[LCD] = true;
@@ -402,14 +402,14 @@ std::int32_t main() {
 				Form forma;
 
 				if (forma.capture_value() == true) {
-					catalog.add_value(forma.get_value());
-					catalog.ordenate();
-					performance_buffer = &catalog.performances[0]; // Actualizamos después del cambio
+					library.add_value(forma.get_value());
+					library.ordenate();
+					performance_buffer = &library.performances[0]; // Actualizamos después del cambio
 				}
 
 				n_performances = dBase[ COMBINATIONS ].get_activeRows();
 				llenado_displayTable(
-						displayTable, catalog.performances, n_performances, keyword, &n_matches );
+						displayTable, library.performances, n_performances, keyword, &n_matches );
 
 				draw_windows();
 				update_window[LCD]		= true;
@@ -427,11 +427,11 @@ std::int32_t main() {
 			case DELETE_VALUE:/*{{{*/
 			{
 				// obtenemos el índice real en dBase al cual displayTable[dIndex] apunta
-				std::size_t real_index {static_cast<std::size_t>(displayTable[dIndex] - &catalog.performances[0])};
+				std::size_t real_index {static_cast<std::size_t>(displayTable[dIndex] - &library.performances[0])};
 
-				catalog.delete_value(real_index);
-				n_performances = catalog.get_activeRows();
-				performance_buffer = &catalog.performances[0]; // Actualizamos después del cambio
+				library.delete_value(real_index);
+				n_performances = library.get_activeRows();
+				performance_buffer = &library.performances[0]; // Actualizamos después del cambio
 
 
 				llenado_displayTable(
@@ -444,7 +444,7 @@ std::int32_t main() {
 				update_window[DIGITS]	= true;
 				update_window[ZOOM]		= true;	
 
-				n_performances = catalog.get_activeRows();
+				n_performances = library.get_activeRows();
 
 				// We procurate the indexed element dont get in the air like the Coyote when deleting
 				// the last element
@@ -458,9 +458,9 @@ std::int32_t main() {
 			{
 				Form forma;
 
-				// dIndex represents absolute iterator over displayTable, but NOT OVER catalog, so we whould
-				// get the exact catalog index calculating the difference
-				int difference = displayTable[dIndex] - &(catalog.performances[0]);
+				// dIndex represents absolute iterator over displayTable, but NOT OVER library, so we whould
+				// get the exact library index calculating the difference
+				int difference = displayTable[dIndex] - &(library.performances[0]);
 
 				if (forma.capture_value(dBase[mode].performances[difference]) == true) {
 					dBase[mode].edit_value(difference, forma.get_value());
@@ -539,7 +539,7 @@ std::int32_t main() {
 				break;/*}}}*/
 
 			case EXPORTATE:/*{{{*/
-				catalog.save_to_json(config_dir/"catalog.json" );
+				library.save_to_json(config_dir/"catalog.json" );
 				x50.save_combs_to_json(config_dir/"combinations.json");
 
 				*keyword = '\0';
@@ -562,7 +562,7 @@ std::int32_t main() {
 			case EXPORTATE_AND_QUIT :/*{{{*/
 				// Esta madrola hace lo básico del EXPORTATE y diréctamente modifica
 				// el command para que el while saque a la chingada el programa
-				catalog.save_to_json(config_dir/"catalog.json");
+				library.save_to_json(config_dir/"catalog.json");
 				x50.save_combs_to_json(config_dir/"combinations.json");
 
 				command = EXIT;

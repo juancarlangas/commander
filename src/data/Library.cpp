@@ -15,13 +15,13 @@
 #include <fstream>
 #include <iomanip> // zerofill
 
-#include "data/Catalog.hpp"
+#include "data/Library.hpp"
 #include "common/string.hpp"
 #include "midi/midi.hpp"
 #include "nlohmann/json.hpp"
 #include "common/common.hpp"
 
-Catalog::Catalog() :/*{{{*/
+Library::Library() :/*{{{*/
 		activeRows( 0 ),
 		n_canciones( 0 )
 {
@@ -30,7 +30,7 @@ Catalog::Catalog() :/*{{{*/
 		homedir = getpwuid(getuid())->pw_dir;
 }/*}}}*/
 
-Catalog::Catalog( const std::string &_Path ) noexcept/*{{{*/
+Library::Library( const std::string &_Path ) noexcept/*{{{*/
 {
 	// homedir
 	if ((homedir = getenv("HOME")) == NULL)
@@ -39,7 +39,7 @@ Catalog::Catalog( const std::string &_Path ) noexcept/*{{{*/
 	load_from_json( _Path );
 }/*}}}*/
 
-void Catalog::clean_row(int line)/*{{{*/
+void Library::clean_row(int line)/*{{{*/
 {
 	performances[line].tagging.title.clear();
 	performances[line].tagging.genre.clear();
@@ -50,12 +50,12 @@ void Catalog::clean_row(int line)/*{{{*/
 	performances[line].program.num = 0;
 }/*}}}*/
 
-void Catalog::load_from_json( const std::string &_Path)/*{{{*/
+void Library::load_from_json( const std::string &_Path)/*{{{*/
 {
 	// LOAD DATA
 	std::ifstream json_file{ _Path };
 	if ( json_file.fail() ) {
-		std::cerr << "Failed to open " + _Path + " in Catalog::load_from_json()\n";
+		std::cerr << "Failed to open " + _Path + " in Library::load_from_json()\n";
 		exit(EXIT_FAILURE);
 	}
 	nlohmann::json json_object;
@@ -69,7 +69,7 @@ void Catalog::load_from_json( const std::string &_Path)/*{{{*/
 	ordenate();
 }/*}}}*/
 
-auto Catalog::fill_favourites() noexcept -> void {/*{{{*/
+auto Library::fill_favourites() noexcept -> void {/*{{{*/
 	for (std::size_t i {0}; i < performances.size(); ++i)
 		if (performances[i].tagging.keyword.starts_with("Favourite"))
 			favourites[
@@ -78,26 +78,26 @@ auto Catalog::fill_favourites() noexcept -> void {/*{{{*/
 						performances[i].tagging.keyword.find_first_of('_') + 1, std::string::npos)) - 1] = &performances[i];
 }/*}}}*/
 
-int32_t Catalog::get_activeRows() noexcept/*{{{*/
+int32_t Library::get_activeRows() noexcept/*{{{*/
 {
 	return n_canciones;
 }/*}}}*/
 
-void Catalog::save_to_json(const std::string& _Path) noexcept {/*{{{*/
+void Library::save_to_json(const std::string& _Path) noexcept {/*{{{*/
     // Create a JSON object and fill it with the data from performances vector
     nlohmann::ordered_json json_object = performances;
 
     // Open a file and write the JSON object to it
     std::ofstream json_file{ _Path };
     if (json_file.fail()) {
-        std::cerr << "Failed to open " + _Path + " in Catalog::save_to_json()\n";
+        std::cerr << "Failed to open " + _Path + " in Library::save_to_json()\n";
         exit(EXIT_FAILURE);
     }
     json_file << std::setfill('\t') << std::setw(1) << json_object << std::endl;
     json_file.close();
 }/*}}}*/
 
-void Catalog::add_value( const Performance& _Performance )/*{{{*/
+void Library::add_value( const Performance& _Performance )/*{{{*/
 {
 	performances.push_back(_Performance);
 
@@ -106,14 +106,14 @@ void Catalog::add_value( const Performance& _Performance )/*{{{*/
 	ordenate();
 }/*}}}*/
 
-void Catalog::edit_value(const std::int32_t line, const Performance& _Performance)/*{{{*/
+void Library::edit_value(const std::int32_t line, const Performance& _Performance)/*{{{*/
 {
 	performances[ line ] = _Performance;
 
 	ordenate();
 }/*}}}*/
 
-void Catalog::delete_value( int line )/*{{{*/
+void Library::delete_value( int line )/*{{{*/
 {
 	performances.erase(std::begin(performances) + line);
 	n_canciones = --activeRows;
@@ -121,7 +121,7 @@ void Catalog::delete_value( int line )/*{{{*/
 	ordenate();
 }/*}}}*/
 
-void Catalog::ordenate()/*{{{*/
+void Library::ordenate()/*{{{*/
 {
 	std::size_t a, b;
 	int32_t k;
@@ -236,7 +236,7 @@ void Catalog::ordenate()/*{{{*/
 	fill_favourites();
 }/*}}}*/
 
-void Catalog::delete_duplicated() noexcept/*{{{*/
+void Library::delete_duplicated() noexcept/*{{{*/
 {
 	int32_t i, j;
 	for ( i = 0; i < n_canciones - 1; ++i )
@@ -249,26 +249,26 @@ void Catalog::delete_duplicated() noexcept/*{{{*/
 	ordenate();
 }/*}}}*/
 
-Performance Catalog::get_cancion( const int _Index ) noexcept/*{{{*/
+Performance Library::get_cancion( const int _Index ) noexcept/*{{{*/
 {
 	return performances[ _Index ];
 }/*}}}*/
 
-Performance *Catalog::get_cancion_ptr( const int32_t &_Index ) noexcept/*{{{*/
+Performance *Library::get_cancion_ptr( const int32_t &_Index ) noexcept/*{{{*/
 {
 	return &performances[_Index];
 }/*}}}*/
 
-Performance *Catalog::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
+Performance *Library::get_favourite_row( const int32_t &_FavNumber ) noexcept/*{{{*/
 {
 	return favourites[_FavNumber];
 }/*}}}*/
 
-auto Catalog::set_sfz_folder(const std::filesystem::path& _Folder) noexcept -> void {/*{{{*/
+auto Library::set_sfz_folder(const std::filesystem::path& _Folder) noexcept -> void {/*{{{*/
 	sfz_folder = _Folder;
 }/*}}}*/
 
-auto Catalog::get_sfz_folder() const noexcept -> std::filesystem::path {/*{{{*/
+auto Library::get_sfz_folder() const noexcept -> std::filesystem::path {/*{{{*/
 	return sfz_folder;
 }/*}}}*/
 
