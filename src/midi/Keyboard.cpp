@@ -237,62 +237,6 @@ void Keyboard::connect() noexcept {/*{{{*/
     	std::exit(EXIT_FAILURE); 
     }
 
-	/*
-	// Get the available ports
-    all_port_names =
-		jack_get_ports(client, NULL, NULL, JackPortIsInput);
-
-	// Connect to
-	std::array<std::string, 5> desired_input {
-		"Piano:events-in",
-		"CP-80:events-in",
-		"Synth Pad:events-in",
-		"Sampling:events-in",
-		"TRITON:events-in"
-	};
-
-	// We dont want to connect automatically to all the possible inputs
-	for (std::size_t i {0}; i < desired_input.size(); ++i) {
-		// Try each of them and connect to it
-		for (std::size_t j {0}; all_port_names[j] != NULL; ++j) {
-			jack_port_t* possible_input =
-				jack_port_by_name(client, all_port_names[j]);
-			if (possible_input != NULL && isMidiPort(possible_input)) {
-				if (std::string(all_port_names[j]) == desired_input[i]) {
-					if (jack_connect(client, jack_port_name(
-							output_port[i]), all_port_names[j]) != 0) {
-						jack_free(all_port_names);
-						jack_client_close(client);
-						std::exit(EXIT_FAILURE);
-						break;
-					}
-				}
-			}
-		}
-    }
-
-    // Connect input port to desired input port (if applicable)
-    // Here you should specify the desired port for MIDI input
-    const char* desired_input_port_keyword {
-		"a2j:Impact LX61  [24] (capture): [0] Impact LX61  MIDI1"
-	};
-
-    // Try each of them and connect to it
-    all_port_names = jack_get_ports(client, NULL, NULL, JackPortIsOutput);
-    for (int i = 0; all_port_names[i] != NULL; ++i) {
-        jack_port_t* possible_port = jack_port_by_name(client, all_port_names[i]);
-        if (possible_port != NULL && isMidiPort(possible_port)) {
-            if (strstr(all_port_names[i], desired_input_port_keyword) != NULL) {
-                if (jack_connect(client, all_port_names[i], jack_port_name(input_port)) != 0) {
-                    jack_free(all_port_names);
-                    jack_client_close(client);
-                    std::exit(EXIT_FAILURE);
-                }
-            }
-        }
-    }
-	*/
-
 	MIDI_state = Switch::ON;
 }
 /*}}}*/
