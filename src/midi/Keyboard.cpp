@@ -243,26 +243,27 @@ void Keyboard::connect() noexcept {/*{{{*/
 
 int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
 {
-	/* It seems we need one buffer per input/output port */
-	// Input buffers
+	/* Creamos un buffer por cada puerto de entrada o salida.
+	 * Parece que es el funcionamiento normal */
+
+	// Buffer de entrada (1)
     void* input_buffer = jack_port_get_buffer(input_port, nframes);
     jack_nframes_t event_count = jack_midi_get_event_count(input_buffer);
     jack_midi_event_t in_event;
 
-	// OUtput buffers
+	// Buffer de salida (6 en este caso)
     for (std::size_t i {0}; i < N_OUTPUT_PORTS; ++i) {
         output_buffer[i] =
             jack_port_get_buffer(output_port[i], nframes);
         jack_midi_clear_buffer(output_buffer[i]);
     }
 
-	/* Heres where we send the PC and SysEx if needed. Lately we should
-	 * send them in each track the user wants, but for now we send them */
+	/* Mandamos al puerto 5 los PC completos (MSB, LSB y PC) del performance.
+	 * Se pretende que a futuro cada Track pueda tener opcionalmente su propio PC*/
     if (should_send_PC) {
-        // Send PC to port 0 (was port 4)
-        jack_midi_event_write(output_buffer[4], 0, callback_PC.msb, sizeof(callback_PC.msb));
-        jack_midi_event_write(output_buffer[4], 0, callback_PC.lsb, sizeof(callback_PC.lsb));
-        jack_midi_event_write(output_buffer[4], 0, callback_PC.pc, sizeof(callback_PC.pc));
+        jack_midi_event_write(output_buffer[5], 0, callback_PC.msb, sizeof(callback_PC.msb));
+        jack_midi_event_write(output_buffer[5], 0, callback_PC.lsb, sizeof(callback_PC.lsb));
+        jack_midi_event_write(output_buffer[5], 0, callback_PC.pc, sizeof(callback_PC.pc));
         should_send_PC = false;
     }
 
@@ -302,20 +303,21 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
                             static_cast<std::uint8_t>(strips[j].midi_ch);
                     }
 
-                    // Heres where we specify the output port depending on the track
+					/* Dependiendo del track, se asigna como puerto uno fixed.
+					 * A futuro esto podrá especificarse en el performance */
                     std::size_t port = 0;
-                    if (j <= 7) {
-                        port = 4; // The TRITON
+                    if (j == 11) {
+                        port = 0; // Addictive Keys: Piano acústico
                     } else if (j == 8) {
-                        port = 1;
-                    } else if (j == 9) {
-                        port = 3;
-                    } else if (j == 10) {
-                        port = 5;
-                    } else if (j == 11) {
-                        port = 0;
+                        port = 1; // Sforzando: CP80
                     } else if (j == 12) {
-                        port = 2;
+                        port = 2; // Dexed: E.Piano
+                    } else if (j == 9) {
+                        port = 3; // SGM: JP Strings
+                    } else if (j == 10) {
+                        port = 4; // Sampling
+					} else if (j <= 7) {
+                        port = 5; // TRITON VST
 					}
 
                     jack_midi_event_write(output_buffer[port], 
