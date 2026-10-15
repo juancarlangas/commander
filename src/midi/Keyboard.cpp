@@ -275,10 +275,6 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
             const std::uint8_t event_type = in_event.buffer[0] & 0xF0;
             const std::uint8_t note_or_cc_or_pb = in_event.buffer[1];
 
-            // Ignore Channel Pressure (Aftertouch) messages
-            //if (event_type == 0xD0) {
-            //    continue;
-            //}
             // Only allow CC64 (damper pedal) and CC1 (modulation wheel) to pass, ignore other CCs
             if (event_type == 0xB0 && (note_or_cc_or_pb != 64 && note_or_cc_or_pb != 1)) {
                 continue;
@@ -286,7 +282,8 @@ int process(jack_nframes_t nframes, [[maybe_unused]] void* arg) /*{{{*/
 
             for (std::size_t j = 0; j < STRIPS_PER_PERFORMANCE; ++j) {
                 if (strips[j].state == Switch::ON &&
-                    (event_type == 0xB0 || /*event_type == 0xE0 ||*/
+                    // Channel pressure applies to the whole channel, regardless of key range.
+                    (event_type == 0xB0 || event_type == 0xD0 || /*event_type == 0xE0 ||*/
                      (strips[j].lower_key <= note_or_cc_or_pb &&
                       note_or_cc_or_pb <= strips[j].upper_key))) {
 
