@@ -1,5 +1,11 @@
 #include "popup.hpp"
 
+Popup::~Popup() noexcept
+{
+	if (area_panel != nullptr)
+		del_panel(area_panel);
+}
+
 void Popup::init(const int32_t _Ysize, const int32_t _Xsize, const int32_t _Ypos, const int32_t _Xpos) noexcept
 {
 	if (Popup::area_panel != nullptr) {

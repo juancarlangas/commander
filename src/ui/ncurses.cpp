@@ -18,7 +18,6 @@ WINDOW 	*searchBox,     *searchWindow,
 WINDOW 	*ventana[2];
 PANEL 	*panel[2];
 
-Orchestra orquestacion;
 
 namespace {
 int safe_dimension(const int value, const int minimum = 1) noexcept
@@ -43,7 +42,7 @@ void delete_panel_window(PANEL *&panel_ref, WINDOW *&window) noexcept
 	delete_window(window);
 }
 
-void create_windows() noexcept
+void create_windows(Orchestra& orchestra) noexcept
 {
 	getmaxyx(stdscr, screen_height, screen_width);
 
@@ -95,7 +94,7 @@ void create_windows() noexcept
 	displayShowResults = safe_dimension(list_height - 4, 0);
 	playlistShowResults = safe_dimension(list_height - 4, 0);
 
-	orquestacion.init(layout_height * 180 / 200, layout_width * 180 / 200, layout_height * 20 / 200, layout_width * 10 / 200);
+	orchestra.init(layout_height * 180 / 200, layout_width * 180 / 200, layout_height * 20 / 200, layout_width * 10 / 200);
 }
 
 void destroy_windows() noexcept
@@ -115,7 +114,7 @@ void destroy_windows() noexcept
 }
 } // namespace
 
-void ncurses_start_sequence() noexcept/*{{{*/
+NcursesSession::NcursesSession() noexcept/*{{{*/
 {
 	initscr();
 	raw();
@@ -125,7 +124,7 @@ void ncurses_start_sequence() noexcept/*{{{*/
 	set_escdelay(3);
 }/*}}}*/
 
-void ncurses_end_sequence() noexcept/*{{{*/ {
+NcursesSession::~NcursesSession() noexcept/*{{{*/ {
 	set_escdelay(0);
 	curs_set(TRUE);
 	keypad(stdscr, FALSE);
@@ -134,10 +133,8 @@ void ncurses_end_sequence() noexcept/*{{{*/ {
 	endwin();
 }/*}}}*/
 
-auto set_windows(void) noexcept -> void/*{{{*/
+Screen::Screen() noexcept/*{{{*/
 {
-	ncurses_start_sequence();
-
 	if (has_colors() == TRUE) {
 		start_color();
 		use_default_colors();
@@ -155,23 +152,28 @@ auto set_windows(void) noexcept -> void/*{{{*/
 
 	}
 
-	create_windows();
+	create_windows(orchestra_);
 	refresh();
 }/*}}}*/
 
-auto resize_windows(void) noexcept -> void/*{{{*/
+Screen::~Screen() noexcept
+{
+	destroy_windows();
+}
+
+void Screen::resize() noexcept/*{{{*/
 {
 	endwin();
 	refresh();
 	clear();
 	erase();
 	destroy_windows();
-	create_windows();
+	create_windows(orchestra_);
 	clearok(curscr, TRUE);
 	refresh();
 }/*}}}*/
 	
-void draw_windows(void)/*{{{*/
+void Screen::draw()/*{{{*/
 {
 	/* playlistBox */
 		werase(playlistBox);

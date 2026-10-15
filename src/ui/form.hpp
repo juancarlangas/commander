@@ -14,6 +14,8 @@ class Form {
 public:
 	Form();
 	~Form();
+	Form(const Form&) = delete;
+	Form& operator=(const Form&) = delete;
 	bool capture_value();
 	bool capture_value(Performance _Performance);
 	auto get_value() -> Performance;

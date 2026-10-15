@@ -1,6 +1,14 @@
 #include "ui/elements/windows/boxed_windows/boxed_popup.hpp"
 
 
+BoxedPopup::~BoxedPopup() noexcept
+{
+	if (area_panel != nullptr)
+		del_panel(area_panel);
+	if (box_panel != nullptr)
+		del_panel(box_panel);
+}
+
 void BoxedPopup::init(	const int32_t _Ysize, const int32_t _Xsize,
 						const int32_t _Ypos, const int32_t _Xpos,
 						const int32_t _Frame_Width ) noexcept

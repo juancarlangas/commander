@@ -10,6 +10,12 @@ enum Type {STRING, BANK, VALUE};
 //Campos
 class Field {
 public:
+	Field() = default;
+	~Field() noexcept;
+	Field(const Field&) = delete;
+	Field& operator=(const Field&) = delete;
+	Field(Field&&) = delete;
+	Field& operator=(Field&&) = delete;
 	void create(const char*, 
 				const int, const int, const int, const int, 
 				const Type, const short);
@@ -27,12 +33,13 @@ public:
 	void set_font_color( const int32_t &color ) noexcept;
 	void set_font_width( const std::string_view ) noexcept;
 private:
+	void release() noexcept;
 	Type type;
 	short limit;
-	char cadena[LONG_STRING];
-	short nCaracter;
-	WINDOW 	*wCaja, *wEspacio;
-	PANEL	*pCaja, *pEspacio;
+	char cadena[LONG_STRING] {};
+	short nCaracter {0};
+	WINDOW 	*wCaja {nullptr}, *wEspacio {nullptr};
+	PANEL	*pCaja {nullptr}, *pEspacio {nullptr};
 };
 
 #endif

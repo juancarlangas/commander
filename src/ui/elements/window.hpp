@@ -14,6 +14,12 @@ struct Font {
 
 class Window {
 	public:
+		Window() = default;
+		virtual ~Window() noexcept;
+		Window(const Window&) = delete;
+		Window& operator=(const Window&) = delete;
+		Window(Window&&) = delete;
+		Window& operator=(Window&&) = delete;
 		void init( const int32_t, const int32_t, const int32_t, const int32_t ) noexcept;
 		void set_font_color( const int32_t &color ) noexcept;
 		void set_font_width( const std::string_view ) noexcept;

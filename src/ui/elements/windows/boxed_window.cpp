@@ -1,6 +1,12 @@
 #include "ui/elements/windows/boxed_window.hpp"
 #include <iostream>
 
+BoxedWindow::~BoxedWindow() noexcept
+{
+	if (box != nullptr)
+		delwin(box);
+}
+
 void BoxedWindow::init(	const int32_t _Ysize, const int32_t _Xsize,
 						const int32_t _Ypos, const int32_t _Xpos,
 						const int32_t _Frame_Width ) noexcept

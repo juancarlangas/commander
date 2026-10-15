@@ -32,8 +32,9 @@ enum HotKeysMode {
 
 std::int32_t main() {
 	// Graphics{{{
-	set_windows();
-	draw_windows();
+	Screen screen;
+	auto& orquestacion = screen.orchestra();
+	screen.draw();
 	std::array<std::int16_t,8> update_window {0};/*}}}*/
 
 	// Folders{{{
@@ -96,8 +97,8 @@ std::int32_t main() {
 
 		switch (command) {
 			case RESIZE_SCREEN:/*{{{*/
-				resize_windows();
-				draw_windows();
+				screen.resize();
+				screen.draw();
 				keep_index_visible(dTop, dIndex, displayShowResults);
 				keep_index_visible(plTop, plIndexB, playlistShowResults);
 
@@ -411,7 +412,7 @@ std::int32_t main() {
 				llenado_displayTable(
 						displayTable, catalog.performances, n_performances, keyword, &n_matches );
 
-				draw_windows();
+				screen.draw();
 				update_window[LCD]		= true;
 				update_window[SEARCH] 	= true;
 				update_window[DISPLAY]	= true;
@@ -469,7 +470,7 @@ std::int32_t main() {
 
 				llenado_displayTable(displayTable, dBase[mode].performances, n_performances, keyword, &n_matches);
 
-				draw_windows();
+				screen.draw();
 				update_window[LCD]		= true;
 				update_window[SEARCH] 	= true;
 				update_window[DISPLAY]	= true;
@@ -494,7 +495,7 @@ std::int32_t main() {
 
 					// retorno
 					update_popups();
-					draw_windows();
+					screen.draw();
 
 					update_window[LCD]		= true;
 					update_window[SEARCH] 	= true;
@@ -780,9 +781,6 @@ std::int32_t main() {
 	// Ending{{{
 	if ( x50.get_MIDI_state() == Switch::ON )
 		x50.disconnect();
-
-	endwin();
-
 	delete playlist;
 
 	delete [] displayTable;

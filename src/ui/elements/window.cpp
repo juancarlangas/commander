@@ -5,6 +5,12 @@
 #include <iostream>
 #include <ncurses.h>
 
+Window::~Window() noexcept
+{
+	if (area != nullptr)
+		delwin(area);
+}
+
 void Window::init(	const int32_t _Ysize, const int32_t _Xsize,/*{{{*/
 					const int32_t _Ypos, const int32_t _Xpos ) noexcept
 {

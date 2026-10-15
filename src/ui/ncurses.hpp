@@ -23,24 +23,31 @@ extern WINDOW 	*searchBox,		*searchWindow,
 extern WINDOW 	*ventana[2];
 extern PANEL 	*panel[2];
 
-extern Orchestra orquestacion;
-
-void ncurses_start_sequence() noexcept;
-void ncurses_end_sequence() noexcept;
-auto set_windows(void) noexcept -> void;
-auto resize_windows(void) noexcept -> void;
-void draw_windows(void);
 void tint_lcd(const short int mode);
 void update_popups() noexcept;
 auto get_y_pixels() noexcept -> std::int16_t;
 
+// Members are destroyed in reverse order: ncurses must outlive its windows.
+class NcursesSession {
+	public:
+		NcursesSession() noexcept;
+		~NcursesSession() noexcept;
+		NcursesSession(const NcursesSession&) = delete;
+		NcursesSession& operator=(const NcursesSession&) = delete;
+};
+
 class Screen {
 	public:
-		Screen();
-		~Screen();
-		void on() noexcept;
+		Screen() noexcept;
+		~Screen() noexcept;
+		Screen(const Screen&) = delete;
+		Screen& operator=(const Screen&) = delete;
+		void resize() noexcept;
+		void draw();
+		Orchestra& orchestra() noexcept { return orchestra_; }
 	private:
-		friend class ventana;
+		NcursesSession session_;
+		Orchestra orchestra_;
 };
 
 #endif

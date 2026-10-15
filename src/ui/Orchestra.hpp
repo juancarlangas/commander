@@ -62,13 +62,13 @@ class Orchestra {
 				std::array<FieldPopup, NUMBER_OF_PARTS> volume_field;
 				std::array<FieldPopup, NUMBER_OF_PARTS> transposition_field;
 				std::array<DoubleXslider, NUMBER_OF_PARTS> double_X_slider;
-				std::array<int16_t, 2> cursor;
+				std::array<int16_t, 2> cursor {};
 		std::array<struct Font, NUMBER_OF_PARTS> native_font;
 		struct Font cursor_font, MIDI_font, dimmed_font, light_font;
-		int16_t current_scene;
-		Performance *info;
-		Keyboard *keyboard_ptr;
-		struct Clipboard clipboard;
+		int16_t current_scene {0};
+		Performance *info {nullptr};
+		Keyboard *keyboard_ptr {nullptr};
+		struct Clipboard clipboard {};
 };
 
 #endif

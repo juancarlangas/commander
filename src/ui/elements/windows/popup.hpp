@@ -5,6 +5,7 @@
 
 class Popup : public Window {
 	public:
+		~Popup() noexcept override;
 		void init( const int32_t, const int32_t, const int32_t, const int32_t ) noexcept;
 		void show() noexcept;
 		void hide() noexcept;

@@ -6,10 +6,36 @@
 #include <string_view>
 #include <string.h>
 
+Field::~Field() noexcept
+{
+	release();
+}
+
+void Field::release() noexcept
+{
+	if (pEspacio != nullptr) {
+		del_panel(pEspacio);
+		pEspacio = nullptr;
+	}
+	if (pCaja != nullptr) {
+		del_panel(pCaja);
+		pCaja = nullptr;
+	}
+	if (wEspacio != nullptr) {
+		delwin(wEspacio);
+		wEspacio = nullptr;
+	}
+	if (wCaja != nullptr) {
+		delwin(wCaja);
+		wCaja = nullptr;
+	}
+}
+
 void Field::create(	const char* legend,/*{{{*/
 					const int high, const int width, const int _Y, const int _X,
 					const Type tipo, const short limite)
 {
+	release();
 	wCaja = newwin(high, width, _Y, _X);
 	pCaja = new_panel(wCaja);
 

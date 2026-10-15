@@ -5,6 +5,7 @@
 
 class BoxedPopup : public BoxedWindow {
 	public:
+		~BoxedPopup() noexcept override;
 		void init( const int32_t, const int32_t, const int32_t, const int32_t,
 					const int32_t ) noexcept;
 		void show() noexcept;

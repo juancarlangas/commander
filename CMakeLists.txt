@@ -61,3 +61,26 @@ set_target_properties(Commander PROPERTIES
 
 # Exportar comandos de compilación
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+include(CTest)
+if(BUILD_TESTING)
+    add_executable(UiLifecycleTests
+        tests/ui_lifecycle.cpp
+        "${SRC_DIR}/ui/elements/window.cpp"
+        "${SRC_DIR}/ui/elements/windows/popup.cpp"
+        "${SRC_DIR}/ui/elements/windows/boxed_window.cpp"
+        "${SRC_DIR}/ui/elements/windows/boxed_windows/boxed_popup.cpp"
+        "${SRC_DIR}/ui/fields.cpp"
+        "${SRC_DIR}/ui/form.cpp"
+        "${SRC_DIR}/common/string.cpp"
+    )
+    target_include_directories(UiLifecycleTests PRIVATE "${SRC_DIR}")
+    target_compile_features(UiLifecycleTests PRIVATE cxx_std_20)
+    target_compile_options(UiLifecycleTests PRIVATE -Wall -Wextra -Wpedantic -Werror)
+    target_link_libraries(UiLifecycleTests PRIVATE ncurses panel)
+    target_link_options(UiLifecycleTests PRIVATE
+        -Wl,--wrap=newwin -Wl,--wrap=delwin
+        -Wl,--wrap=new_panel -Wl,--wrap=del_panel
+    )
+    add_test(NAME ui_lifecycle COMMAND UiLifecycleTests)
+endif()

@@ -5,6 +5,7 @@
 
 class BoxedWindow : public Window {
 	public:
+		~BoxedWindow() noexcept override;
 		void init( const int32_t, const int32_t, const int32_t, const int32_t,
 					const int32_t ) noexcept;
 		void set_box_color( const int32_t &color ) noexcept;

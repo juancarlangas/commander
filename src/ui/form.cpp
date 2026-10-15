@@ -205,4 +205,6 @@ void Form::hide()/*{{{*/
 Form::~Form()
 {
 	delete [] field;
+	del_panel(panel);
+	delwin(window);
 }
