@@ -21,29 +21,29 @@ PANEL 	*panel[2];
 Orchestra orquestacion;
 
 namespace {
-int safe_dimension(const int value, const int minimum = 1) noexcept
+int safe_dimension(const int value, const int minimum = 1) noexcept// {{{
 {
 	return std::max(value, minimum);
-}
+}// }}}
 
-void delete_window(WINDOW *&window) noexcept
+void delete_window(WINDOW *&window) noexcept// {{{
 {
 	if (window != nullptr) {
 		delwin(window);
 		window = nullptr;
 	}
-}
+}// }}}
 
-void delete_panel_window(PANEL *&panel_ref, WINDOW *&window) noexcept
+void delete_panel_window(PANEL *&panel_ref, WINDOW *&window) noexcept// {{{
 {
 	if (panel_ref != nullptr) {
 		del_panel(panel_ref);
 		panel_ref = nullptr;
 	}
 	delete_window(window);
-}
+}// }}}
 
-void create_windows() noexcept
+void create_windows() noexcept// {{{
 {
 	getmaxyx(stdscr, screen_height, screen_width);
 
@@ -96,9 +96,9 @@ void create_windows() noexcept
 	playlistShowResults = safe_dimension(list_height - 4, 0);
 
 	orquestacion.init(layout_height * 180 / 200, layout_width * 180 / 200, layout_height * 20 / 200, layout_width * 10 / 200);
-}
+}// }}}
 
-void destroy_windows() noexcept
+void destroy_windows() noexcept// {{{
 {
 	delete_panel_window(panel[INPUT_BOX], ventana[INPUT_BOX]);
 	delete_panel_window(panel[DIALOG_WINDOW], ventana[DIALOG_WINDOW]);
@@ -112,7 +112,7 @@ void destroy_windows() noexcept
 	delete_window(lcdWindow);
 	delete_window(searchWindow);
 	delete_window(searchBox);
-}
+}// }}}
 } // namespace
 
 void ncurses_start_sequence() noexcept/*{{{*/
